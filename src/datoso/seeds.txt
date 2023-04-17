@@ -1,0 +1,5 @@
+nointro https://github.com/laromicas/datoso_nointro.git No-Intro is a collection of DATs aimed for video game preservation especialized in cartridge-based and digital systems.
+pleasuredome https://github.com/laromicas/datoso_pleasuredome.git PleasureDome is a group that gathers dats for MAME, HBMAME and fruit machines.
+redump https://github.com/laromicas/datoso_redump.git Redump.org is a disc preservation database and internet community dedicated to collecting precise and accurate information about every video game ever released on optical media of any system.
+t_en https://github.com/laromicas/datoso_t_en.git Translated-English is a collection of DATs aimed for video game translations.
+vpinmame https://github.com/laromicas/datoso_vpinmame.git VPinMAME is a dat aimed for VisualPinMame.

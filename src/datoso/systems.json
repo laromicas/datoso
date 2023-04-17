@@ -1,0 +1,1810 @@
+[
+    {
+        "company": "Acorn",
+        "system": "Archimedes",
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Acorn",
+        "system": "Atom",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Acorn",
+        "system": "Risc PC",
+        "system_type": "Computer"
+    },
+    {
+        "company": "ACT",
+        "system": "Apricot PC Xi",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Amstrad",
+        "system": "CPC",
+        "system_type": "Computer"
+    },
+    {
+        "company": null,
+        "system": "Merit Megatouch",
+        "override": {
+            "company": "Merit",
+            "system": "Megatouch"
+        },
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Analogue",
+        "system": "Analogue Pocket",
+        "system_type": "Console"
+    },
+    {
+        "company": "APF",
+        "system": "Imagination Machine",
+        "system_type": "Console"
+    },
+    {
+        "company": "APF",
+        "system": "MP-1000",
+        "system_type": "Console"
+    },
+    {
+        "company": "Apple",
+        "system": "Macintosh",
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Apple",
+        "system": "I",
+        "override": {
+            "system": "Apple I"
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Apple",
+        "system": "II",
+        "override": {
+            "system": "Apple II"
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Apple",
+        "system": "II Plus",
+        "override": {
+            "system": "Apple II Plus"
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Apple",
+        "system": "IIe",
+        "override": {
+            "system": "Apple IIe"
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Apple",
+        "system": "IIGS",
+        "override": {
+            "system": "Apple IIGS"
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Apple-Bandai",
+        "system": "Pippin",
+        "system_type": "Console"
+    },
+    {
+        "company": "Atari",
+        "system": "8-bit Family",
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies"
+            }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Atari",
+        "system": "ST",
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies"
+            }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Atari",
+        "system": "Atari Jaguar CD",
+        "override": {
+            "system": "Jaguar CD"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Atari",
+        "system": "Jaguar CD Interactive Multimedia System",
+        "override": {
+            "system": "Jaguar CD"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Atari",
+        "system": "2600",
+        "system_type": "Console"
+    },
+    {
+        "company": "Atari",
+        "system": "5200",
+        "system_type": "Console"
+    },
+    {
+        "company": "Atari",
+        "system": "7800",
+        "system_type": "Console"
+    },
+    {
+        "company": "Atari",
+        "system": "Jaguar",
+        "system_type": "Console"
+    },
+    {
+        "company": "Atari",
+        "system": "Lynx",
+        "system_type": "Console"
+    },
+    {
+        "company": "Bally",
+        "system": "Astrocade",
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Cartridges"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Bandai",
+        "system": "Pippin",
+        "override": {
+            "company": "Apple-Bandai"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Bandai",
+        "system": "Design Master Denshi Mangajuku",
+        "system_type": "Console"
+    },
+    {
+        "company": "Bandai",
+        "system": "Gundam RX-78",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Bandai",
+        "system": "Playdia Quick Interactive System",
+        "system_type": "Console"
+    },
+    {
+        "company": "Bandai",
+        "system": "WonderSwan",
+        "system_type": "Handheld"
+    },
+    {
+        "company": "Bandai",
+        "system": "WonderSwan Color",
+        "system_type": "Handheld"
+    },
+    {
+        "company": "Benesse",
+        "system": "Pocket Challenge V2",
+        "system_type": "Console"
+    },
+    {
+        "company": "Benesse",
+        "system": "Pocket Challenge W",
+        "system_type": "Console"
+    },
+    {
+        "company": "Bit Corporation",
+        "system": "Gamate",
+        "system_type": "Console"
+    },
+    {
+        "company": "Casio",
+        "system": "Loopy",
+        "system_type": "Console"
+    },
+    {
+        "company": "Casio",
+        "system": "PV-1000",
+        "system_type": "Console"
+    },
+    {
+        "company": "Coleco",
+        "system": "ColecoVision",
+        "system_type": "Console"
+    },
+    {
+        "company": "Commodore",
+        "system": "Commodore 64",
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Cartridges"
+            }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Commodore",
+        "system": "Amiga",
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies"
+            }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Commodore",
+        "system": "Amiga CD",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Commodore",
+        "system": "Amiga CD32",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Commodore",
+        "system": "Amiga CDTV",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Commodore",
+        "system": "Plus-4",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Commodore",
+        "system": "VIC-20",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Emerson",
+        "system": "Arcadia 2001",
+        "system_type": "Console"
+    },
+    {
+        "company": "Entex",
+        "system": "Adventure Vision",
+        "system_type": "Console"
+    },
+    {
+        "company": "Epoch",
+        "system": "Game Pocket Computer",
+        "system_type": "Console"
+    },
+    {
+        "company": "Epoch",
+        "system": "Super Cassette Vision",
+        "system_type": "Console"
+    },
+    {
+        "company": "Fairchild",
+        "system": "Channel F",
+        "system_type": "Console"
+    },
+    {
+        "company": "Fujitsu",
+        "system": "FM Towns",
+        "override": {
+            "system": "FM-Towns"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Fujitsu",
+        "system": "FM-Towns",
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Fujitsu",
+        "system": "FM-7",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Fujitsu",
+        "system": "FMR50",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Fukutake Publishing",
+        "system": "StudyBox",
+        "system_type": "Console"
+    },
+    {
+        "company": "Funtech",
+        "system": "Super Acan",
+        "system_type": "Console"
+    },
+    {
+        "company": "funworld",
+        "system": "Photo Play",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "GamePark",
+        "system": "GP2X",
+        "system_type": "Handheld"
+    },
+    {
+        "company": "GamePark",
+        "system": "GP32",
+        "system_type": "Handheld"
+    },
+    {
+        "company": "GCE",
+        "system": "Vectrex",
+        "system_type": "Console"
+    },
+    {
+        "company": "Google",
+        "system": "Android",
+        "system_type": "Phone"
+    },
+    {
+        "company": "Hartung",
+        "system": "Game Master",
+        "system_type": "Console"
+    },
+    {
+        "company": "Hasbro",
+        "system": "VideoNow",
+        "system_type": "Video"
+    },
+    {
+        "company": "Hasbro",
+        "system": "VideoNow Color",
+        "system_type": "Video"
+    },
+    {
+        "company": "Hasbro",
+        "system": "VideoNow Jr.",
+        "override": {
+            "system": "VideoNow Jr"
+        },
+        "system_type": "Video"
+    },
+    {
+        "company": "Hasbro",
+        "system": "VideoNow XP",
+        "system_type": "Video"
+    },
+    {
+        "company": "Hasbro",
+        "system": "iON Educational Gaming System",
+        "system_type": "Console"
+    },
+    {
+        "company": "Hitachi",
+        "system": "S1",
+        "system_type": "Computer"
+    },
+    {
+        "company": "IBM",
+        "system": "PC compatible",
+        "override": {
+            "system": "PC and Compatibles"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs/Discs"
+            }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "IBM",
+        "system": "PC and Compatibles",
+        "system_type": "Computer"
+    },
+    {
+        "company": "IBM",
+        "system": "PC Compatible",
+        "override": {
+            "system": "PC and Compatibles"
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Web",
+        "system": "Humble Play",
+        "override": {
+            "system": "PC and Compatibles",
+            "company": "IBM"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Digital/Web/Humble Play"
+            }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Various",
+        "system": "itch.io",
+        "override": {
+            "system": "PC and Compatibles",
+            "company": "IBM"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Digital/itch.io"
+            }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Incredible Technologies",
+        "system": "Eagle",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Interton",
+        "system": "VC 4000",
+        "system_type": "Console"
+    },
+    {
+        "company": "iQue",
+        "system": "iQue",
+        "system_type": "Console"
+    },
+    {
+        "company": "Konami",
+        "system": "e-Amusement",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Konami",
+        "system": "FireBeat",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Konami",
+        "system": "Picno",
+        "system_type": "Console"
+    },
+    {
+        "company": "Konami",
+        "system": "Python 2",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Konami",
+        "system": "System GV",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "LeapFrog",
+        "system": "LeapPad",
+        "system_type": "Console"
+    },
+    {
+        "company": "LeapFrog",
+        "system": "Leapster Learning Game System",
+        "system_type": "Console"
+    },
+    {
+        "company": "Luxor",
+        "system": "ABC 800",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Magnavox",
+        "system": "Odyssey 2",
+        "system_type": "Console"
+    },
+    {
+        "company": "Mattel",
+        "system": "Fisher-Price iXL",
+        "system_type": "Console"
+    },
+    {
+        "company": "Mattel",
+        "system": "HyperScan",
+        "system_type": "Console"
+    },
+    {
+        "company": "Mattel",
+        "system": "Intellivision",
+        "system_type": "Console"
+    },
+    {
+        "company": "Memorex",
+        "system": "Visual Information System",
+        "system_type": "Console"
+    },
+    {
+        "company": "Microsoft",
+        "system": "XBOX",
+        "override": {
+            "system": "Xbox"
+        },
+        "extra_configs": {
+            "if_suffix": {
+                "Development Kit Hard Drives": {
+                    "modifier": "Source Code"
+                }
+            },
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Microsoft",
+        "system": "Xbox",
+        "extra_configs": {
+            "if_suffix": {
+                "Development Kit Hard Drives": {
+                    "modifier": "Source Code"
+                }
+            },
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Microsoft",
+        "system": "XBOX 360",
+        "override": {
+            "system": "Xbox 360"
+        },
+        "extra_configs": {
+            "if_suffix": {
+                "Development Kit Hard Drives": {
+                    "modifier": "Source Code"
+                }
+            },
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Microsoft",
+        "system": "Xbox 360",
+        "extra_configs": {
+            "if_suffix": {
+                "Development Kit Hard Drives": {
+                    "modifier": "Source Code"
+                }
+            },
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Microsoft",
+        "system": "MSX",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Microsoft",
+        "system": "MSX Turbo-R",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Microsoft",
+        "system": "MSX2",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Microsoft",
+        "system": "Pocket PC",
+        "system_type": "Mobile"
+    },
+    {
+        "company": "Microsoft",
+        "system": "Xbox One",
+        "system_type": "Console"
+    },
+    {
+        "company": "Microsoft",
+        "system": "Xbox Series X",
+        "system_type": "Console"
+    },
+    {
+        "company": "Milton-Bradley",
+        "system": "Omni",
+        "system_type": "Console"
+    },
+    {
+        "company": "Mobile",
+        "system": "Pocket PC",
+        "override": {
+            "company": "Microsoft"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Roms",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Mobile"
+    },
+    {
+        "company": "Mobile",
+        "system": "Palm OS",
+        "override": {
+            "company": "Palm",
+            "system": "Palm OS"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Roms",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Mobile"
+    },
+    {
+        "company": "Mobile",
+        "system": "J2ME",
+        "system_type": "Mobile"
+    },
+    {
+        "company": "Mobile",
+        "system": "Symbian",
+        "system_type": "Mobile"
+    },
+    {
+        "company": "Namco",
+        "system": "System 246",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Namco-Sega-Nintendo",
+        "system": "Triforce",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Navisoft",
+        "system": "Naviken 2.1",
+        "system_type": "Computer"
+    },
+    {
+        "company": "NEC",
+        "system": "PC-88",
+        "override": {
+            "system": "PC-88 series"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "NEC",
+        "system": "PC-88 series",
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "NEC",
+        "system": "PC-8801",
+        "override": {
+            "system": "PC-88 series"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "NEC",
+        "system": "PC-98",
+        "override": {
+            "system": "PC-98 series"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "NEC",
+        "system": "PC-98 series",
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "NEC",
+        "system": "PC-9801",
+        "override": {
+            "system": "PC-98 series"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "NEC",
+        "system": "PC Engine CD",
+        "override": {
+            "system": "PC Engine CD & TurboGrafx CD"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "NEC",
+        "system": "PC Engine CD & TurboGrafx CD",
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "NEC",
+        "system": "PC Engine CD + TurboGrafx CD",
+        "override": {
+            "system": "PC Engine CD & TurboGrafx CD"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "NEC",
+        "system": "PC Engine",
+        "override": {
+            "system": "PC Engine - TurboGrafx 16"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "NEC",
+        "system": "PC Engine - TurboGrafx-16",
+        "override": {
+            "system": "PC Engine - TurboGrafx 16"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "NEC",
+        "system": "PC Engine - TurboGrafx 16",
+        "system_type": "Console"
+    },
+    {
+        "company": "NEC",
+        "system": "PC Engine SuperGrafx",
+        "system_type": "Console"
+    },
+    {
+        "company": "NEC",
+        "system": "PC-6001",
+        "system_type": "Computer"
+    },
+    {
+        "company": "NEC",
+        "system": "PC-8001",
+        "system_type": "Computer"
+    },
+    {
+        "company": "NEC",
+        "system": "PC-FX",
+        "override": {
+            "system": "PC-FX & PC-FXGA"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "NEC",
+        "system": "PC-FX & PC-FXGA",
+        "system_type": "Console"
+    },
+    {
+        "company": "Nichibutsu",
+        "system": "My Vision",
+        "system_type": "Console"
+    },
+    {
+        "company": null,
+        "system": "NintendoSDK Firmware for NX",
+        "override": {
+            "system": "NintendoSDK Firmware for NX",
+            "company": "Nintendo",
+            "modifier": "Source Code"
+        },
+        "system_type": "Source Code"
+    },
+    {
+        "company": "Nintendo",
+        "system": "SDKs",
+        "override": {
+            "modifier": "Source Code"
+        },
+        "system_type": "Source Code"
+    },
+    {
+        "company": "Nintendo",
+        "system": "GameCube",
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Wii",
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Wii U",
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Misc",
+        "override": {
+            "modifier": "Source Code"
+        },
+        "extra_configs": {
+            "if_suffix": {
+                "Manual": {
+                    "modifier": "Manuals"
+                },
+                "Wallpaper": {
+                    "modifier": "Manuals"
+                }
+            }
+        },
+        "system_type": "Source Code"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Game Boy Advance",
+        "extra_configs": {
+            "if_suffix": {
+                "Video": {
+                    "modifier": "Video"
+                }
+            }
+        },
+        "system_type": "Handheld"
+    },
+    {
+        "company": "Nintendo",
+        "system": "amiibo",
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "e-Reader",
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Famicom",
+        "override": {
+            "system": "Nintendo Entertainment System"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Family BASIC",
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Family Computer Disk System",
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Family Computer Network System",
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Game & Watch",
+        "system_type": "Handheld"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Game Boy",
+        "system_type": "Handheld"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Game Boy Color",
+        "system_type": "Handheld"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Kiosk Video Compact Flash",
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Mario no Photopi SmartMedia",
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "New Nintendo 3DS",
+        "system_type": "Handheld"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Nintendo 3DS",
+        "system_type": "Handheld"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Nintendo 64",
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Nintendo 64DD",
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Nintendo DS",
+        "system_type": "Handheld"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Nintendo DSi",
+        "system_type": "Handheld"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Nintendo Entertainment System",
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Nintendo GameCube",
+        "override": {
+            "system": "GameCube"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Play-Yan",
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Pokemon Mini",
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Nintendo Switch",
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Satellaview",
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Sufami Turbo",
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Super Famicom",
+        "override": {
+            "system": "Super Nintendo Entertainment System"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Super Nintendo Entertainment System",
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Switch",
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Virtual Boy",
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Wallpapers",
+        "override": {
+            "modifier": "Manuals"
+        },
+        "system_type": "Source Code"
+    },
+    {
+        "company": "Nokia",
+        "system": "N-Gage",
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Roms"
+            }
+        },
+        "system_type": "Handheld"
+    },
+    {
+        "company": "Ouya",
+        "system": "Ouya",
+        "system_type": "Handheld"
+    },
+    {
+        "company": "Palm",
+        "system": "Palm OS",
+        "override": {
+            "company": "Palm",
+            "system": "Palm OS"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Roms"
+            }
+        },
+        "system_type": "Mobile"
+    },
+    {
+        "company": "Panasonic",
+        "system": "3DO Interactive Multiplayer",
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Panasonic",
+        "system": "M2",
+        "system_type": "Console"
+    },
+    {
+        "company": "Philips",
+        "system": "CD-i",
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Philips",
+        "system": "Videopac+",
+        "system_type": "Console"
+    },
+    {
+        "company": "Pocket PC",
+        "system": "Pocket PC",
+        "override": {
+            "company": "Microsoft"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Roms",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Mobile"
+    },
+    {
+        "company": "RCA",
+        "system": "Studio II",
+        "system_type": "Console"
+    },
+    {
+        "company": "Sanyo",
+        "system": "MBC-550",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Sega",
+        "system": "Dreamcast",
+        "extra_configs": {
+            "if_suffix": {
+                "Development Kit Hard Drives": {
+                    "modifier": "Source Code"
+                }
+            },
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Sega",
+        "system": "Mega CD",
+        "override": {
+            "system": "Mega CD & Sega CD"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Sega",
+        "system": "Mega CD & Sega CD",
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Sega",
+        "system": "Saturn",
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Sega",
+        "system": "Sega Mega CD + Sega CD",
+        "override": {
+            "system": "Mega CD & Sega CD"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Sega",
+        "system": "Sega Saturn",
+        "override": {
+            "system": "Saturn"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Sega",
+        "system": "32X",
+        "system_type": "Console"
+    },
+    {
+        "company": "Sega",
+        "system": "ALLS",
+        "override": {
+            "system": "Alls"
+        },
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Sega",
+        "system": "Alls",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Sega",
+        "system": "Beena",
+        "system_type": "Console"
+    },
+    {
+        "company": "Sega",
+        "system": "Chihiro",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Sega",
+        "system": "Game Gear",
+        "system_type": "Console"
+    },
+    {
+        "company": "Sega",
+        "system": "Lindbergh",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Sega",
+        "system": "Master System",
+        "override": {
+            "system": "Master System - Mark III"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Sega",
+        "system": "Master System - Mark III",
+        "system_type": "Console"
+    },
+    {
+        "company": "Sega",
+        "system": "Mega Drive",
+        "override": {
+            "system": "Mega Drive - Genesis"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Sega",
+        "system": "Mega Drive - Genesis",
+        "system_type": "Console"
+    },
+    {
+        "company": "Sega",
+        "system": "Naomi",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Sega",
+        "system": "Naomi 2",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Sega",
+        "system": "PICO",
+        "system_type": "Console"
+    },
+    {
+        "company": "Sega",
+        "system": "Prologue 21",
+        "system_type": "Video"
+    },
+    {
+        "company": "Sega",
+        "system": "RingEdge",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Sega",
+        "system": "RingEdge 2",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Sega",
+        "system": "SG-1000",
+        "system_type": "Console"
+    },
+    {
+        "company": "Seta",
+        "system": "Aleck64",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Sharp",
+        "system": "X68000",
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Sharp",
+        "system": "MZ-2200",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Sharp",
+        "system": "MZ-700",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Sharp",
+        "system": "X1",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Sinclair",
+        "system": "ZX Spectrum +3",
+        "system_type": "Console"
+    },
+    {
+        "company": "SNK",
+        "system": "Neo Geo CD",
+        "system_type": "Console"
+    },
+    {
+        "company": "SNK",
+        "system": "Neo Geo Pocket",
+        "system_type": "Handheld"
+    },
+    {
+        "company": "SNK",
+        "system": "Neo Geo Pocket Color",
+        "system_type": "Handheld"
+    },
+    {
+        "company": "SNK",
+        "system": "NeoGeo Pocket",
+        "override": {
+            "system": "Neo Geo Pocket"
+        },
+        "system_type": "Handheld"
+    },
+    {
+        "company": "SNK",
+        "system": "NeoGeo Pocket Color",
+        "override": {
+            "system": "Neo Geo Pocket Color"
+        },
+        "system_type": "Handheld"
+    },
+    {
+        "company": "Sony",
+        "system": "PlayStation",
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Sony",
+        "system": "PlayStation 2",
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Sony",
+        "system": "PlayStation 3",
+        "extra_configs": {
+            "if_suffix": {
+                "Development Kit Hard Drives": {
+                    "modifier": "Source Code"
+                }
+            },
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Sony",
+        "system": "PlayStation 4",
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Sony",
+        "system": "PlayStation 5",
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Sony",
+        "system": "PlayStation Portable",
+        "extra_configs": {
+            "if_suffix": {
+                "UMD Music": {
+                    "modifier": "Audio"
+                },
+                "UMD Video": {
+                    "modifier": "Video"
+                }
+            },
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Sony",
+        "system": "PlayStation Mobile",
+        "system_type": "Mobile"
+    },
+    {
+        "company": "Sony",
+        "system": "PlayStation Vita",
+        "system_type": "Console"
+    },
+    {
+        "company": "TAB-Austria",
+        "system": "Quizard",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Tangerine Computer Systems",
+        "system": "Oric",
+        "system_type": "Computer"
+    },
+    {
+        "company": "TeleNova",
+        "system": "Compis",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Texas Instruments",
+        "system": "TI-99-4A",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Tiger",
+        "system": "Game.com",
+        "system_type": "Handheld"
+    },
+    {
+        "company": "Tiger",
+        "system": "Gizmondo",
+        "override": {
+            "system_type": "Handheld"
+        },
+        "system_type": "Handheld"
+    },
+    {
+        "company": "Tomy",
+        "system": "Kiss-Site",
+        "system_type": "Video"
+    },
+    {
+        "company": "Toshiba",
+        "system": "Pasopia",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Toshiba",
+        "system": "Visicom",
+        "system_type": "Console"
+    },
+    {
+        "company": "VM Labs",
+        "system": "NUON",
+        "system_type": "Console"
+    },
+    {
+        "company": "VTech",
+        "system": "CreatiVision",
+        "system_type": "Console"
+    },
+    {
+        "company": "VTech",
+        "system": "Mobigo",
+        "system_type": "Handheld"
+    },
+    {
+        "company": "VTech",
+        "system": "V.Flash & V.Smile Pro",
+        "system_type": "Console"
+    },
+    {
+        "company": "VTech",
+        "system": "V.Smile",
+        "system_type": "Console"
+    },
+    {
+        "company": "Watara",
+        "system": "Supervision",
+        "system_type": "Console"
+    },
+    {
+        "company": "Welback",
+        "system": "Mega Duck",
+        "system_type": "Console"
+    },
+    {
+        "company": "Yamaha",
+        "system": "Copera",
+        "system_type": "Console"
+    },
+    {
+        "company": "ZAPiT Games",
+        "system": "Game Wave Family Entertainment System",
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Zeebo",
+        "system": "Zeebo",
+        "system_type": "Console"
+    },
+    {
+        "company": null,
+        "system": "Pocket PC",
+        "override": {
+            "company": "Microsoft"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Roms",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Mobile"
+    },
+    {
+        "company": null,
+        "system": "Palm",
+        "override": {
+            "company": "Palm",
+            "system": "Palm OS"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Roms",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Mobile"
+    },
+    {
+        "company": "Non-Game",
+        "system": "Miscellaneous - Stand-Up Comedy",
+        "extra_configs": {
+            "if_suffix": {
+                "Audio CD": {
+                    "modifier": "Audio"
+                }
+            }
+        },
+        "system_type": "Video"
+    },
+    {
+        "company": "Non-Game",
+        "system": "Miscellaneous - Instructional",
+        "extra_configs": {
+            "if_suffix": {
+                "Audio CD": {
+                    "modifier": "Audio"
+                }
+            }
+        },
+        "system_type": "Video"
+    },
+    {
+        "company": "Non-Game",
+        "system": "Audio CD",
+        "system_type": "Audio"
+    },
+    {
+        "company": null,
+        "system": "Audio CD",
+        "system_type": "Audio"
+    },
+    {
+        "company": null,
+        "system": "BD-Video",
+        "system_type": "Video"
+    },
+    {
+        "company": null,
+        "system": "DVD-Video",
+        "system_type": "Video"
+    },
+    {
+        "company": null,
+        "system": "Photo CD",
+        "system_type": "Video"
+    },
+    {
+        "company": null,
+        "system": "PlayStation GameShark Updates",
+        "override": {
+            "company": "Sony",
+            "system": "PlayStation",
+            "suffix": "GameShark Updates"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": null,
+        "system": "Sony Electronic Book",
+        "system_type": "Book"
+    },
+    {
+        "company": null,
+        "system": "Super Audio CD",
+        "system_type": "Audio"
+    },
+    {
+        "company": null,
+        "system": "Various",
+        "system_type": "Source Code"
+    },
+    {
+        "company": null,
+        "system": "Video CD",
+        "system_type": "Video"
+    },
+    {
+        "company": null,
+        "system": "Video Game Scans",
+        "system_type": "Manuals"
+    },
+    {
+        "company": null,
+        "system": "Video Game Documents",
+        "system_type": "Manuals"
+    },
+    {
+        "company": null,
+        "system": "Video Game Magazine Scans",
+        "system_type": "Manuals"
+    },
+    {
+        "company": null,
+        "system": "Video Game Magazine Scans",
+        "system_type": "Manuals"
+    },
+    {
+        "company": "Tao",
+        "system": "iKTV",
+        "system_type": "Video"
+    },
+    {
+        "company": "Acorn RISC OS",
+        "system": "Flash Media",
+        "override": {
+            "company": "Acorn",
+            "system": "Risc PC",
+            "suffix": "Flash Media"
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": null,
+        "system": "VPinMAME",
+        "system_type": "Pinball"
+    },
+    {
+        "company": null,
+        "system": "Video Game Scans",
+        "system_type": "Manuals"
+    },
+    {
+        "company": null,
+        "system": "Video Game Digital OSTs",
+        "system_type": "Audio"
+    },
+    {
+        "company": null,
+        "system": "Video Game Manual Scans",
+        "system_type": "Manuals"
+    },
+    {
+        "company": null,
+        "system": "Video Game Magazine Scans",
+        "system_type": "Manuals"
+    }
+]

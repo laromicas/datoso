@@ -1,0 +1,39 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.1",
+    "configurations": [
+        {
+            "name": "Python: NoIntroProcessArchimedes",
+            "type": "python",
+            "request": "launch",
+            "module": "datoso",
+            "justMyCode": true,
+            "args": [
+                "nointro",
+                "--process",
+                "-fd",
+                "Archimedes",
+            ],
+        },
+        {
+            "name": "Python: Import Dats",
+            "type": "python",
+            "request": "launch",
+            "module": "datoso",
+            "justMyCode": true,
+            "args": [
+                "import",
+            ],
+        },
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}
