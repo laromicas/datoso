@@ -1,14 +1,7 @@
-``` bash
-    .___       __
-  __| _/____ _/  |_  ____  __________
- / __ |\__  \\   __\/  _ \/  ___/  _ \
-/ /_/ | / __ \|  | (  <_> )___ (  <_> )
-\____ |(____  /__|  \____/____  >____/
-     \/     \/                \/
-```
+![Datoso](/bearlogo.png)
 
 # Datoso
-![Datoso](/bearlogo.png)
+
 Datoso is a WIP Python command line tool to download and organize your Dat Roms.
 As today the tool supports dat-omatic, redump, and translated-english dats.
 It merges all the dats in a tree folder structure thought to use with Emulators rather than dats.
