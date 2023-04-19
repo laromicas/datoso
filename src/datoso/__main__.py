@@ -56,9 +56,6 @@ def parse_args() -> argparse.Namespace:
     group_save.add_argument('--get', metavar=('configuration'), help='Get value of Configuration Option.')
     parser_save.add_argument('-g','--global', action='store_true', help='When set, saves to global config, else to `.datosorc`')
 
-    parser_list = subparser.add_parser('list', help='List installed seeds')
-    parser_list.set_defaults(func=command_list)
-
     parser_doctor = subparser.add_parser('doctor', help='Doctor installed seeds')
     parser_doctor.add_argument('command', nargs='?', help='Seed to doctor')
     parser_doctor.set_defaults(func=command_doctor)
