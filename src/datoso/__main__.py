@@ -335,10 +335,7 @@ def command_seed(args) -> None:
 
 def command_config_save(args) -> None:
     """ Save config to file """
-    if args.directory == '~':
-        config_file = os.path.expanduser('~/.datosorc')
-    else:
-        config_file = os.path.join(os.getcwd(), '.datosorc')
+    config_file = os.path.expanduser('~/.datosorc') if args.directory == '~' else os.path.join(os.getcwd(), '.datosorc')
     with open(config_file, 'w', encoding='utf-8') as file:
         config.write(file)
     print(f'Config saved to {Bcolors.OKGREEN}{config_file}{Bcolors.ENDC}')

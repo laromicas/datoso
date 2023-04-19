@@ -1,15 +1,13 @@
 """List all installed seeds."""
-import os
 from pydoc import locate
 from datoso import __app_name__
-from datoso.configuration import SEEDS_FOLDER
 
 def get_seed(seed, module):
     if module:
         return locate(f'{__app_name__}_seed_{seed}.{module}')
     return locate(f'{__app_name__}_seed_{seed}')
 
-def installed_seeds(): #TODO: rename to seeds
+def installed_seeds():
     import importlib
     import pkgutil
 

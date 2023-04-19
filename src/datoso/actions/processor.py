@@ -3,7 +3,6 @@ Process actions.
 """
 # pylint: disable=too-few-public-methods
 import os
-from pydoc import locate
 import shutil
 from datoso.configuration import config
 from datoso.repositories.dedupe import Dedupe

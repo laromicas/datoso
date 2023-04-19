@@ -147,7 +147,7 @@ class XMLDatFile(DatFile):
         self.shas = HashesIndex()
 
         for game in self.data['datafile'][self.game_key]:
-            if not 'rom' in game:
+            if 'rom' not in game:
                 continue
             if not isinstance(game['rom'], list):
                 self.add_rom(game['rom'])
@@ -159,7 +159,7 @@ class XMLDatFile(DatFile):
         """ Merge the dat file with the parent. """
         parent.get_rom_shas()
         for game in self.data['datafile'][self.game_key]:
-            if not 'rom' in game:
+            if 'rom' not in game:
                 continue
             if not isinstance(game['rom'], list):
                 if parent.shas.has_rom(self.parse_rom(game['rom'])):

@@ -7,7 +7,7 @@ from typing import Dict, Any
 from tinydb import TinyDB, JSONStorage
 from tinydb.middlewares import CachingMiddleware
 
-from datoso.helpers import Bcolors, parse_folder
+from datoso.helpers import parse_folder
 from datoso.configuration import config
 
 database_path = parse_folder(config['PATHS'].get('DatosoPath','~/.datoso'))

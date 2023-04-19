@@ -1,10 +1,9 @@
 """ Fetch and Process Commands for Seeds """
 import os
-import json
 import re
 from datoso.commands.list import get_seed
 from datoso.helpers import Bcolors, parse_folder
-from datoso.configuration import SEEDS_FOLDER, config, ROOT_FOLDER
+from datoso.configuration import config
 from datoso.helpers.executor import Command
 from datoso.actions.processor import Processor
 
@@ -18,10 +17,6 @@ class Seed:
 
     def __init__(self, **kwargs) -> None:
         self.__dict__.update(kwargs)
-        self.path = os.path.join(SEEDS_FOLDER, self.name)
-        # if os.path.exists(os.path.join(self.path,'actions.json')):
-        #     with open(os.path.join(self.path,'actions.json'), 'r', encoding='utf-8') as file:
-        #         self.actions = json.load(file)
         actions = get_seed(self.name, 'actions')
         if actions:
             self.actions = actions.get_actions()
