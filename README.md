@@ -74,23 +74,21 @@ OTW.
 
 ## TODO (without priority)
 
--   Database initialization !!! (priority)
--   Make update rules write to database only when finished
+-   Migration of current datero seeds to plugins
+-   Cleaning of legacy modular code
 -   Better rules update process
--   Logging
+    -   Make update rules write to database only when finished
 -   Tests
 -   More dat repositories
 -   Mega.nz download support (<https://pypi.org/project/mega.py/>)
 -   Zippyshare download support (<https://pypi.org/project/zippyshare-downloader/>)
 -   Zippyshare download support (<https://pypi.org/project/pyOneFichierClient/>)
 -   Configurable folder structure (instead of emulator-focused structure use dat-repositories or viceversa)
-    -   Maybe with a builder, to avoid the need to change the code
+    -   Maybe with a builder, to avoid the need to change the code anytime
 -   Modular design for repositories (done for seeds, repositores
     missing)
 -   Better structure for the downloaders \*
--   Better command line support
--   Migrate to python modules
--   Manually Deduplicate dats from command line (easy to implement)
+
 
 *(*) Done but to be improved*
 *(**) Did it Yay!!!*
@@ -111,7 +109,6 @@ $ pylint src --disable=all --enable=missing-function-docstring
 
 ## WISHLIST (without priority)
 
--   Modular design for dat seeds (\*\*)
 -   Dat structure for ClrMamePro or another dat manager.
 -   Web interface
 -   Download from central repositories (an S3 or something like that to prevent overload main sites)
@@ -119,7 +116,6 @@ $ pylint src --disable=all --enable=missing-function-docstring
     -   Downloading from S3
 -   Auto-Import MIA Lists (for redump)
     -   Add \[MIA\] to dat roms
--   Deduplicate dats (\*\*)
 -   Remove MIA from dats
 -   .cue Generator
 
