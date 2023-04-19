@@ -7,12 +7,13 @@ from typing import Dict, Any
 from tinydb import TinyDB, JSONStorage
 from tinydb.middlewares import CachingMiddleware
 
+from datoso.helpers import Bcolors, parse_folder
 from datoso.configuration import config
 
+database_path = parse_folder(config['PATHS'].get('DatosoPath','~/.datoso'))
+os.makedirs(f"{database_path}", exist_ok=True)
 
-os.makedirs(f"{os.path.join(os.getcwd(), config.get('PATHS','DatabasePath'))}", exist_ok=True)
-
-DATABASE_URL = f"{config.get('PATHS','DatabasePath')}/{config.get('PATHS','DatabaseFile')}"
+DATABASE_URL = os.path.join(database_path, config['PATHS'].get('DatabaseFile','datoso.json'))
 
 class JSONStorageWithBackup(JSONStorage):
     """ TinyDB JSON storage with backup. """

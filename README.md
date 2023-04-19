@@ -56,6 +56,16 @@ $ pip install build
 $ python -m build
 ```
 
+## Developing a seed
+
+``` bash
+# Download base
+$ git clone https://
+
+# Build
+$ python -m build
+```
+
 ## Posible Issues
 
 Be careful when updating dats from datomatic, sometimes they put a

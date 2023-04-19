@@ -2,7 +2,8 @@
 import os
 import json
 import re
-from datoso.helpers import Bcolors
+from datoso.commands.list import get_seed
+from datoso.helpers import Bcolors, parse_folder
 from datoso.configuration import SEEDS_FOLDER, config, ROOT_FOLDER
 from datoso.helpers.executor import Command
 from datoso.actions.processor import Processor
@@ -12,29 +13,33 @@ class Seed:
     name = None
     path = None
     actions = {}
-    working_path = os.path.abspath(os.path.join(os.getcwd(), config.get('PATHS', 'WorkingPath')))
+    # working_path = os.path.abspath(os.path.join(os.getcwd(), config.get('PATHS', 'WorkingPath')))
     status_to_show = ['Updated', 'Created', 'Error', 'Disabled', 'Deduped']
 
     def __init__(self, **kwargs) -> None:
         self.__dict__.update(kwargs)
         self.path = os.path.join(SEEDS_FOLDER, self.name)
-        if os.path.exists(os.path.join(self.path,'actions.json')):
-            with open(os.path.join(self.path,'actions.json'), 'r', encoding='utf-8') as file:
-                self.actions = json.load(file)
+        # if os.path.exists(os.path.join(self.path,'actions.json')):
+        #     with open(os.path.join(self.path,'actions.json'), 'r', encoding='utf-8') as file:
+        #         self.actions = json.load(file)
+        actions = get_seed(self.name, 'actions')
+        if actions:
+            self.actions = actions.get_actions()
+
 
     def fetch(self):
         """ Fetch seed """
-        paths = {
-            'SEED_NAME': self.name,
-            'WORK_FOLDER': self.working_path,
-            'TMP_FOLDER': config.get('PATHS', 'TempPath'),
-            'ROMVAULT_FOLDER': config.get('PATHS', 'RomVaultPath'),
-            'DAT_FOLDER': config.get('PATHS', 'DatPath'),
-            'DATERO_HOME': ROOT_FOLDER,
-        }
-        paths.update(os.environ)
-        result = Command.execute(os.path.join(self.path, 'fetch'), cwd=self.path, env=paths)
-        return result
+        fetch = get_seed(self.name, 'fetch')
+        fetch.fetch()
+
+
+    def format_actions(self, actions, data: dict = {}):
+        """ Format actions. """
+        for action in actions:
+            for action_name, action_value in action.items():
+                if isinstance(action_value, str):
+                    action[action_name] = action_value.format(**data)
+        return actions
 
 
     def process_dats(self, fltr=None):
@@ -44,11 +49,12 @@ class Seed:
             [print('\b \b', end='') for x in range(0, len(line))]
             print(' ' * (len(line)), end='')
             print('\r', end='')
-        dat_path = os.path.join(self.working_path, config.get('PATHS', 'TempPath'), self.name, 'dats')
+        dat_origin = os.path.join(parse_folder(config['PATHS'].get('DownloadPath', 'tmp')), self.name, 'dats')
         line = ''
         for path, actions in self.actions.items():
-            new_path = path.format(dat_path=dat_path)
-            for file in os.listdir(new_path):
+            new_path = path.format(dat_origin=dat_origin)
+            actions = self.format_actions(actions, data={'dat_destination': config['PATHS'].get('DatPath', 'DatRoot')})
+            for file in os.listdir(new_path) if os.path.isdir(new_path) else []:
                 if config['PROCESS'].get('DatIgnoreRegEx'):
                     ignore_regex = re.compile(config['PROCESS']['DatIgnoreRegEx'])
                     if ignore_regex.match(file):

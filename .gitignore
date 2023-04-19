@@ -1,7 +1,4 @@
 # Project
-tmp/
-src/datoso/seeds/
-database/database.*
 .datosorc
 
 # Byte-compiled / optimized / DLL files

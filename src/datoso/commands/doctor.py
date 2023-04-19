@@ -6,15 +6,22 @@ import subprocess
 import sys
 from shutil import which
 import pkg_resources
+from datoso import __app_name__
+from datoso.commands.list import installed_seeds
 from datoso.configuration import SEEDS_FOLDER
 from datoso.helpers import Bcolors
 
 ignore_packages = ['pyOpenSSL', 'PySocks']
 
 
+# def check_seed(seed):
+#     """ Check if seed is installed """
+#     return os.path.isdir(os.path.join(SEEDS_FOLDER, seed))
+
 def check_seed(seed):
     """ Check if seed is installed """
-    return os.path.isdir(os.path.join(SEEDS_FOLDER, seed))
+    return f'{__app_name__}_seed_{seed}' in installed_seeds()
+
 
 def check_version(detected, required, expression):
     """ Check if version of required package is correct """

@@ -78,3 +78,10 @@ def is_git_repo(path) -> bool:
     if os.path.isdir(os.path.join(path, ".git")):
         return True
     return False
+
+def parse_folder(path):
+    """ Get folder from config. """
+    if path is not None and path.startswith(('/', '~')):
+        return os.path.expanduser(path)
+    else:
+        return os.path.join(os.getcwd(), path)

@@ -10,10 +10,11 @@ import sys
 import argparse
 from venv import logger
 from tabulate import tabulate
+from datoso.configuration.configuration import get_seed_name
 from datoso.configuration.logger import enable_logging, set_verbosity
 from datoso.database.models.datfile import Dat
 
-from datoso import __version__, ROOT_FOLDER
+from datoso import __version__, __app_name__, ROOT_FOLDER
 from datoso.helpers import Bcolors
 from datoso.configuration import config
 
@@ -46,6 +47,7 @@ def parse_args() -> argparse.Namespace:
 
     parser_save = subparser.add_parser('config', help='Show configuration')
     parser_save.add_argument('-s', '--save', action='store_true', help='Save configuration to .datosorc')
+    parser_save.add_argument('-d', '--directory', default='~', choices=['~', '.'], help='Directory to save .datosorc')
     parser_save.set_defaults(func=command_config)
     parser_save.add_argument('-ru', '--rules-update', action='store_true', help='Update system rules from GoogleSheets Url')
 
@@ -80,6 +82,10 @@ def parse_args() -> argparse.Namespace:
     parser_available = subparser_seed.add_parser('available', help='List available seeds')
     parser_available.set_defaults(func=command_seed_available)
 
+    parser_details = subparser_seed.add_parser('details', help='Show details of seed')
+    parser_details.add_argument('seed', help='Seed to show details of')
+    parser_details.set_defaults(func=command_seed_details)
+
     parser_install = subparser_seed.add_parser('install', help='Install seed')
     parser_install.add_argument('seed', help='Seed to install')
     parser_install.set_defaults(func=command_seed_install)
@@ -105,9 +111,10 @@ def parse_args() -> argparse.Namespace:
 
 
     # Seed commands
-    for seed in list(installed_seeds()) + [('all', 'All seeds')]:
-        parser_command = subparser.add_parser(seed[0], help=f'Update seed {seed[0]}')
-        parser_command.set_defaults(func=command_seed, seed=seed[0])
+    for seed, _ in list(installed_seeds().items()) + [('all', 'All seeds')]:
+        seed = get_seed_name(seed)
+        parser_command = subparser.add_parser(seed, help=f'Update seed {seed}')
+        parser_command.set_defaults(func=command_seed, seed=seed)
         parser_command.add_argument('-f', '--fetch', action='store_true', help='Fetch seed')
         parser_command.add_argument('-p', '--process', action='store_true', help='Process dats from seed')
         parser_command.add_argument('-fd', '--filter', help='Filter dats to process')
@@ -160,6 +167,7 @@ def command_deduper(args) -> None:
     elif not args.dry_run:
         merged.save(args.input)
     print(f'{Bcolors.OKBLUE}File saved to {args.output if args.output else args.input}{Bcolors.ENDC}')
+
 
 def command_import(_) -> None:
     """ Make changes in dat config """
@@ -280,15 +288,32 @@ def command_seed_available(_) -> None:
         print(f'* {status[installed]}{seed[0]}{Bcolors.ENDC} - {seed[1][0:60] if len(seed[1]) > 60 else seed[1]}...')
 
 
+def command_seed_details(args) -> None:
+    module = None
+    for seed, seed_module in list(installed_seeds().items()):
+        if seed == f'{__app_name__}_seed_{args.seed}':
+            module = seed_module
+            break
+    if not module:
+        print(f'Seed {Bcolors.FAIL}{args.seed}{Bcolors.ENDC} not installed')
+        sys.exit(1)
+    print(f'Seed {Bcolors.OKGREEN}{args.seed}{Bcolors.ENDC} details:')
+    print(f'  * Name: {module.__name__}')
+    print(f'  * Version: {module.__version__}')
+    print(f'  * Author: {module.__author__}')
+    print(f'  * Description: {module.__description__}')
+
+
 def command_seed(args) -> None:
     """ Commands with the seed (must be installed) """
     if args.seed == 'all':
-        for seed in installed_seeds():
+        for seed, _ in installed_seeds():
+            seed = get_seed_name(seed)
             if config['PROCESS'].get('SeedIgnoreRegEx'):
                 ignore_regex = re.compile(config['PROCESS']['SeedIgnoreRegEx'])
-                if ignore_regex.match(seed[0]):
+                if ignore_regex.match(seed):
                     continue
-            args.seed = seed[0]
+            args.seed = seed
             command_seed(args)
         sys.exit(0)
     seed = Seed(name=args.seed)
@@ -308,11 +333,15 @@ def command_seed(args) -> None:
             command_doctor(args)
 
 
-def command_config_save(_) -> None:
+def command_config_save(args) -> None:
     """ Save config to file """
-    with open('.datosorc', 'w', encoding='utf-8') as file:
+    if args.directory == '~':
+        config_file = os.path.expanduser('~/.datosorc')
+    else:
+        config_file = os.path.join(os.getcwd(), '.datosorc')
+    with open(config_file, 'w', encoding='utf-8') as file:
         config.write(file)
-    print(f'Config saved to {Bcolors.OKGREEN}.datosorc{Bcolors.ENDC}')
+    print(f'Config saved to {Bcolors.OKGREEN}{config_file}{Bcolors.ENDC}')
 
 
 def command_config_set(args) -> None:
@@ -331,6 +360,8 @@ def command_config_set(args) -> None:
         file = os.path.join(ROOT_FOLDER, 'datoso.ini')
     else:
         file = os.path.join(os.getcwd(), '.datosorc')
+        if not os.path.isfile(file):
+            file = os.path.expanduser('~/.datosorc')
     newconfig.read(file)
     if not newconfig.has_section(myconfig[0]):
         newconfig.add_section(myconfig[0])
@@ -387,9 +418,9 @@ def command_config(args) -> None:
 
 def command_list(_):
     """ List installed seeds """
-    seeds = installed_seeds()
-    for seed in seeds:
-        print(f'* {Bcolors.OKCYAN}{seed[0]}{Bcolors.ENDC} - {seed[1][0:60] if len(seed[1]) > 60 else seed[1]}...')
+    for seed, seed_class in installed_seeds():
+        description = seed_class.description()
+        print(f'* {Bcolors.OKCYAN}{seed}{Bcolors.ENDC} - {description[0:60] if len(description) > 60 else description}...')
 
 def command_doctor(args):
     """ Doctor installed seeds """

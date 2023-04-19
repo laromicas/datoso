@@ -1,0 +1,51 @@
+{
+    "GENERAL": {
+        "Overwrite": "false",
+        "UnionCharacter": "-"
+    },
+    "COMMAND": {
+        "Quiet": "false",
+        "Verbose": "false"
+    },
+    "LOG": {
+        "Logging": "false",
+        "LogLevel": "INFO",
+        "LogFile": "datoso.log"
+    },
+    "PREFFIXES": {
+        "Arcade": "Arcade",
+        "Audio": "Other/Audio",
+        "Book": "Other/Book",
+        "Calculator": "Other/Calculator",
+        "Computer": "Computer",
+        "Console": "Consoles",
+        "Handheld": "Consoles",
+        "PDA": "Mobile",
+        "Phone": "Mobile",
+        "Source Code": "Other/Source Code",
+        "Video": "Other/Video",
+        "Mobile": "Mobile",
+        "Manuals": "Other/Manuals",
+        "BIOS Images": "Other/BIOS Images"
+    },
+    "PATHS": {
+        "RomVaultPath": "~/ROMVault",
+        "DatPath": "~/ROMVault/DatRoot",
+        "DatosoPath": "~/.datoso",
+        "DatabaseFile": "datoso.json",
+        "DownloadPath": "~/.datoso/dats"
+    },
+    "IMPORT": {
+        "IgnoreRegEx": ""
+    },
+    "PROCESS": {
+        "DatIgnoreRegEx": ".*(?:Update ROMs).*",
+        "SeedIgnoreRegEx": ""
+    },
+    "UPDATE_URLS": {
+        "GoogleSheetUrl": ""
+    }
+}
+Wrote profile results to __main__.py.lprof
+Timer unit: 1e-06 s
+

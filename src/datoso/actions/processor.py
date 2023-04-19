@@ -50,11 +50,12 @@ class LoadDatFile(Process):
     def process(self):
         """ Load a dat file. """
         from datoso.database.models.datfile import Dat
-        if getattr(self, 'factory', None) and self.factory:
-            self._factory = locate(self.factory)
-            self._class = self._factory(self.file)
-        else:
-            self._class = locate(self.class_name)
+        # if getattr(self, 'factory', None) and self.factory:
+        #     self._factory = locate(self.factory)
+        #     self._class = self._factory(self.file)
+        # else:
+        #     self._class = locate(self.class_obj)
+        # self._class = locate(self.class_obj)
         self._dat = self._class(file=self.file)
         self._dat.load()
         self.database = Dat(seed=self.seed, **self._dat.dict())
@@ -97,7 +98,7 @@ class Copy(Process):
         filename = os.path.basename(origin)
         self.destination = self.destination if self.destination else self.previous['path']
 
-        destination = os.path.join(config.get('PATHS','RomVaultPath'), self.folder, self.destination, filename)
+        destination = os.path.join(self.folder, self.destination, filename)
         os.makedirs(os.path.dirname(destination), exist_ok=True)
         result = None
         if self.previous:
