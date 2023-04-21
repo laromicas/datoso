@@ -74,6 +74,7 @@ OTW.
 
 ## TODO (without priority)
 
+-   Migrate pydantic to dataclasses
 -   Migration of current datero seeds to plugins
 -   Cleaning of legacy modular code
 -   Better rules update process
