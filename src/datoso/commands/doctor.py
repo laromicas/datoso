@@ -7,7 +7,7 @@ import sys
 from shutil import which
 import pkg_resources
 from datoso import __app_name__
-from datoso.commands.list import installed_seeds
+from datoso.helpers.plugins import installed_seeds
 from datoso.configuration import SEEDS_FOLDER
 from datoso.helpers import Bcolors
 

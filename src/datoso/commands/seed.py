@@ -1,7 +1,7 @@
 """ Fetch and Process Commands for Seeds """
 import os
 import re
-from datoso.commands.list import get_seed
+from datoso.helpers.plugins import get_seed
 from datoso.helpers import Bcolors, parse_folder
 from datoso.configuration import config
 from datoso.helpers.executor import Command

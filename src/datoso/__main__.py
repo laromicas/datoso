@@ -17,7 +17,7 @@ from datoso import __version__, __app_name__, ROOT_FOLDER
 from datoso.helpers import Bcolors
 from datoso.configuration import config
 
-from datoso.commands.list import installed_seeds, seed_description
+from datoso.helpers.plugins import installed_seeds, seed_description
 from datoso.commands.doctor import check_dependencies, check_main_executables, check_seed
 from datoso.commands.seed_manager import seed_available, get_seed_repository, seed_install, seed_remove
 from datoso.commands.seed import Seed

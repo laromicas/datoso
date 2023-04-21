@@ -1,6 +1,6 @@
 """ Rules class. """
 from pydoc import locate
-from datoso.commands.list import installed_seeds
+from datoso.helpers.plugins import installed_seeds
 
 class Rules:
     """ Rules class. """
