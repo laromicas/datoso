@@ -2,47 +2,48 @@
 import re
 from datoso.repositories.dat import ClrMameProDatFile, XMLDatFile
 
-def detect_xml(dat_file: str, rules_classes):
+def detect_xml(dat_file: str, rules):
     """ Detect the seed for a XML dat file. """
     dat = XMLDatFile(file=dat_file)
-    for rule_class in rules_classes:
+    for rule_details in rules:
         found = True
         # print(dat.header)
-        for rule in rule_class['rules']:
-            # print(rule['key'], rule['value'], rule['operator'])
-            if not comparator(dat.header.get(rule['key']), rule['value'], rule['operator']):
+        for rule in rule_details['rules']:
+            # print(rule['key'], dat.header.get(rule['key']), rule['value'], rule['operator'], comparator(dat.header.get(rule['key']), rule['value'], rule.get('operator', 'eq')))
+            if not comparator(dat.header.get(rule['key']), rule['value'], rule.get('operator', 'eq')):
                 found = False
                 break
+        # print(f'found: {found}')
         if found:
-            return rule_class['seed'], rule_class['class_name']
+            return rule_details['seed'], rule_details['_class']
     return None, None
 
-def detect_clrmame(dat_file: str, rules_classes):
+def detect_clrmame(dat_file: str, rules):
     """ Detect the seed for a ClrMamePro dat file. """
     dat = ClrMameProDatFile(file=dat_file)
-    for rule_class in rules_classes:
+    for rule_details in rules:
         found = True
         # print(dat.header)
-        for rule in rule_class['rules']:
+        for rule in rule_details['rules']:
             # print(rule['key'], rule['value'], rule['operator'])
-            if not comparator(dat.header.get(rule['key']), rule['value'], rule['operator']):
+            if not comparator(dat.header.get(rule['key']), rule['value'], rule.get('operator', 'eq')):
                 found = False
                 break
         if found:
-            return rule_class['seed'], rule_class['class_name']
+            return rule_details['seed'], rule_details['_class']
     return None, None
 
-def detect_seed(dat_file: str, rules_classes):
+def detect_seed(dat_file: str, rules):
     """ Detect the seed for a dat file. """
     try:
-        return detect_xml(dat_file, rules_classes)
+        return detect_xml(dat_file, rules)
     except Exception:
         try:
-            return detect_clrmame(dat_file, rules_classes)
+            return detect_clrmame(dat_file, rules)
         except Exception:
             return None, None
 
-def comparator(key, value, operator): # pylint: disable=too-many-return-statements
+def comparator(key, value, operator='eq'): # pylint: disable=too-many-return-statements
     """ Returns a boolean based on the comparison of the key and value. """
     match operator:
         case 'eq' | 'equals' | '==':
@@ -90,27 +91,3 @@ def comparator(key, value, operator): # pylint: disable=too-many-return-statemen
         case 'isnt' | 'is_not':
             return key is not value
     return False
-
-
-
-
-
-#     path = config['PATHS']['DatPath']
-#     dats = { str(x):"" for x in Path(path).rglob("*.[dD][aA][tT]") }
-#     print(dats)
-
-#     # for dat in dat_list:
-#         # print(dat)
-#         # # dat_list.append(os.path.join(path, dat))
-#         # for
-#         # self._dat = self._class(file=self.file)
-
-# def process_dats():
-#     """ Detect the seed for a dat file. """
-#     global classes, dats
-#     load_dats()
-#     print(classes)
-
-#     path = config['PATHS']['DatPath']
-#     dats = { str(x):"" for x in Path(path).rglob("*.[dD][aA][tT]") }
-#     print(dats)
