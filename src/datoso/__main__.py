@@ -310,7 +310,7 @@ def command_seed_available(_) -> None:
 
 def command_seed_details(args) -> None:
     module = None
-    for seed, seed_module in list(installed_seeds().items()):
+    for seed, seed_module in installed_seeds().items():
         if seed == f'{__app_name__}_seed_{args.seed}':
             module = seed_module
             break
@@ -327,7 +327,7 @@ def command_seed_details(args) -> None:
 def command_seed(args) -> None:
     """ Commands with the seed (must be installed) """
     if args.seed == 'all':
-        for seed, _ in installed_seeds():
+        for seed, _ in installed_seeds().items():
             seed = get_seed_name(seed)
             if config['PROCESS'].get('SeedIgnoreRegEx'):
                 ignore_regex = re.compile(config['PROCESS']['SeedIgnoreRegEx'])
@@ -435,7 +435,7 @@ def command_config(args) -> None:
 
 def command_list(_):
     """ List installed seeds """
-    for seed, seed_class in installed_seeds():
+    for seed, seed_class in installed_seeds().items():
         description = seed_class.description()
         print(f'* {Bcolors.OKCYAN}{seed}{Bcolors.ENDC} - {description[0:60] if len(description) > 60 else description}...')
 
