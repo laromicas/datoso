@@ -36,21 +36,15 @@ dynamic = ["version"]
 all = [
     "datoso_seed_fbneo>=0.1.0",
     "datoso_seed_nointro>=0.1.0",
+    "datoso_seed_pleasuredome>=0.1.0",
     "datoso_seed_redump>=0.1.0",
     "datoso_seed_translatedenglish>=0.1.0",
     ]
-fbneo = [
-    "datoso_seed_fbneo>=0.1.0",
-    ]
-nointro = [
-    "datoso_seed_nointro>=0.1.0",
-    ]
-redump = [
-    "datoso_seed_redump>=0.1.0",
-    ]
-translatedenglish = [
-    "datoso_seed_translatedenglish>=0.1.0",
-    ]
+fbneo = [ "datoso_seed_fbneo>=0.1.0" ]
+nointro = [ "datoso_seed_nointro>=0.1.0" ]
+pleasuredome = [ "datoso_seed_pleasuredome>=0.1.0" ]
+redump = [ "datoso_seed_redump>=0.1.0" ]
+translatedenglish = [ "datoso_seed_translatedenglish>=0.1.0" ]
 dev = [
     "ruff>=0.0.261",
     "line_profiler==4.0.3"

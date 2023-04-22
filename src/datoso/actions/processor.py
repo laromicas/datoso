@@ -49,12 +49,11 @@ class LoadDatFile(Process):
     def process(self):
         """ Load a dat file. """
         from datoso.database.models.datfile import Dat
-        # if getattr(self, 'factory', None) and self.factory:
-        #     self._factory = locate(self.factory)
-        #     self._class = self._factory(self.file)
-        # else:
-        #     self._class = locate(self.class_obj)
-        # self._class = locate(self.class_obj)
+
+        # If there is a factory method, use it to create the class
+        if getattr(self, '_factory', None) and self._factory:
+            self._class = self._factory(self.file)
+
         self._dat = self._class(file=self.file)
         self._dat.load()
         self.database = Dat(seed=self.seed, **self._dat.dict())
