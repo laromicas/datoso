@@ -5,6 +5,7 @@ Process actions.
 import os
 import shutil
 from datoso.configuration import config
+from datoso.helpers import FileUtils
 from datoso.repositories.dedupe import Dedupe
 from datoso.database.models.datfile import Dat
 
@@ -71,11 +72,16 @@ class DeleteOld(Process):
         self.database.load()
         olddat = self.database.dict()
         result = None
-        if 'new_file' in olddat and olddat['new_file'] and os.path.exists(olddat['new_file']):
-            if os.path.isdir(olddat['new_file']):
+        if 'new_file' in olddat and olddat['new_file']:
+            try:
                 shutil.rmtree(olddat['new_file'])
-            else:
-                os.unlink(olddat['new_file'])
+            except NotADirectoryError:
+                try:
+                    os.unlink(olddat['new_file'])
+                except FileNotFoundError:
+                    pass
+            except FileNotFoundError:
+                pass
             result = "Deleted"
 
         self.output = self.previous
@@ -97,7 +103,6 @@ class Copy(Process):
         self.destination = self.destination if self.destination else self.previous['path']
 
         destination = os.path.join(self.folder, self.destination, filename)
-        os.makedirs(os.path.dirname(destination), exist_ok=True)
         result = None
         if self.previous:
             self.database = Dat(seed=self.previous['seed'], name=self.previous['name'])
@@ -113,17 +118,14 @@ class Copy(Process):
                     elif config.getboolean('GENERAL', 'Overwrite', fallback=False):
                         result = "Overwritten"
                     self.previous['new_file'] = destination
-                    if os.path.isdir(origin):
-                        os.system(f'cp -r "{origin}" "{destination}"')
-                    else:
-                        os.system(f'cp "{origin}" "{destination}"')
+                    FileUtils.copy(origin, destination)
                 else:
                     result = "Exists"
             else:
                 self.previous['new_file'] = None
                 result = "Ignored"
         else:
-            os.system(f'cp "{origin}" "{destination}"')
+            FileUtils.copy(origin, destination)
             result = "Copied"
 
         self.output = self.previous

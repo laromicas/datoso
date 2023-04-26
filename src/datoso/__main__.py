@@ -115,6 +115,7 @@ def parse_args() -> argparse.Namespace:
         parser_command.set_defaults(func=command_seed, seed=seed)
         parser_command.add_argument('-f', '--fetch', action='store_true', help='Fetch seed')
         parser_command.add_argument('-p', '--process', action='store_true', help='Process dats from seed')
+        parser_command.add_argument('-d', '--details', action='store_true', help='Show details of seed')
         parser_command.add_argument('-fd', '--filter', help='Filter dats to process')
 
     # Common arguments
@@ -337,6 +338,8 @@ def command_seed(args) -> None:
             command_seed(args)
         sys.exit(0)
     seed = Seed(name=args.seed)
+    if getattr(args, 'details', False):
+        command_seed_details(args)
     if getattr(args, 'fetch', False):
         print(f'Fetching seed {Bcolors.OKGREEN}{args.seed}{Bcolors.ENDC}')
         if seed.fetch():

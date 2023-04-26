@@ -2,7 +2,7 @@
 import os
 import re
 from datoso.helpers.plugins import get_seed
-from datoso.helpers import Bcolors, parse_folder
+from datoso.helpers import Bcolors, FileUtils
 from datoso.configuration import config
 from datoso.helpers.executor import Command
 from datoso.actions.processor import Processor
@@ -44,7 +44,7 @@ class Seed:
             [print('\b \b', end='') for x in range(0, len(line))]
             print(' ' * (len(line)), end='')
             print('\r', end='')
-        dat_origin = os.path.join(parse_folder(config['PATHS'].get('DownloadPath', 'tmp')), self.name, 'dats')
+        dat_origin = os.path.join(FileUtils.parse_folder(config['PATHS'].get('DownloadPath', 'tmp')), self.name, 'dats')
         line = ''
         for path, actions in self.actions.items():
             new_path = path.format(dat_origin=dat_origin)

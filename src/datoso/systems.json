@@ -1023,6 +1023,42 @@
     },
     {
         "company": "Nintendo",
+        "system": "GameCube - NKit RVZ [zstd-19-128k]",
+        "override": {
+            "system": "GameCube",
+            "suffix": "NKit RVZ [zstd-19-128k]"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Wii - NKit RVZ [zstd-19-128k]",
+        "override": {
+            "system": "Wii",
+            "suffix": "NKit RVZ [zstd-19-128k]"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Wii - NKit WBFS [lossless]",
+        "override": {
+            "system": "Wii",
+            "suffix": "NKit WBFS [lossless]"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Wii U - WUX",
+        "override": {
+            "system": "Wii U",
+            "suffix": "WUX"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
         "system": "Kiosk Video Compact Flash",
         "system_type": "Console"
     },
@@ -1695,6 +1731,16 @@
     {
         "company": "Non-Game",
         "system": "Audio CD",
+        "system_type": "Audio"
+    },
+    {
+        "company": "Audio CD",
+        "system": "Spillover Tracks",
+        "override": {
+            "company": null,
+            "system": "Audio CD",
+            "suffix": "Spillover Tracks"
+        },
         "system_type": "Audio"
     },
     {

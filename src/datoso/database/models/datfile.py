@@ -3,6 +3,8 @@
 """
 # pylint: disable=too-few-public-methods
 from typing import Optional
+
+from attr import dataclass
 from pydantic import BaseModel, Extra
 from tinydb import Query
 from datoso.database import DB
@@ -12,7 +14,7 @@ class Database:
     DB = DB
     table = None
 
-class DatabaseModel(BaseModel):
+class DatabaseModel(BaseModel): # BaseModel needed for initialization, TODO: find a better way
     """ Base model for TinyDB. """
     class Config:
         """ Pydantic default config. """
@@ -33,7 +35,6 @@ class DatabaseModel(BaseModel):
         result = self._DB.table.search(self.query())
         if result:
             self.__dict__.update(result[0])
-
 
     def save(self):
         """ Save record to the database. """

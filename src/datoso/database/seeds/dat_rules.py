@@ -1,9 +1,9 @@
 """
     Seed the database with Systems.
 """
-import os
 import json
 import requests
+from pathlib import Path
 from datoso.configuration import config
 from datoso import ROOT_FOLDER
 from datoso.database.models import System
@@ -46,7 +46,7 @@ def import_dats():
     """ Seed the database with Systems. """
     # pylint: disable=protected-access
     systems = get_systems()
-    with open(os.path.join(ROOT_FOLDER,'systems.json'), 'w', encoding='utf-8') as file:
+    with open(Path(ROOT_FOLDER,'systems.json'), 'w', encoding='utf-8') as file:
         json.dump(systems, file, indent=4)
     for system in systems:
         row = System(**system)

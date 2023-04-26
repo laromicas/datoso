@@ -2,7 +2,7 @@
 import logging
 import os
 
-from datoso.helpers import Bcolors, parse_folder
+from datoso.helpers import Bcolors, FileUtils
 from .configuration import config
 
 log_level = config['LOG'].get('LogLevel', logging.DEBUG)
@@ -66,7 +66,7 @@ logger.setLevel(logging.DEBUG)
 
 def enable_logging():
     """ Enable logging to file """
-    log_path = parse_folder(config.get('PATHS','DatosoPath', fallback='~/.datoso'))
+    log_path = FileUtils.parse_folder(config.get('PATHS','DatosoPath', fallback='~/.datoso'))
     os.makedirs(log_path, exist_ok=True)
     log_file = os.path.join(log_path, config['LOG'].get('LogFile', 'datoso.log'))
     file_handler = TrimmedFileHandler(log_file)

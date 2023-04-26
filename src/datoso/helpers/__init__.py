@@ -3,7 +3,9 @@ Helpers
 """
 import re
 import os
+from pathlib import Path
 from dateutil import parser
+import shutil
 
 class Bcolors:
     # pylint: disable=anomalous-backslash-in-string
@@ -75,13 +77,43 @@ def is_git_path(path) -> bool:
 
 def is_git_repo(path) -> bool:
     """ Check if a path is a git repository. """
-    if os.path.isdir(os.path.join(path, ".git")):
+    if Path.is_dir(Path(path, ".git")):
         return True
     return False
 
-def parse_folder(path):
-    """ Get folder from config. """
-    if path is not None and path.startswith(('/', '~')):
-        return os.path.expanduser(path)
-    else:
-        return os.path.join(os.getcwd(), path)
+class FileUtils:
+
+    @staticmethod
+    def copy(origin, destination):
+        """ Copy file to destination. """
+        os.makedirs(os.path.dirname(destination), exist_ok=True)
+        try:
+            shutil.copy(origin, destination)
+        except shutil.SameFileError:
+            pass
+        except IsADirectoryError:
+            try:
+                shutil.rmtree(destination)
+            except FileNotFoundError:
+                pass
+            shutil.copytree(origin, destination)
+        except FileNotFoundError:
+            raise FileNotFoundError(f"File {origin} not found.")
+
+    @staticmethod
+    def remove(path):
+        """ Remove file or folder. """
+        try:
+            os.unlink(path)
+        except IsADirectoryError:
+            shutil.rmtree(path)
+        except FileNotFoundError:
+            pass
+
+    @staticmethod
+    def parse_folder(path):
+        """ Get folder from config. """
+        if path is not None and path.startswith(('/', '~')):
+            return os.path.expanduser(path)
+        else:
+            return os.path.join(os.getcwd(), path)

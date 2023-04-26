@@ -7,10 +7,10 @@ from typing import Dict, Any
 from tinydb import TinyDB, JSONStorage
 from tinydb.middlewares import CachingMiddleware
 
-from datoso.helpers import parse_folder
+from datoso.helpers import FileUtils
 from datoso.configuration import config
 
-database_path = parse_folder(config['PATHS'].get('DatosoPath','~/.datoso'))
+database_path = FileUtils.parse_folder(config['PATHS'].get('DatosoPath','~/.datoso'))
 os.makedirs(f"{database_path}", exist_ok=True)
 
 DATABASE_URL = os.path.join(database_path, config['PATHS'].get('DatabaseFile','datoso.json'))
@@ -30,7 +30,7 @@ class JSONStorageWithBackup(JSONStorage):
 
     def make_backup(self):
         """ Make a backup of the database. """
-        os.system(f"cp {self.path} {self.path}.bak")
+        FileUtils.copy(self.path, f"{self.path}.bak")
 
 
 DB = TinyDB(DATABASE_URL, storage=CachingMiddleware(JSONStorageWithBackup), indent=4)

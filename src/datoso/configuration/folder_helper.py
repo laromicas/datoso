@@ -1,7 +1,7 @@
 
 import os
 import shutil
-from datoso.helpers import parse_folder
+from datoso.helpers import FileUtils
 from datoso.configuration import config
 
 
@@ -13,7 +13,7 @@ class Folders:
     extras: dict = None
 
     def __init__(self, seed, extras=[]) -> None:
-        self.base = parse_folder(config['PATHS'].get('DownloadPath'))
+        self.base = FileUtils.parse_folder(config['PATHS'].get('DownloadPath'))
         self.download = os.path.join(self.base, seed)
         self.dats = os.path.join(self.download, 'dats')
         self.backup = os.path.join(self.download, 'backup')
@@ -22,8 +22,7 @@ class Folders:
             self.extras.append(os.path.join(self.dats, extra))
 
     def clean_dats(self):
-        if os.path.exists(self.dats):
-            shutil.rmtree(self.dats)
+        FileUtils.remove(self.dats)
         os.makedirs(self.dats, exist_ok=True)
 
     def create_all(self):
