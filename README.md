@@ -46,17 +46,41 @@ pip install datoso_seed_translatedenglish
 # Show help
 $ datoso --help
 
+usage: datoso [-h] [-v] {config,doctor,dat,seed,import,deduper,all} ...
+
+Update dats from different sources.
+
+positional arguments:
+  {config,doctor,dat,seed,import,deduper,base,fbneo,nointro,pleasuredome,private,redump,translatedenglish,all}
+                        sub-command help
+    config              Show configuration
+    doctor              Doctor installed seeds
+    dat                 Changes configuration in current dats
+    seed                Seed admin commands
+    import              Import dats from existing romvault
+    deduper             Deduplicate dats, removes duplicates from input dat existing in parent dat
+    all                 Update seed all
+
+options:
+  -h, --help            show this help message and exit
+  -v, --version         show version
+
+
+
 # Seed commands
 $ datoso seed [list,details]
 
 # Seed commands
-$ datoso [seed] {--fetch|--process} [--filter FILTER]
+$ datoso {<seed> | all} {--fetch | --process} [--filter FILTER]
+#e.g.
+$ datoso redump --fetch                    # Downloads all dats from redump
+$ datoso redump --process --filter IBM     # Process all dats downloaded in the step before that has IBM in its name
 
-# Seed install
-$ datoso seed install [seed] [--repository REPOSITORY] [--branch BRANCH]
+# Doctor
+$ datoso doctor [seed]        # Validates if all requirements for all seeds are OK
 
-# Seed remove
-$ datoso seed remove [seed]
+# Deduper
+$ datoso deduper -input <input_dat> -p <parent_dat> [-o <output_dat>]   # If output dat is not especified, input dat will be overwritten.
 
 optional arguments:
    -h, --help            show the help message and exit, feel free to append to other commands
@@ -64,25 +88,9 @@ optional arguments:
    -q, --quiet           quiet output
 ```
 
-## How to Build
-
-``` bash
-# Install build
-$ pip install build
-
-# Build
-$ python -m build
-```
-
 ## Developing a seed
 
-``` bash
-# Download base
-$ git clone https://
-
-# Build
-$ python -m build
-```
+Check [datoso_seed_base](https://github.com/laromicas/datoso_seed_base)
 
 ## Posible Issues
 
@@ -92,9 +100,9 @@ OTW.
 
 ## TODO (without priority)
 
--   Migrate pydantic to dataclasses
--   Migration of current datero seeds to plugins
--   Cleaning of legacy modular code
+-   Datoso Initialization
+-   Change logo
+-   Change pydantic to dataclasses
 -   Better rules update process
     -   Make update rules write to database only when finished
 -   Tests
@@ -104,9 +112,7 @@ OTW.
 -   Zippyshare download support (<https://pypi.org/project/pyOneFichierClient/>)
 -   Configurable folder structure (instead of emulator-focused structure use dat-repositories or viceversa)
     -   Maybe with a builder, to avoid the need to change the code anytime
--   Modular design for repositories (done for seeds, repositores
-    missing)
--   Better structure for the downloaders \*
+-   Modular design for repositories (done for seeds, repositores missing)
 
 
 *(*) Done but to be improved*
