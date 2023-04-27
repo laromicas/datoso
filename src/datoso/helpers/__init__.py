@@ -1,6 +1,7 @@
 """
 Helpers
 """
+from contextlib import suppress
 import re
 import os
 from pathlib import Path
@@ -92,10 +93,8 @@ class FileUtils:
         except shutil.SameFileError:
             pass
         except IsADirectoryError:
-            try:
+            with suppress(FileNotFoundError):
                 shutil.rmtree(destination)
-            except FileNotFoundError:
-                pass
             shutil.copytree(origin, destination)
         except FileNotFoundError:
             raise FileNotFoundError(f"File {origin} not found.")

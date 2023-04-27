@@ -1,5 +1,4 @@
 """Main entry point for datoso"""
-from ast import Module
 import configparser
 import json
 import logging

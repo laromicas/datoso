@@ -4,7 +4,6 @@
 # pylint: disable=too-few-public-methods
 from typing import Optional
 
-from attr import dataclass
 from pydantic import BaseModel, Extra
 from tinydb import Query
 from datoso.database import DB

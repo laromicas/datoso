@@ -58,9 +58,8 @@ def check_module(seed, module, repair=False):
         module = locate(seed)
     check_module_attributes(seed, module)
     requirements = getattr(module, '__requirements__', None)
-    if requirements:
-        if 'executables' in requirements:
-            for executable in requirements['executables']:
-                if not check_executable(executable):
-                    seed_name = seed.replace(f'{__app_name__}_seed_', '')
-                    print(f'{seed_name} - {Bcolors.FAIL}{executable}{Bcolors.ENDC} not found.')
+    if requirements and 'executables' in requirements:
+        for executable in requirements['executables']:
+            if not check_executable(executable):
+                seed_name = seed.replace(f'{__app_name__}_seed_', '')
+                print(f'{seed_name} - {Bcolors.FAIL}{executable}{Bcolors.ENDC} not found.')

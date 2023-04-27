@@ -1,6 +1,5 @@
 
 import os
-import shutil
 from datoso.helpers import FileUtils
 from datoso.configuration import config
 

@@ -2,6 +2,7 @@
 Process actions.
 """
 # pylint: disable=too-few-public-methods
+from contextlib import suppress
 import os
 import shutil
 from datoso.configuration import config
@@ -76,10 +77,8 @@ class DeleteOld(Process):
             try:
                 shutil.rmtree(olddat['new_file'])
             except NotADirectoryError:
-                try:
+                with suppress(FileNotFoundError):
                     os.unlink(olddat['new_file'])
-                except FileNotFoundError:
-                    pass
             except FileNotFoundError:
                 pass
             result = "Deleted"
