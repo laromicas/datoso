@@ -1,5 +1,6 @@
 """List all installed seeds."""
 from pydoc import locate
+from types import ModuleType
 from datoso import __app_name__
 
 def get(plugin, module, plugin_type):
@@ -19,7 +20,7 @@ def installed(plugin_type):
     }
 
 def description(plugin, plugin_type):
-    plugin = locate(f'{__app_name__}_{plugin_type}_{plugin}')
+    plugin = plugin if isinstance(plugin, ModuleType) else locate(f'{__app_name__}_{plugin_type}_{plugin}')
     return plugin.__description__
 
 def get_seed(seed, module):

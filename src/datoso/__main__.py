@@ -1,4 +1,5 @@
 """Main entry point for datoso"""
+from ast import Module
 import configparser
 import json
 import logging
@@ -18,13 +19,11 @@ from datoso.helpers import Bcolors
 from datoso.configuration import config
 
 from datoso.helpers.plugins import installed_seeds, seed_description
-from datoso.commands.doctor import check_dependencies, check_main_executables, check_seed
-from datoso.commands.seed_manager import seed_available, get_seed_repository, seed_install, seed_remove
+from datoso.commands.doctor import check_module, check_seed
 from datoso.commands.seed import Seed
 from datoso.repositories.dedupe import Dedupe
 from datoso.seeds.rules import Rules
 from datoso.seeds.unknown_seed import detect_seed
-import orjson
 
 #---------Boilerplate to check python version ----------
 if sys.version_info[0] < 3 or sys.version_info.minor < 9:
@@ -56,11 +55,11 @@ def parse_args() -> argparse.Namespace:
     parser_save.add_argument('-g','--global', action='store_true', help='When set, saves to global config, else to `.datosorc`')
 
     parser_doctor = subparser.add_parser('doctor', help='Doctor installed seeds')
-    parser_doctor.add_argument('command', nargs='?', help='Seed to doctor')
+    parser_doctor.add_argument('seed', nargs='?', help='Seed to doctor')
     parser_doctor.set_defaults(func=command_doctor)
     parser_doctor.add_argument('-r', '--repair', action='store_true', help='Try to repair seed(s)')
 
-    parser_dat = subparser.add_parser('dat', help='Make changes in dat config')
+    parser_dat = subparser.add_parser('dat', help='Changes configuration in current dats')
     parser_dat.add_argument('command', nargs='?', help='Command to execute')
 
     group_dat= parser_dat.add_mutually_exclusive_group(required=True)
@@ -74,27 +73,15 @@ def parse_args() -> argparse.Namespace:
     parser_dat.set_defaults(func=command_dat)
 
     # Seed admin commands
-    parser_seed = subparser.add_parser('seed', help='Seed scripts')
+    parser_seed = subparser.add_parser('seed', help='Seed admin commands')
     subparser_seed = parser_seed.add_subparsers(help='sub-command help')
 
-    parser_available = subparser_seed.add_parser('available', help='List available seeds')
-    parser_available.set_defaults(func=command_seed_available)
+    parser_available = subparser_seed.add_parser('installed', help='List installed seeds')
+    parser_available.set_defaults(func=command_seed_installed)
 
     parser_details = subparser_seed.add_parser('details', help='Show details of seed')
     parser_details.add_argument('seed', help='Seed to show details of')
     parser_details.set_defaults(func=command_seed_details)
-
-    parser_install = subparser_seed.add_parser('install', help='Install seed')
-    parser_install.add_argument('seed', help='Seed to install')
-    parser_install.set_defaults(func=command_seed_install)
-    parser_install.add_argument('-r', '--repository', help='Use repository instead of default')
-    parser_install.add_argument('-b', '--branch', help='Use branch name instead of master')
-    parser_install.add_argument('-d', '--developer', action='store_true', help='Install developer version (with git)')
-    parser_install.add_argument('-id', '--install-dependencies', action='store_true', help='Install all required dependencies')
-
-    parser_remove = subparser_seed.add_parser('remove', help='Remove seed')
-    parser_remove.add_argument('seed', help='Seed to remove')
-    parser_remove.set_defaults(func=command_seed_remove)
 
     parser_import = subparser.add_parser('import', help='Import dats from existing romvault')
     parser_import.set_defaults(func=command_import)
@@ -177,12 +164,6 @@ def command_import(_) -> None:
         sys.exit(1)
 
     rules = Rules().rules
-    # def default(obj):
-    #     if isinstance(obj, type):
-    #         return obj.__name__
-    #     return obj
-    # print(orjson.dumps(rules, option=orjson.OPT_INDENT_2, default=default).decode('utf-8'))
-    # exit()
 
     dats = { str(x):None for x in Path(dat_root_path).rglob("*.[dD][aA][tT]") }
 
@@ -272,41 +253,14 @@ def command_dat(args):
         print_dats(result)
 
 
-def command_seed_remove(args) -> None:
-    """ Remove seed """
-    if not check_seed(args.seed):
-        print(f'Module Seed {Bcolors.FAIL}  - {Bcolors.BOLD}{args.seed}{Bcolors.ENDC} not found')
-        sys.exit(1)
-    seed_remove(args.seed)
-    print(f'Seed {Bcolors.OKGREEN}{args.seed}{Bcolors.ENDC} removed successfully')
-
-
-def command_seed_install(args) -> None:
-    """ Install seed """
-    if check_seed(args.seed):
-        print(f'Module Seed {Bcolors.WARNING}{args.seed}{Bcolors.ENDC} already installed')
-        print('Reinstall? [y/n]: ', end='')
-        if input().lower() != 'y':
-            sys.exit(1)
-    repository = get_seed_repository(args.seed) or (args.repository if getattr(args, 'repository', None) else None)
-    if not repository:
-        print(f'{Bcolors.FAIL}Repository for seed {args.seed} not found.{Bcolors.ENDC}')
-        print('Please provide it with --repository parameter.')
-        sys.exit(1)
-    seed_install(args, repository)
-    print(f'Seed {Bcolors.OKGREEN}{args.seed}{Bcolors.ENDC} installed successfully')
-
-
-def command_seed_available(_) -> None:
+def command_seed_installed(_) -> None:
     """ List available seeds """
-    status = {
-        'installed': Bcolors.OKGREEN,
-        'not installed': Bcolors.OKCYAN,
-    }
-    print('Available seeds:')
-    for seed in seed_available():
-        installed = 'installed' if check_seed(seed[0]) else 'not installed'
-        print(f'* {status[installed]}{seed[0]}{Bcolors.ENDC} - {seed[1][0:60] if len(seed[1]) > 60 else seed[1]}...')
+    print('Installed seeds:')
+    for seed, seed_module in installed_seeds().items():
+        description = seed_description(seed_module)
+        description = {description[0:60]+'...' if len(description) > 60 else description}
+        seed_name = seed[12:]
+        print(f'* {Bcolors.OKGREEN}{seed_name}{Bcolors.ENDC} - {description}')
 
 
 def command_seed_details(args) -> None:
@@ -444,17 +398,18 @@ def command_list(_):
 
 def command_doctor(args):
     """ Doctor installed seeds """
-    check_main_executables()
     if getattr(args, 'seed', False):
         seed = check_seed(args.seed)
         if not seed:
             print(f'Module Seed {Bcolors.FAIL}  - {Bcolors.BOLD}{args.seed}{Bcolors.ENDC} not found')
             sys.exit(1)
-        seeds = [(args.seed, seed_description(args.seed))]
+        seed = seed if args.seed.startswith('datoso_seed_') else f'datoso_seed_{args.seed}'
+        seeds = {seed: None}
     else:
         seeds = installed_seeds()
-    for seed in seeds:
-        check_dependencies(seed[0], args.repair)
+    for seed, module in seeds.items():
+        print(f'Checking seed {Bcolors.OKCYAN}{seed}{Bcolors.ENDC}')
+        check_module(seed, module, args.repair)
 
 def main():
     """ Main function """

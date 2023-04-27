@@ -9,11 +9,35 @@ The dat file format must be compatible with [ROMVault](https://www.romvault.com/
 
 ## Installation
 
-Use pip or download a release and install it (recommended to use a
-virtual environment):
+Datoso requires python 3.10+.
+
+Use pip (recommended to use a virtual environment):
 
 ``` bash
+# Optional (create a virtual environment)
+python3 -m venv venv
+source venv/bin/activate
+
+# Install datoso base (doesn't do much without plugins)
 pip install datoso
+
+# Install datoso with all official plugins
+pip install datoso[all]
+
+# Install datoso with only one of the plugins
+pip install datoso[fbneo]
+pip install datoso[nointro]
+pip install datoso[pleasuredome]
+pip install datoso[redump]
+pip install datoso[translatedenglish]
+
+# Install datoso plugins after installing datoso
+pip install datoso_seed_fbneo
+pip install datoso_seed_nointro
+pip install datoso_seed_pleasuredome
+pip install datoso_seed_redump
+pip install datoso_seed_translatedenglish
+
 ```
 
 ## Usage
@@ -22,23 +46,17 @@ pip install datoso
 # Show help
 $ datoso --help
 
-# List installed seeds
-$ datoso list
+# Seed commands
+$ datoso seed [list,details]
 
-# Doctor the seeds installation
-$ datoso doctor [seed]
-
-# List available seeds
-$ datoso seed available
+# Seed commands
+$ datoso [seed] {--fetch|--process} [--filter FILTER]
 
 # Seed install
 $ datoso seed install [seed] [--repository REPOSITORY] [--branch BRANCH]
 
 # Seed remove
 $ datoso seed remove [seed]
-
-# Seed commands
-$ datoso [seed] {--fetch|--process} [--filter FILTER]
 
 optional arguments:
    -h, --help            show the help message and exit, feel free to append to other commands
