@@ -56,7 +56,15 @@ dev = [
 datoso = "datoso.__main__:main"
 
 [tool.setuptools]
-packages = ["datoso"]
+packages = [
+    "datoso",
+    "datoso.actions",
+    "datoso.commands",
+    "datoso.configuration",
+    "datoso.helpers",
+    "datoso.repositories",
+    "datoso.seeds"
+    ]
 license-files = ["LICENSE"]
 include-package-data = true
 

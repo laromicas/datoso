@@ -1,3 +1,4 @@
-include README.rst
+include README.md
 include src/datoso/datoso.ini
-include src/datoso/seeds.txt
+include src/datoso/systems.json
+recursive-include src/datoso *
