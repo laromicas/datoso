@@ -33,19 +33,19 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 all = [
-    "datoso_seed_fbneo>=0.1.0",
-    "datoso_seed_nointro>=0.1.0",
-    "datoso_seed_pleasuredome>=0.1.0",
-    "datoso_seed_redump>=0.1.0",
-    "datoso_seed_translatedenglish>=0.1.0",
+    "datoso_seed_fbneo>=0.2.3",
+    "datoso_seed_nointro>=0.2.3",
+    "datoso_seed_pleasuredome>=0.2.3",
+    "datoso_seed_redump>=0.2.3",
+    "datoso_seed_translatedenglish>=0.2.3",
     ]
-fbneo = [ "datoso_seed_fbneo>=0.1.0" ]
-nointro = [ "datoso_seed_nointro>=0.1.0" ]
-pleasuredome = [ "datoso_seed_pleasuredome>=0.1.0" ]
-redump = [ "datoso_seed_redump>=0.1.0" ]
-translatedenglish = [ "datoso_seed_translatedenglish>=0.1.0" ]
+fbneo = [ "datoso_seed_fbneo>=0.2.3" ]
+nointro = [ "datoso_seed_nointro>=0.2.3" ]
+pleasuredome = [ "datoso_seed_pleasuredome>=0.2.3" ]
+redump = [ "datoso_seed_redump>=0.2.3" ]
+translatedenglish = [ "datoso_seed_translatedenglish>=0.2.3" ]
 dev = [
-    "ruff>=0.0.261",
+    "ruff>=0.0.263",
     "line_profiler==4.0.3"
     ]
 
