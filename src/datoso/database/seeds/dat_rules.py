@@ -52,3 +52,19 @@ def import_dats():
         row = System(**system)
         row.save()
         row._DB.table.storage.flush()
+
+def init():
+    """ Seed the database with Systems. """
+    # pylint: disable=protected-access
+    with open(Path(ROOT_FOLDER,'systems.json'), 'r', encoding='utf-8') as file:
+        systems = json.loads(file.read())
+    for system in systems:
+        row = System(**system)
+        row.save()
+        row._DB.table.storage.flush()
+
+def detect_first_run():
+    """ Detect if this is the first run. """
+    # pylint: disable=protected-access
+    if not len(System.all()):
+        init()

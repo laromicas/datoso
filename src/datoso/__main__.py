@@ -412,6 +412,8 @@ def command_doctor(args):
 
 def main():
     """ Main function """
+    from datoso.database.seeds.dat_rules import detect_first_run
+    detect_first_run()
     args = parse_args()
     args.func(args)
 

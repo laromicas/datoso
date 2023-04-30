@@ -93,3 +93,10 @@ class System(DatabaseModel):
         """ Query to update or load a record. """
         query = Query()
         return (query.company == self.company) & (query.system == self.system)
+
+    @staticmethod
+    def all():
+        """ Get all systems. """
+        System._DB.DB = DB  # pylint: disable=invalid-name
+        System._DB.table = DB.table(System._table_name)
+        return System._DB.table.all()
