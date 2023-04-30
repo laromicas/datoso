@@ -1,4 +1,5 @@
 release 0.2.1
+- Autoinitialize database on first run
 - Seeds are now plugins
 - Removed seed installator/manager
 - Added factory support for actions
