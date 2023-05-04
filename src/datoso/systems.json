@@ -1299,6 +1299,15 @@
     },
     {
         "company": "Sega",
+        "system": "Mega CD Hacks",
+        "override": {
+            "system": "Mega CD & Sega CD",
+            "suffix": "Hacks"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Sega",
         "system": "Sega Mega CD + Sega CD",
         "override": {
             "system": "Mega CD & Sega CD"

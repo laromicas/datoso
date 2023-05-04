@@ -44,7 +44,10 @@ class Seed:
             [print('\b \b', end='') for x in range(0, len(line))]
             print(' ' * (len(line)), end='')
             print('\r', end='')
-        dat_origin = os.path.join(FileUtils.parse_folder(config['PATHS'].get('DownloadPath', 'tmp')), self.name, 'dats')
+        def get_preffix(name):
+            seed = get_seed(name)
+            return seed.__preffix__ if seed else name
+        dat_origin = os.path.join(FileUtils.parse_folder(config['PATHS'].get('DownloadPath', 'tmp')), get_preffix(self.name), 'dats')
         line = ''
         for path, actions in self.actions.items():
             new_path = path.format(dat_origin=dat_origin)

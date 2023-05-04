@@ -1,7 +1,12 @@
 """List all installed seeds."""
+from enum import Enum
 from pydoc import locate
 from types import ModuleType
 from datoso import __app_name__
+
+class PluginType(Enum):
+    SEED = 'seed'
+    PLUGIN = 'plugin'
 
 def get(plugin, module, plugin_type):
     if module:
@@ -23,20 +28,20 @@ def description(plugin, plugin_type):
     plugin = plugin if isinstance(plugin, ModuleType) else locate(f'{__app_name__}_{plugin_type}_{plugin}')
     return plugin.__description__
 
-def get_seed(seed, module):
-    return get(seed, module, 'seed')
+def get_seed(seed, module=None):
+    return get(seed, module, PluginType.SEED)
 
 def installed_seeds():
-    return installed('seed')
+    return installed(PluginType.SEED)
 
 def seed_description(seed):
-    return description(seed, 'seed')
+    return description(seed, PluginType.SEED)
 
-def get_plugin(plugin, module):
-    return get(plugin, module, 'plugin')
+def get_plugin(plugin, module=None):
+    return get(plugin, module, PluginType.PLUGIN)
 
 def installed_plugins():
-    return installed('plugin')
+    return installed(PluginType.PLUGIN)
 
 def plugin_description(plugin):
-    return description(plugin, 'plugin')
+    return description(plugin, PluginType.PLUGIN)
