@@ -116,3 +116,12 @@ class FileUtils:
             return os.path.expanduser(path)
         else:
             return os.path.join(os.getcwd(), path)
+
+    @staticmethod
+    def move(origin, destination):
+        """ Move file to destination. """
+        os.makedirs(os.path.dirname(destination), exist_ok=True)
+        try:
+            shutil.move(origin, destination)
+        except shutil.Error:
+            FileUtils.remove(origin)
