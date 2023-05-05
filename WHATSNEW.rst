@@ -1,3 +1,11 @@
+release 0.2.3
+- Standarized minimum version of all dependencies
+- Fixed a bug where internetarchive seeds where not being processed
+- Minimum recommended version
+
+release 0.2.2
+Skipped
+
 release 0.2.1
 - Autoinitialize database on first run
 - Seeds are now plugins

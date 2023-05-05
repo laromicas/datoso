@@ -100,7 +100,6 @@ OTW.
 
 ## TODO (without priority)
 
--   Datoso Initialization
 -   Change logo
 -   Change pydantic to dataclasses
 -   Better rules update process
@@ -112,11 +111,7 @@ OTW.
 -   Zippyshare download support (<https://pypi.org/project/pyOneFichierClient/>)
 -   Configurable folder structure (instead of emulator-focused structure use dat-repositories or viceversa)
     -   Maybe with a builder, to avoid the need to change the code anytime
--   Modular design for repositories (done for seeds, repositores missing)
 
-
-*(*) Done but to be improved*
-*(**) Did it Yay!!!*
 
 ## USEFUL DEVELOPMENT COMMANDS
 
@@ -130,6 +125,9 @@ $ find . -type d -empty -print -delete
 # Pylint
 $ pylint src --errors-only
 $ pylint src --disable=all --enable=missing-function-docstring
+
+# Find duplicate names different case
+$ find . | sort -f | uniq -i -d
 ```
 
 ## WISHLIST (without priority)
@@ -143,8 +141,6 @@ $ pylint src --disable=all --enable=missing-function-docstring
     -   Add \[MIA\] to dat roms
 -   Remove MIA from dats
 -   .cue Generator
-
-*(**) Did it Yay!!!*
 
 ## Contributing
 
