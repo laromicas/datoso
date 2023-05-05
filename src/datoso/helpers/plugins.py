@@ -16,7 +16,6 @@ def get(plugin, module, plugin_type):
 def installed(plugin_type):
     import importlib
     import pkgutil
-
     return {
         name: importlib.import_module(name)
         for finder, name, ispkg
@@ -29,19 +28,19 @@ def description(plugin, plugin_type):
     return plugin.__description__
 
 def get_seed(seed, module=None):
-    return get(seed, module, PluginType.SEED)
+    return get(seed, module, PluginType.SEED.value)
 
 def installed_seeds():
-    return installed(PluginType.SEED)
+    return installed(PluginType.SEED.value)
 
 def seed_description(seed):
-    return description(seed, PluginType.SEED)
+    return description(seed, PluginType.SEED.value)
 
 def get_plugin(plugin, module=None):
-    return get(plugin, module, PluginType.PLUGIN)
+    return get(plugin, module, PluginType.PLUGIN.value)
 
 def installed_plugins():
-    return installed(PluginType.PLUGIN)
+    return installed(PluginType.PLUGIN.value)
 
 def plugin_description(plugin):
-    return description(plugin, PluginType.PLUGIN)
+    return description(plugin, PluginType.PLUGIN.value)
