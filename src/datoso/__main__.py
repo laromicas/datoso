@@ -103,6 +103,9 @@ def parse_args() -> argparse.Namespace:
         parser_command.add_argument('-p', '--process', action='store_true', help='Process dats from seed')
         parser_command.add_argument('-d', '--details', action='store_true', help='Show details of seed')
         parser_command.add_argument('-fd', '--filter', help='Filter dats to process')
+        if seed == 'all':
+            parser_command.add_argument('-e', '--exclude', action='append', help='Exclude seed or seeds (only work with all)')
+            parser_command.add_argument('-o', '--only', action='append', help='Only seed or seeds (only work with all)')
 
     # Common arguments
     subparsers = [subparser, subparser_seed]
@@ -283,6 +286,10 @@ def command_seed(args) -> None:
     if args.seed == 'all':
         for seed, _ in installed_seeds().items():
             seed = get_seed_name(seed)
+            if seed in args.exclude:
+                continue
+            if args.only and seed not in args.only:
+                continue
             if config['PROCESS'].get('SeedIgnoreRegEx'):
                 ignore_regex = re.compile(config['PROCESS']['SeedIgnoreRegEx'])
                 if ignore_regex.match(seed):

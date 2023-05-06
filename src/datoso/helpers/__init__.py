@@ -123,5 +123,5 @@ class FileUtils:
         os.makedirs(os.path.dirname(destination), exist_ok=True)
         try:
             shutil.move(origin, destination)
-        except shutil.Error:
+        except shutil.Error as error:
             FileUtils.remove(origin)
