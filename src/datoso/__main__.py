@@ -308,15 +308,19 @@ def command_seed(args) -> None:
     if getattr(args, 'details', False):
         command_seed_details(args)
     if getattr(args, 'fetch', False):
-        print(f'Fetching seed {Bcolors.OKGREEN}{args.seed}{Bcolors.ENDC}')
+        message = f'{Bcolors.OKCYAN}Fetching seed {Bcolors.OKGREEN}{args.seed}{Bcolors.ENDC}'
+        print('='*(len(message)-14))
+        print(message)
+        print('='*(len(message)-14))
         if seed.fetch():
             print(f'Errors fetching {Bcolors.FAIL}{args.seed}{Bcolors.ENDC}')
             print('Please enable logs for more information or use -v parameter')
             command_doctor(args)
     if getattr(args, 'process', False):
-        print('=======================')
-        print(f'{Bcolors.OKCYAN}Processing seed {Bcolors.OKGREEN}{args.seed}{Bcolors.ENDC}')
-        print('=======================')
+        message = f'{Bcolors.OKCYAN}Processing seed {Bcolors.OKGREEN}{args.seed}{Bcolors.ENDC}'
+        print('='*(len(message)-14))
+        print(message)
+        print('='*(len(message)-14))
         if seed.process_dats(fltr=getattr(args, 'filter', None)):
             print(f'Errors processing {Bcolors.FAIL}{args.seed}{Bcolors.ENDC}')
             print('Please enable logs for more information or use -v parameter')
