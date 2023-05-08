@@ -293,7 +293,7 @@ def command_seed(args) -> None:
     if args.seed == 'all':
         for seed, _ in installed_seeds().items():
             seed = get_seed_name(seed)
-            if seed in args.exclude:
+            if args.exclude and seed in args.exclude:
                 continue
             if args.only and seed not in args.only:
                 continue
