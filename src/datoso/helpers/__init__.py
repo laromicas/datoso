@@ -105,7 +105,10 @@ class FileUtils:
         try:
             os.unlink(path)
         except IsADirectoryError:
-            shutil.rmtree(path)
+            try:
+                shutil.rmtree(path)
+            except PermissionError:
+                pass
         except FileNotFoundError:
             pass
 

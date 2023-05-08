@@ -67,6 +67,8 @@ def parse_args() -> argparse.Namespace:
     group_dat.add_argument('-a', '--all', help='Show all dats', action='store_true')
 
     parser_dat.add_argument('-s', '--set', help='Manually set variable, must be in format "variable=value"')
+    parser_dat.add_argument('--delete', action='store_true', default=False, help='Delete Dat')
+
     parser_dat.add_argument('-on', '--only-names', action='store_true', help='Only show names')
 
     parser_dat.set_defaults(func=command_dat)
@@ -239,6 +241,11 @@ def command_dat(args):
                 table.update({key: value}, doc_ids=[result.doc_id])
                 table.storage.flush()
                 print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} {key} set to {Bcolors.OKBLUE}{value}{Bcolors.ENDC}')
+                sys.exit(0)
+            if args.delete:
+                table.remove(doc_ids=[result.doc_id])
+                table.storage.flush()
+                print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} removed{Bcolors.ENDC}')
                 sys.exit(0)
             print_dats([result])
     elif args.all:
