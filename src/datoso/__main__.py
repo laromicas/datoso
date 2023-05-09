@@ -316,6 +316,8 @@ def command_seed(args) -> None:
             print(f'Errors fetching {Bcolors.FAIL}{args.seed}{Bcolors.ENDC}')
             print('Please enable logs for more information or use -v parameter')
             command_doctor(args)
+            sys.exit(1)
+        print(f'{Bcolors.OKBLUE}Finished fetching {Bcolors.OKGREEN}{args.seed}{Bcolors.ENDC}')
     if getattr(args, 'process', False):
         message = f'{Bcolors.OKCYAN}Processing seed {Bcolors.OKGREEN}{args.seed}{Bcolors.ENDC}'
         print('='*(len(message)-14))
@@ -325,6 +327,8 @@ def command_seed(args) -> None:
             print(f'Errors processing {Bcolors.FAIL}{args.seed}{Bcolors.ENDC}')
             print('Please enable logs for more information or use -v parameter')
             command_doctor(args)
+            sys.exit(1)
+        print(f'{Bcolors.OKBLUE}Finished processing {Bcolors.OKGREEN}{args.seed}{Bcolors.ENDC}')
 
 
 def command_config_save(args) -> None:

@@ -84,4 +84,3 @@ class Seed:
                     line = ''
                     print(line)
         delete_line(line)
-        print(f'{Bcolors.OKBLUE}Finished processing {Bcolors.OKGREEN}{self.name}{Bcolors.ENDC}')
