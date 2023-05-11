@@ -106,14 +106,19 @@ class XMLDatFile(DatFile):
         """ Load the data from a XML file. """
         with open(self.file, encoding='utf-8') as fild:
             self.data = xmltodict.parse(fild.read())
-            self.header = self.data['datafile']['header']
-            self.name = self.header['name'] if 'name' in self.header else None
-            self.full_name = self.header['description'] if 'description' in self.header else None
-            self.date = self.header['date'] if 'date' in self.header else None
-            self.homepage = self.header['homepage'] if 'homepage' in self.header and self.header['homepage'] and 'insert' not in self.header['homepage'] else None
-            self.url = self.header['url'] if 'url' in self.header and self.header['url'] and 'insert' not in self.header['url'] else None
-            self.author = self.header['author'] if 'author' in self.header and self.header['author'] and 'insert' not in self.header['author'] else None
-            self.email = self.header['email'] if 'email' in self.header and self.header['email'] and 'insert' not in self.header['email'] else None
+            self.detect_main_key()
+            self.header = self.data[self.main_key].get('header', {})
+            if self.header:
+                self.name = self.header['name'] if 'name' in self.header else None
+                self.full_name = self.header['description'] if 'description' in self.header else None
+                self.date = self.header['date'] if 'date' in self.header else None
+                self.homepage = self.header['homepage'] if 'homepage' in self.header and self.header['homepage'] and 'insert' not in self.header['homepage'] else None
+                self.url = self.header['url'] if 'url' in self.header and self.header['url'] and 'insert' not in self.header['url'] else None
+                self.author = self.header['author'] if 'author' in self.header and self.header['author'] and 'insert' not in self.header['author'] else None
+                self.email = self.header['email'] if 'email' in self.header and self.header['email'] and 'insert' not in self.header['email'] else None
+            else:
+                self.name = self.data[self.main_key].get('@name')
+                self.full_name = self.data[self.main_key].get('@description')
             self.detect_game_key()
 
     def save(self) -> None:
@@ -121,9 +126,13 @@ class XMLDatFile(DatFile):
         with open(self.file, 'w', encoding='utf-8') as fild:
             fild.write(xmltodict.unparse(self.data, pretty=True))
 
+    def detect_main_key(self) -> str:
+        """ Detect the main key for the dat file. """
+        self.main_key = next(iter(self.data))
+
     def detect_game_key(self) -> str:
         """ Get the game key. """
-        for key in self.data['datafile']:
+        for key in self.data[self.main_key]:
             if key != 'header' and not key.startswith('@'):
                 self.game_key = key
                 break
@@ -146,7 +155,7 @@ class XMLDatFile(DatFile):
         """ Get the shas for the roms and creates an index. """
         self.shas = HashesIndex()
 
-        for game in self.data['datafile'][self.game_key]:
+        for game in self.data[self.main_key][self.game_key]:
             if 'rom' not in game:
                 continue
             if not isinstance(game['rom'], list):
@@ -158,7 +167,7 @@ class XMLDatFile(DatFile):
     def merge_with(self, parent: DatFile) -> None:
         """ Merge the dat file with the parent. """
         parent.get_rom_shas()
-        for game in self.data['datafile'][self.game_key]:
+        for game in self.data[self.main_key][self.game_key]:
             if 'rom' not in game:
                 continue
             if not isinstance(game['rom'], list):
@@ -174,10 +183,10 @@ class XMLDatFile(DatFile):
                         self.merged_roms.append(self.parse_rom(rom))
                 game['rom'] = new_roms
         new_games = []
-        for game in self.data['datafile'][self.game_key]:
+        for game in self.data[self.main_key][self.game_key]:
             if 'rom' in game:
                 new_games.append(game)
-        self.data['datafile'][self.game_key] = new_games
+        self.data[self.main_key][self.game_key] = new_games
 
     def get_name(self) -> str:
         """ Get the name of the dat file. """
@@ -274,7 +283,7 @@ class ClrMameProDatFile(DatFile):
                 self.games.append(self.read_block(block))
 
         self.data = {
-            'datafile': {
+            self.main_key: {
                 'header':  self.header,
                 'game': self.games
             }
@@ -298,7 +307,7 @@ class ZipMultiDatFile(DatFile):
         self.header = self.get_header()
 
         self.data = {
-            'datafile': {
+            self.main_key: {
                 'header':  self.header,
                 'game': self.games
             }
@@ -324,7 +333,7 @@ class DirMultiDatFile(DatFile):
         self.header = self.get_header()
 
         self.data = {
-            'datafile': {
+            self.main_key: {
                 'header':  self.header,
                 'game': self.games
             }
