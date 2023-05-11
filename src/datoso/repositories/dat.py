@@ -272,6 +272,7 @@ class ClrMameProDatFile(DatFile):
     def load(self) -> None:
         """ Load the data from a ClrMamePro file. """
         self.games = []
+        self.main_key = 'datafile'
         with open(self.file, encoding='utf-8', errors='ignore') as file:
             data = file.read()
 
