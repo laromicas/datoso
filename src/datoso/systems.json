@@ -111,6 +111,11 @@
         "system_type": "Console"
     },
     {
+        "company": "Arduboy Inc",
+        "system": "Arduboy",
+        "system_type": "Console"
+    },
+    {
         "company": "Atari",
         "system": "8-bit Family",
         "extra_configs": {

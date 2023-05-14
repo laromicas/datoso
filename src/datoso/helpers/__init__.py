@@ -100,15 +100,18 @@ class FileUtils:
             raise FileNotFoundError(f"File {origin} not found.")
 
     @staticmethod
+    def remove_folder(path):
+        """ Remove folder. """
+        with suppress(PermissionError):
+            shutil.rmtree(path)
+
+    @staticmethod
     def remove(path):
         """ Remove file or folder. """
         try:
             os.unlink(path)
         except IsADirectoryError:
-            try:
-                shutil.rmtree(path)
-            except PermissionError:
-                pass
+            FileUtils.remove_folder(path)
         except FileNotFoundError:
             pass
 
@@ -126,5 +129,5 @@ class FileUtils:
         os.makedirs(os.path.dirname(destination), exist_ok=True)
         try:
             shutil.move(origin, destination)
-        except shutil.Error as error:
+        except shutil.Error:
             FileUtils.remove(origin)
