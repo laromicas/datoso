@@ -1187,6 +1187,11 @@
         "system_type": "Handheld"
     },
     {
+        "company": "Panic",
+        "system": "Playdate",
+        "system_type": "Console"
+    },
+    {
         "company": "Palm",
         "system": "Palm OS",
         "override": {
