@@ -116,7 +116,7 @@ class FileUtils:
             pass
 
     @staticmethod
-    def parse_folder(path):
+    def parse_folder(path) -> str:
         """ Get folder from config. """
         if path is not None and path.startswith(('/', '~')):
             return os.path.expanduser(path)

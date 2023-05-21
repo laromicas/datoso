@@ -5,6 +5,7 @@ Process actions.
 from contextlib import suppress
 import os
 import shutil
+from dateutil import parser
 from datoso.configuration import config
 from datoso.helpers import FileUtils
 from datoso.repositories.dedupe import Dedupe
@@ -116,8 +117,11 @@ class Copy(Process):
                         result = "Updated"
                     elif config.getboolean('GENERAL', 'Overwrite', fallback=False):
                         result = "Overwritten"
-                    self.previous['new_file'] = destination
-                    FileUtils.copy(origin, destination)
+                    if parser.parse(self.database.date, fuzzy=True) > parser.parse(self.previous['date'], fuzzy=True):
+                        result = "No Action Taken, Newer Found"
+                    else:
+                        self.previous['new_file'] = destination
+                        FileUtils.copy(origin, destination)
                 else:
                     result = "Exists"
             else:

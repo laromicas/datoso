@@ -13,7 +13,7 @@ class Seed:
     path = None
     actions = {}
     # working_path = os.path.abspath(os.path.join(os.getcwd(), config.get('PATHS', 'WorkingPath')))
-    status_to_show = ['Updated', 'Created', 'Error', 'Disabled', 'Deduped']
+    status_to_show = ['Updated', 'Created', 'Error', 'Disabled', 'Deduped', 'No Action Taken, Newer Found']
 
     def __init__(self, **kwargs) -> None:
         self.__dict__.update(kwargs)
@@ -44,10 +44,11 @@ class Seed:
             [print('\b \b', end='') for x in range(0, len(line))]
             print(' ' * (len(line)), end='')
             print('\r', end='')
-        def get_preffix(name):
+        def get_preffix(name) -> str:
             seed = get_seed(name)
             return seed.__preffix__ if seed else name
-        dat_origin = os.path.join(FileUtils.parse_folder(config['PATHS'].get('DownloadPath', 'tmp')), get_preffix(self.name), 'dats')
+        tmp_path = config['PATHS'].get('DownloadPath', 'tmp')
+        dat_origin = os.path.join(FileUtils.parse_folder(tmp_path), get_preffix(self.name), 'dats')
         line = ''
         for path, actions in self.actions.items():
             new_path = path.format(dat_origin=dat_origin)
