@@ -304,6 +304,7 @@ class ZipMultiDatFile(DatFile):
 
     def load(self) -> None:
         """ Load the data from a ClrMamePro file. """
+        self.main_key = 'datafile'
         self.games = []
         self.header = self.get_header()
 
@@ -324,6 +325,7 @@ class DirMultiDatFile(DatFile):
 
     def load(self) -> None:
         """ Load the data from a ClrMamePro file. """
+        self.main_key = 'datafile'
         self.games = []
         for file in os.listdir(self.file):
             if file.endswith(('.xml', '.dat')):

@@ -117,11 +117,14 @@ class Copy(Process):
                         result = "Updated"
                     elif config.getboolean('GENERAL', 'Overwrite', fallback=False):
                         result = "Overwritten"
-                    if parser.parse(self.database.date, fuzzy=True) > parser.parse(self.previous['date'], fuzzy=True):
-                        result = "No Action Taken, Newer Found"
-                    else:
-                        self.previous['new_file'] = destination
-                        FileUtils.copy(origin, destination)
+                    try:
+                        if getattr(self.database, 'date', None) and self.previous.get('date', None) and parser.parse(self.database.date, fuzzy=True) > parser.parse(self.previous['date'], fuzzy=True):
+                            result = "No Action Taken, Newer Found"
+                        else:
+                            self.previous['new_file'] = destination
+                            FileUtils.copy(origin, destination)
+                    except ValueError:
+                        pass
                 else:
                     result = "Exists"
             else:

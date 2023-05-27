@@ -311,6 +311,11 @@
         "system_type": "Computer"
     },
     {
+        "company": "Digital Media Cartridge",
+        "system": "Firecore",
+        "system_type": "Console"
+    },
+    {
         "company": "Emerson",
         "system": "Arcadia 2001",
         "system_type": "Console"
