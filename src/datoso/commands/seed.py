@@ -69,7 +69,13 @@ class Seed:
                     line = f'Processing {Bcolors.OKCYAN}{file}{Bcolors.ENDC}'
                     print(line, end=' ', flush=True)
                 procesor = Processor(seed=self.name, file=f'{new_path}/{file}', actions=actions)
-                output = [x for x in procesor.process() if (x in self.status_to_show or Command.verbose)]
+                # output = [x for x in procesor.process() if (x in self.status_to_show or Command.verbose)]
+                output = []
+                for process in procesor.process():
+                    if process in self.status_to_show or Command.verbose:
+                        output.append(process)
+                    if process == 'Error':
+                        break
                 if 'Deleted' in output and 'Ignored' in output:
                     output.append('Disabled')
                 if not config.getboolean('COMMAND', 'Quiet', fallback=False):

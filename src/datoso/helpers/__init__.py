@@ -17,6 +17,7 @@ class Bcolors:
     OKGREEN = '\033[92m'
     WARNING = '\033[93m'
     FAIL = '\033[91m'
+    ERROR = '\033[91m'
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
@@ -131,3 +132,6 @@ class FileUtils:
             shutil.move(origin, destination)
         except shutil.Error:
             FileUtils.remove(origin)
+
+class RequestUtils:
+    pass

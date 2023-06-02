@@ -57,7 +57,12 @@ class LoadDatFile(Process):
         if getattr(self, '_factory', None) and self._factory:
             self._class = self._factory(self.file)
 
-        self._dat = self._class(file=self.file)
+        try:
+            self._dat = self._class(file=self.file)
+        except Exception:
+            self._dat = None
+            self.status = "Error"
+            return "Error"
         self._dat.load()
         self.database = Dat(seed=self.seed, **self._dat.dict())
         self.output = self.database.dict()
