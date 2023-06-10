@@ -1,5 +1,7 @@
 """ Unknown seed, detects version and type of dat already in DatRoot. """
 import re
+import logging
+from datoso.helpers import FileHeaders
 from datoso.repositories.dat import ClrMameProDatFile, XMLDatFile
 
 def detect_xml(dat_file: str, rules):
@@ -35,6 +37,18 @@ def detect_clrmame(dat_file: str, rules):
 
 def detect_seed(dat_file: str, rules):
     """ Detect the seed for a dat file. """
+    # Read first 5 chars of file to determine type
+    with open(file, 'r', encoding='utf-8') as file:
+        file_header = file.read(5)
+    try:
+        if file_header == FileHeaders.XML.value:
+            return detect_xml(dat_file, rules)
+        if file_header == FileHeaders.CLRMAMEPRO.value:
+            return detect_clrmame(dat_file, rules)
+        raise Exception('Unknown file header', dat_file, file_header)
+    except Exception as e:
+        logging.exception('Error detecting seed type', e)
+
     try:
         return detect_xml(dat_file, rules)
     except Exception:

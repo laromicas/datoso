@@ -37,7 +37,7 @@ class Seed:
         return actions
 
 
-    def process_dats(self, fltr=None):
+    def process_dats(self, fltr=None, actions_to_execute=None):
         """ Process dats."""
         def delete_line(line):
             # pylint: disable=expression-not-assigned
@@ -53,6 +53,8 @@ class Seed:
         for path, actions in self.actions.items():
             new_path = path.format(dat_origin=dat_origin)
             actions = self.format_actions(actions, data={'dat_destination': config['PATHS'].get('DatPath', 'DatRoot')})
+            if actions_to_execute:
+                actions = [x for x in actions if x['action'] in actions_to_execute]
             for file in os.listdir(new_path) if os.path.isdir(new_path) else []:
                 if config['PROCESS'].get('DatIgnoreRegEx'):
                     ignore_regex = re.compile(config['PROCESS']['DatIgnoreRegEx'])

@@ -14,7 +14,7 @@ from datoso.configuration.logger import enable_logging, set_verbosity
 from datoso.database.models.datfile import Dat
 
 from datoso import __version__, __app_name__, ROOT_FOLDER
-from datoso.helpers import Bcolors
+from datoso.helpers import Bcolors, FileUtils
 from datoso.configuration import config
 
 from datoso.helpers.plugins import installed_seeds, seed_description
@@ -25,7 +25,7 @@ from datoso.seeds.rules import Rules
 from datoso.seeds.unknown_seed import detect_seed
 
 #---------Boilerplate to check python version ----------
-if sys.version_info[0] < 3 or sys.version_info.minor < 9:
+if sys.version_info < (3, 10):
     print("This is a Python 3 script. Please run it with Python 3.9 or above")
     sys.exit(1)
 
@@ -41,6 +41,9 @@ def parse_args() -> argparse.Namespace:
     subparser = parser.add_subparsers(help='sub-command help')
 
     parser.add_argument('-v', '--version', action='store_true', help='show version')
+
+    parser_log = subparser.add_parser('log', help='Show log')
+    parser_log.set_defaults(func=command_log)
 
     parser_save = subparser.add_parser('config', help='Show configuration')
     parser_save.add_argument('-s', '--save', action='store_true', help='Save configuration to .datosorc')
@@ -101,10 +104,12 @@ def parse_args() -> argparse.Namespace:
         seed = get_seed_name(seed)
         parser_command = subparser.add_parser(seed, help=f'Update seed {seed}')
         parser_command.set_defaults(func=command_seed, seed=seed)
-        parser_command.add_argument('-f', '--fetch', action='store_true', help='Fetch seed')
-        parser_command.add_argument('-p', '--process', action='store_true', help='Process dats from seed')
         parser_command.add_argument('-d', '--details', action='store_true', help='Show details of seed')
-        parser_command.add_argument('-fd', '--filter', help='Filter dats to process')
+        parser_command.add_argument('-f', '--fetch', action='store_true', help='Fetch seed')
+        parser_command_process = parser_command.add_argument_group('process')
+        parser_command_process.add_argument('-p', '--process', action='store_true', help='Process dats from seed')
+        parser_command_process.add_argument('-a', '--actions', action="append", help='Action to execute')
+        parser_command_process.add_argument('-fd', '--filter', help='Filter dats to process')
         if seed == 'all':
             parser_command.add_argument('-e', '--exclude', action='append', help='Exclude seed or seeds (only work with all)')
             parser_command.add_argument('-o', '--only', action='append', help='Only seed or seeds (only work with all)')
@@ -290,6 +295,11 @@ def command_seed_details(args) -> None:
 
 def command_seed(args) -> None:
     """ Commands with the seed (must be installed) """
+    def parse_actions(args):
+        if args.actions:
+            if len(args.actions) == 1:
+                args.actions = args.actions[0].split(',')
+    parse_actions(args)
     if args.seed == 'all':
         for seed, _ in installed_seeds().items():
             seed = get_seed_name(seed)
@@ -323,7 +333,7 @@ def command_seed(args) -> None:
         print('='*(len(message)-14))
         print(message)
         print('='*(len(message)-14))
-        if seed.process_dats(fltr=getattr(args, 'filter', None)):
+        if seed.process_dats(fltr=getattr(args, 'filter', None), actions_to_execute=args.actions):
             print(f'Errors processing {Bcolors.FAIL}{args.seed}{Bcolors.ENDC}')
             print('Please enable logs for more information or use -v parameter')
             command_doctor(args)
@@ -431,6 +441,11 @@ def command_doctor(args):
     for seed, module in seeds.items():
         print(f'Checking seed {Bcolors.OKCYAN}{seed}{Bcolors.ENDC}')
         check_module(seed, module, args.repair)
+
+def command_log(args):
+    log_path = FileUtils.parse_folder(config.get('PATHS','DatosoPath', fallback='~/.datoso'))
+    logfile = os.path.join(log_path, config['LOG'].get('LogFile', 'datoso.log'))
+    os.system(f'cat {logfile}')
 
 def main():
     """ Main function """

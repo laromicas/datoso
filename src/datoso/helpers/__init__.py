@@ -2,6 +2,7 @@
 Helpers
 """
 from contextlib import suppress
+from enum import Enum
 import re
 import os
 from pathlib import Path
@@ -135,3 +136,7 @@ class FileUtils:
 
 class RequestUtils:
     pass
+
+class FileHeaders(Enum):
+    XML = '<?xml'
+    CLRMAMEPRO = 'clrma'
