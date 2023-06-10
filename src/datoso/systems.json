@@ -1075,6 +1075,10 @@
     {
         "company": "Nintendo",
         "system": "Mario no Photopi SmartMedia",
+        "override": {
+            "system": "Nintendo 64",
+            "suffix": "Mario no Photopi SmartMedia"
+        },
         "system_type": "Console"
     },
     {
