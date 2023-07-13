@@ -28,12 +28,15 @@ class Processor:
             action_class = globals()[action['action']](file=self.file, seed=self.seed, previous=self._previous, **action)
             yield action_class.process()
             self._previous = action_class.output
+            if action_class.stop:
+                break
 
 
 class Process:
     """ Process Base class. """
     output = None
     status = None
+    stop = False
     previous = {}
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
@@ -78,6 +81,11 @@ class DeleteOld(Process):
         self.database = Dat(seed=self.previous['seed'], name=self.previous['name'])
         self.database.load()
         olddat = self.database.dict()
+        if self.previous and getattr(self.database, 'date', None) and self.previous.get('date', None) and parser.parse(self.database.date, fuzzy=True) > parser.parse(self.previous['date'], fuzzy=True):
+            result = "No Action Taken, Newer Found"
+            self.stop = True
+            return result
+
         result = None
         if 'new_file' in olddat and olddat['new_file']:
             try:

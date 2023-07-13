@@ -140,3 +140,9 @@ class RequestUtils:
 class FileHeaders(Enum):
     XML = '<?xml'
     CLRMAMEPRO = 'clrma'
+
+def show_progress(block_num, block_size, total_size):
+    if total_size != -1:
+        print(f' {block_num * block_size / total_size:.1%}', end="\r")
+    else:
+        print(f' {block_num * block_size / 1024 / 1024:.1f} MB', end="\r")
