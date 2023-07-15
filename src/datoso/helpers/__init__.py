@@ -146,3 +146,14 @@ def show_progress(block_num, block_size, total_size):
         print(f' {block_num * block_size / total_size:.1%}', end="\r")
     else:
         print(f' {block_num * block_size / 1024 / 1024:.1f} MB', end="\r")
+
+def compare_dates(date1, date2):
+    if date1 is None or date2 is None:
+        return False
+    if isinstance(date1, str):
+        date1 = date1.split(' ')[0]
+        date1 = parser.parse(date1, fuzzy=True)
+    if isinstance(date2, str):
+        date2 = date2.split(' ')[0]
+        date2 = parser.parse(date2, fuzzy=True)
+    return date1 > date2

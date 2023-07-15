@@ -7,7 +7,7 @@ import os
 import shutil
 from dateutil import parser
 from datoso.configuration import config
-from datoso.helpers import FileUtils
+from datoso.helpers import FileUtils, compare_dates
 from datoso.repositories.dedupe import Dedupe
 from datoso.database.models.datfile import Dat
 
@@ -81,10 +81,13 @@ class DeleteOld(Process):
         self.database = Dat(seed=self.previous['seed'], name=self.previous['name'])
         self.database.load()
         olddat = self.database.dict()
-        if self.previous and getattr(self.database, 'date', None) and self.previous.get('date', None) and parser.parse(self.database.date, fuzzy=True) > parser.parse(self.previous['date'], fuzzy=True):
-            result = "No Action Taken, Newer Found"
-            self.stop = True
-            return result
+        try:
+            if self.previous and getattr(self.database, 'date', None) and self.previous.get('date', None) and compare_dates(self.database.date, self.previous['date']):
+                result = "No Action Taken, Newer Found"
+                self.stop = True
+                return result
+        except ValueError:
+            print(self.database.date, self.previous['date'])
 
         result = None
         if 'new_file' in olddat and olddat['new_file']:
@@ -131,7 +134,7 @@ class Copy(Process):
                     elif config.getboolean('GENERAL', 'Overwrite', fallback=False):
                         result = "Overwritten"
                     try:
-                        if getattr(self.database, 'date', None) and self.previous.get('date', None) and parser.parse(self.database.date, fuzzy=True) > parser.parse(self.previous['date'], fuzzy=True):
+                        if getattr(self.database, 'date', None) and self.previous.get('date', None) and compare_dates(self.database.date, self.previous['date']):
                             result = "No Action Taken, Newer Found"
                         else:
                             self.previous['new_file'] = destination
