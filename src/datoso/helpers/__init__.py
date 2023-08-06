@@ -150,10 +150,11 @@ def show_progress(block_num, block_size, total_size):
 def compare_dates(date1, date2):
     if date1 is None or date2 is None:
         return False
+    dayfirst = not date1.startswith('20')
     if isinstance(date1, str):
         date1 = date1.split(' ')[0]
-        date1 = parser.parse(date1, fuzzy=True)
+        date1 = parser.parse(date1, fuzzy=True, dayfirst=dayfirst)
     if isinstance(date2, str):
         date2 = date2.split(' ')[0]
-        date2 = parser.parse(date2, fuzzy=True)
+        date2 = parser.parse(date2, fuzzy=True, dayfirst=dayfirst)
     return date1 > date2

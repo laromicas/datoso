@@ -1122,6 +1122,13 @@
         "override": {
             "system": "GameCube"
         },
+        "extra_configs": {
+            "if_suffix": {
+                "Private": {
+                    "suffix": "Private"
+                }
+            }
+        },
         "system_type": "Console"
     },
     {
@@ -1257,6 +1264,11 @@
             }
         },
         "system_type": "Mobile"
+    },
+    {
+        "company": null,
+        "system": "Project EGG",
+        "system_type": "Computer"
     },
     {
         "company": "RCA",
