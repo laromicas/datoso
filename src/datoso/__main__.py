@@ -296,8 +296,7 @@ def command_seed_details(args) -> None:
 def command_seed(args) -> None:
     """ Commands with the seed (must be installed) """
     def parse_actions(args):
-        if args.actions:
-            if len(args.actions) == 1:
+        if args.actions and len(args.actions) == 1:
                 args.actions = args.actions[0].split(',')
     parse_actions(args)
     if args.seed == 'all':

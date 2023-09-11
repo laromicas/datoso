@@ -38,7 +38,7 @@ def detect_clrmame(dat_file: str, rules):
 def detect_seed(dat_file: str, rules):
     """ Detect the seed for a dat file. """
     # Read first 5 chars of file to determine type
-    with open(file, 'r', encoding='utf-8') as file:
+    with open(dat_file, 'r', encoding='utf-8') as file:
         file_header = file.read(5)
     try:
         if file_header == FileHeaders.XML.value:

@@ -1,6 +1,7 @@
 """
 Helpers
 """
+__all__ = ['downloader']
 from contextlib import suppress
 from enum import Enum
 import re
@@ -8,6 +9,8 @@ import os
 from pathlib import Path
 from dateutil import parser
 import shutil
+
+from datoso.helpers.download import downloader
 
 class Bcolors:
     # pylint: disable=anomalous-backslash-in-string

@@ -5,7 +5,6 @@ Process actions.
 from contextlib import suppress
 import os
 import shutil
-from dateutil import parser
 from datoso.configuration import config
 from datoso.helpers import FileUtils, compare_dates
 from datoso.repositories.dedupe import Dedupe
@@ -62,13 +61,13 @@ class LoadDatFile(Process):
 
         try:
             self._dat = self._class(file=self.file)
+            self._dat.load()
+            self.database = Dat(seed=self.seed, **self._dat.dict())
+            self.output = self.database.dict()
         except Exception:
             self._dat = None
             self.status = "Error"
             return "Error"
-        self._dat.load()
-        self.database = Dat(seed=self.seed, **self._dat.dict())
-        self.output = self.database.dict()
         return "Loaded"
 
 
