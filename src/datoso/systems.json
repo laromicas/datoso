@@ -625,6 +625,9 @@
             "if_suffix": {
                 "Development Kit Hard Drives": {
                     "modifier": "Source Code"
+                },
+                "Title Updates": {
+                    "suffix": "Title Updates"
                 }
             },
             "empty_suffix": {
@@ -640,6 +643,9 @@
             "if_suffix": {
                 "Development Kit Hard Drives": {
                     "modifier": "Source Code"
+                },
+                "Title Updates": {
+                    "suffix": "Title Updates"
                 }
             },
             "empty_suffix": {
@@ -1877,6 +1883,11 @@
         "company": null,
         "system": "Video Game Scans",
         "system_type": "Manuals"
+    },
+    {
+        "company": null,
+        "system": "Video Game OSTs",
+        "system_type": "Audio"
     },
     {
         "company": null,

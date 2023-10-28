@@ -38,7 +38,7 @@ all = [
     "datoso-seed-fbneo>=0.3.2",
     "datoso-seed-md-enhanced>=0.3.0",
     "datoso-seed-nointro>=0.3.0",
-    "datoso-seed-pleasuredome>=0.3.1",
+    "datoso-seed-pleasuredome>=0.3.2",
     "datoso-seed-redump>=0.3.1",
     "datoso-seed-sfc-enhancedcolors>=0.3.0",
     "datoso-seed-sfc-msu1>=0.3.0",
@@ -49,7 +49,7 @@ all = [
 fbneo = [ "datoso-seed-fbneo>=0.3.2" ]
 md-enhanced = [ "datoso-seed-md-enhanced>=0.3.0" ]
 nointro = [ "datoso-seed-nointro>=0.3.0" ]
-pleasuredome = [ "datoso-seed-pleasuredome>=0.3.1" ]
+pleasuredome = [ "datoso-seed-pleasuredome>=0.3.2" ]
 redump = [ "datoso-seed-redump>=0.3.1" ]
 sfc-enhancedcolors = [ "datoso-seed-sfc-enhancedcolors>=0.3.0" ]
 sfc-msu1 = [ "datoso-seed-sfc-msu1>=0.3.0" ]
