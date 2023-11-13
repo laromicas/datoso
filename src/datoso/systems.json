@@ -943,6 +943,11 @@
         "company": "Nintendo",
         "system": "Wii",
         "extra_configs": {
+            "if_suffix": {
+                "Development Kit Hard Drives": {
+                    "modifier": "Source Code"
+                }
+            },
             "empty_suffix": {
                 "redump": "Discs"
             }

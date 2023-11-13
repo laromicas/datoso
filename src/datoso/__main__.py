@@ -45,16 +45,16 @@ def parse_args() -> argparse.Namespace:
     parser_log = subparser.add_parser('log', help='Show log')
     parser_log.set_defaults(func=command_log)
 
-    parser_save = subparser.add_parser('config', help='Show configuration')
-    parser_save.add_argument('-s', '--save', action='store_true', help='Save configuration to .datosorc')
-    parser_save.add_argument('-d', '--directory', default='~', choices=['~', '.'], help='Directory to save .datosorc')
-    parser_save.set_defaults(func=command_config)
-    parser_save.add_argument('-ru', '--rules-update', action='store_true', help='Update system rules from GoogleSheets Url')
+    parser_config = subparser.add_parser('config', help='Show configuration')
+    parser_config.add_argument('-s', '--save', action='store_true', help='Save configuration to .datosorc')
+    parser_config.add_argument('-d', '--directory', default='~', choices=['~', '.'], help='Directory to save .datosorc')
+    parser_config.set_defaults(func=command_config)
+    parser_config.add_argument('-ru', '--rules-update', action='store_true', help='Update system rules from GoogleSheets Url')
 
-    group_save = parser_save.add_mutually_exclusive_group()
+    group_save = parser_config.add_mutually_exclusive_group()
     group_save.add_argument('--set', nargs=2, metavar=('configuration', 'value'), help='Set Configuration Option separated by point with new value e.g. <GENERAL.Overwrite> <false>')
     group_save.add_argument('--get', metavar=('configuration'), help='Get value of Configuration Option.')
-    parser_save.add_argument('-g','--global', action='store_true', help='When set, saves to global config, else to `.datosorc`')
+    parser_config.add_argument('-g','--global', action='store_true', help='When set, saves to global config, else to `.datosorc`')
 
     parser_doctor = subparser.add_parser('doctor', help='Doctor installed seeds')
     parser_doctor.add_argument('seed', nargs='?', help='Seed to doctor')
@@ -64,13 +64,15 @@ def parse_args() -> argparse.Namespace:
     parser_dat = subparser.add_parser('dat', help='Changes configuration in current dats')
     parser_dat.add_argument('command', nargs='?', help='Command to execute')
 
-    group_dat= parser_dat.add_mutually_exclusive_group(required=True)
+    group_dat = parser_dat.add_mutually_exclusive_group(required=True)
     group_dat.add_argument('-d', '--dat-name', help='Select dat to update/check, must be in format "seed:name"')
     group_dat.add_argument('-f', '--find', help='Select dats based on filter, they are "<field><operator><value>;...", valid operators are: =, !=, and ~=')
     group_dat.add_argument('-a', '--all', help='Show all dats', action='store_true')
 
-    parser_dat.add_argument('-s', '--set', help='Manually set variable, must be in format "variable=value"')
-    parser_dat.add_argument('--delete', action='store_true', default=False, help='Delete Dat')
+    group_dat_action = parser_dat.add_mutually_exclusive_group(required=False)
+    group_dat_action.add_argument('-dt', '--details', help='Show details of dat', action='store_true')
+    group_dat_action.add_argument('-s', '--set', help='Manually set variable, must be in format "variable=value"')
+    group_dat_action.add_argument('--delete', action='store_true', default=False, help='Delete Dat')
 
     parser_dat.add_argument('-on', '--only-names', action='store_true', help='Only show names')
 
@@ -201,15 +203,13 @@ def command_import(_) -> None:
 def command_dat(args):
     """ Make changes in dat config """
 
-    def print_dats(dats):
+    def print_dats(dats, fields = ['seed', 'name', 'status']):
         """ Print dats """
         output = []
         for dat in dats:
-            output.append({
-                'seed': dat['seed'],
-                'name': dat['name'],
-                'status': dat['status'] if 'status' in dat else 'enabled',
-            })
+            new_dat = { k:dat[k] for k in fields if k in dat and dat[k] }
+            new_dat['status'] = dat['status'] if 'status' in dat else 'enabled'
+            output.append(new_dat)
         if getattr(args, 'only_names', False):
             for dat in output:
                 print(f"{dat['seed']}:{dat['name']}")
@@ -252,7 +252,10 @@ def command_dat(args):
                 table.storage.flush()
                 print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} removed{Bcolors.ENDC}')
                 sys.exit(0)
-            print_dats([result])
+            if args.details:
+                print_dats([result], fields=["name", "modifier", "company", "system", "seed", "date", "path", "system_type", "full_name"])
+            else:
+                print_dats([result])
     elif args.all:
         # Show all dats
         print_dats(table.all())
