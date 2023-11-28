@@ -182,9 +182,13 @@ class Deduplicate(Process):
         """ Save process to database. """
         child_db = Dat(**self.previous)
         child_db.load()
-        if not getattr(child_db, 'merge', None) or not getattr(child_db, 'parent', None):
+        if parent := getattr(child_db, 'parent', None):
+            merged = Dedupe(child_db, parent)
+        elif getattr(child_db, 'automerge', None):
+            merged = Dedupe(child_db)
+        else:
             return "Skipped"
-        merged = Dedupe(child_db)
+
         merged.dedupe()
         merged.save()
         self.output = self.previous

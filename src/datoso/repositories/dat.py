@@ -167,13 +167,19 @@ class XMLDatFile(DatFile):
     def merge_with(self, parent: DatFile) -> None:
         """ Merge the dat file with the parent. """
         parent.get_rom_shas()
+        new_games = []
         for game in self.data[self.main_key][self.game_key]:
             if 'rom' not in game:
                 continue
+            new_game = {}
+            for key in game:
+                if key != 'rom':
+                    new_game[key] = game[key]
             if not isinstance(game['rom'], list):
                 if parent.shas.has_rom(self.parse_rom(game['rom'])):
                     self.merged_roms.append(self.parse_rom(game['rom']))
-                    del game['rom']
+                else:
+                    new_game['rom'] = game['rom']
             else:
                 new_roms = []
                 for rom in game['rom']:
@@ -181,11 +187,38 @@ class XMLDatFile(DatFile):
                         new_roms.append(rom)
                     else:
                         self.merged_roms.append(self.parse_rom(rom))
-                game['rom'] = new_roms
+                new_game['rom'] = new_roms
+            new_games.append(new_game)
+        self.data[self.main_key][self.game_key] = new_games
+
+    def dedupe(self) -> None:
+        """ Dedupe the dat file. """
         new_games = []
+        self.shas = HashesIndex()
+
         for game in self.data[self.main_key][self.game_key]:
-            if 'rom' in game:
-                new_games.append(game)
+            if 'rom' not in game:
+                continue
+            new_game = {}
+            for key in game:
+                if key != 'rom':
+                    new_game[key] = game[key]
+            if not isinstance(game['rom'], list):
+                if self.shas.has_rom(self.parse_rom(game['rom'])):
+                    self.merged_roms.append(self.parse_rom(game['rom']))
+                else:
+                    self.add_rom(game['rom'])
+                    new_game['rom'] = game['rom']
+            else:
+                new_roms = []
+                for rom in game['rom']:
+                    if not self.shas.has_rom(self.parse_rom(rom)):
+                        new_roms.append(rom)
+                    else:
+                        self.add_rom(game['rom'])
+                        self.merged_roms.append(self.parse_rom(rom))
+                new_game['rom'] = new_roms
+            new_games.append(new_game)
         self.data[self.main_key][self.game_key] = new_games
 
     def get_name(self) -> str:
@@ -347,7 +380,7 @@ class DirMultiDatFile(DatFile):
 
 class HashesIndex:
     """ Index of hashes. """
-    hashes = ['sha256', 'sha1', 'md5', 'crc']
+    valid_hashes = ['sha256', 'sha1', 'md5', 'crc']
     sha256 = {}
     sha1 = {}
     md5 = {}
@@ -356,7 +389,7 @@ class HashesIndex:
 
     def add_rom(self, rom):
         """ Add a rom to the index. """
-        for hash in self.hashes:
+        for hash in self.valid_hashes:
             if hash in rom:
                 if hash not in self.__dict__:
                     self.__dict__[hash] = {}
@@ -371,7 +404,7 @@ class HashesIndex:
         return any((hash in rom and hash in self.__dict__ \
                     and rom[hash] in self.__dict__[hash] \
                     and rom['size'] == self.__dict__[hash][rom[hash]]['size']) \
-                    for hash in self.hashes)
+                    for hash in self.valid_hashes)
 
     def get_sha256s(self):
         """ Get the sha256s. """

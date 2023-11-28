@@ -36,7 +36,7 @@ class Dedupe:
         load_metadata(child, self.child)
         if not parent:
             parent = self.child['db'].parent
-        load_metadata(parent, self.parent)
+            load_metadata(parent, self.parent)
 
     def get_dat_file(self, file):
         try:
@@ -54,7 +54,10 @@ class Dedupe:
         raise Exception("Invalid dat file")
 
     def dedupe(self):
-        self.child['dat'].merge_with(self.parent['dat'])
+        if self.parent:
+            self.child['dat'].merge_with(self.parent['dat'])
+        else:
+            self.child['dat'].dedupe()
         logging.info("Deduped %i roms", len(self.child['dat'].merged_roms))
         return self.child['dat']
 

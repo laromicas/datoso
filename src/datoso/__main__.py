@@ -162,8 +162,8 @@ def command_deduper(args) -> None:
     if args.output and not args.dry_run:
         merged.save(args.output)
     elif not args.dry_run:
-        merged.save(args.input)
-    print(f'{Bcolors.OKBLUE}File saved to {args.output if args.output else args.input}{Bcolors.ENDC}')
+        merged.save()
+    logging.info(f'{Bcolors.OKBLUE} File saved to {args.output if args.output else args.input}{Bcolors.ENDC}')
 
 
 def command_import(_) -> None:
@@ -247,13 +247,20 @@ def command_dat(args):
                 table.storage.flush()
                 print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} {key} set to {Bcolors.OKBLUE}{value}{Bcolors.ENDC}')
                 sys.exit(0)
+            # if args.unset:
+            #     # TODO: unset
+            #     key = args.unset
+            #     table.update({key: value}, doc_ids=[result.doc_id])
+            #     table.storage.flush()
+            #     print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} {key} set to {Bcolors.OKBLUE}{value}{Bcolors.ENDC}')
+            #     sys.exit(0)
             if args.delete:
                 table.remove(doc_ids=[result.doc_id])
                 table.storage.flush()
                 print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} removed{Bcolors.ENDC}')
                 sys.exit(0)
             if args.details:
-                print_dats([result], fields=["name", "modifier", "company", "system", "seed", "date", "path", "system_type", "full_name"])
+                print_dats([result], fields=["name", "modifier", "company", "system", "seed", "date", "path", "system_type", "full_name", "automerge", "parent"])
             else:
                 print_dats([result])
     elif args.all:

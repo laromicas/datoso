@@ -14,12 +14,14 @@ class Seed:
     actions = {}
     # working_path = os.path.abspath(os.path.join(os.getcwd(), config.get('PATHS', 'WorkingPath')))
     status_to_show = ['Updated', 'Created', 'Error', 'Disabled', 'Deduped', 'No Action Taken, Newer Found']
+    config = None
 
     def __init__(self, **kwargs) -> None:
         self.__dict__.update(kwargs)
         actions = get_seed(self.name, 'actions')
         if actions:
             self.actions = actions.get_actions()
+        self.config = config[self.name.upper()] if config.has_section(self.name.upper()) else None
 
 
     def fetch(self):
@@ -53,6 +55,7 @@ class Seed:
         for path, actions in self.actions.items():
             new_path = path.format(dat_origin=dat_origin)
             actions = self.format_actions(actions, data={'dat_destination': config['PATHS'].get('DatPath', 'DatRoot')})
+            # TODO: override actions to process from config
             if actions_to_execute:
                 actions = [x for x in actions if x['action'] in actions_to_execute]
             for file in os.listdir(new_path) if os.path.isdir(new_path) else []:
