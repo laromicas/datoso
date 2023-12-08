@@ -7,6 +7,7 @@ from enum import Enum
 import re
 import os
 from pathlib import Path
+
 from dateutil import parser
 import shutil
 
@@ -138,7 +139,10 @@ class FileUtils:
             FileUtils.remove(origin)
 
 class RequestUtils:
-    pass
+    @staticmethod
+    def urljoin(*args):
+        """ Join url parts. """
+        return '/'.join(args).replace('//', '/').replace(':/', '://')
 
 class FileHeaders(Enum):
     XML = '<?xml'

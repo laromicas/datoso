@@ -35,7 +35,7 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 all = [
-    "datoso-seed-fbneo>=0.3.2",
+    "datoso-seed-fbneo>=0.3.3",
     "datoso-seed-md-enhanced>=0.3.0",
     "datoso-seed-nointro>=0.3.0",
     "datoso-seed-pleasuredome>=0.3.2",
@@ -46,7 +46,7 @@ all = [
     "datoso-seed-translatedenglish>=0.3.1",
     "datoso-seed-vpinmame>=0.3.0",
     ]
-fbneo = [ "datoso-seed-fbneo>=0.3.2" ]
+fbneo = [ "datoso-seed-fbneo>=0.3.3" ]
 md-enhanced = [ "datoso-seed-md-enhanced>=0.3.0" ]
 nointro = [ "datoso-seed-nointro>=0.3.0" ]
 pleasuredome = [ "datoso-seed-pleasuredome>=0.3.2" ]
