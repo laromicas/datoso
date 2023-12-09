@@ -264,12 +264,15 @@ class ClrMameProDatFile(DatFile):
         parenthesis = 0
         start = 0
         end = 0
+        within_string = 0
         for i, char in enumerate(data):
-            if char == '(':
+            if char == '"':
+                within_string = not(within_string)
+            if char == '(' and within_string == 0:
                 if parenthesis == 0:
                     start = i + 1
                 parenthesis += 1
-            if char == ')':
+            if char == ')' and within_string == 0:
                 parenthesis -= 1
             if parenthesis == 0 and start >= 1:
                 end = i
