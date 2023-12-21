@@ -95,13 +95,14 @@ class FileUtils:
         """ Copy file to destination. """
         os.makedirs(os.path.dirname(destination), exist_ok=True)
         try:
-            shutil.copy(origin, destination)
+            if os.path.isdir(origin):
+                with suppress(FileNotFoundError):
+                    shutil.rmtree(destination)
+                shutil.copytree(origin, destination)
+            else:
+                shutil.copy(origin, destination)
         except shutil.SameFileError:
             pass
-        except IsADirectoryError:
-            with suppress(FileNotFoundError):
-                shutil.rmtree(destination)
-            shutil.copytree(origin, destination)
         except FileNotFoundError:
             raise FileNotFoundError(f"File {origin} not found.")
 
@@ -114,12 +115,12 @@ class FileUtils:
     @staticmethod
     def remove(path):
         """ Remove file or folder. """
-        try:
-            os.unlink(path)
-        except IsADirectoryError:
+        if not os.path.exists(path):  
+            return
+        if os.path.isdir(path):
             FileUtils.remove_folder(path)
-        except FileNotFoundError:
-            pass
+        else:
+            os.unlink(path)
 
     @staticmethod
     def parse_folder(path) -> str:
