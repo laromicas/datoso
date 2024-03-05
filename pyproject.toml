@@ -37,8 +37,8 @@ dynamic = ["version"]
 all = [
     "datoso-seed-fbneo>=0.3.3",
     "datoso-seed-md-enhanced>=0.3.0",
-    "datoso-seed-nointro>=0.3.0",
-    "datoso-seed-pleasuredome>=0.3.2",
+    "datoso-seed-nointro>=0.3.5",
+    "datoso-seed-pleasuredome>=0.3.3",
     "datoso-seed-redump>=0.3.1",
     "datoso-seed-sfc-enhancedcolors>=0.3.0",
     "datoso-seed-sfc-msu1>=0.3.0",
@@ -48,8 +48,8 @@ all = [
     ]
 fbneo = [ "datoso-seed-fbneo>=0.3.3" ]
 md-enhanced = [ "datoso-seed-md-enhanced>=0.3.0" ]
-nointro = [ "datoso-seed-nointro>=0.3.0" ]
-pleasuredome = [ "datoso-seed-pleasuredome>=0.3.2" ]
+nointro = [ "datoso-seed-nointro>=0.3.5" ]
+pleasuredome = [ "datoso-seed-pleasuredome>=0.3.3" ]
 redump = [ "datoso-seed-redump>=0.3.1" ]
 sfc-enhancedcolors = [ "datoso-seed-sfc-enhancedcolors>=0.3.0" ]
 sfc-msu1 = [ "datoso-seed-sfc-msu1>=0.3.0" ]

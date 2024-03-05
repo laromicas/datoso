@@ -1,0 +1,35 @@
+services:
+  datoso:
+    build: .
+    volumes:
+      - /datoso:/datoso
+      - /datRoot:/datRoot
+      - /download:/download
+    environment:
+      DATOSO.DATOSOPATH: "/datoso"
+      DATOSO.DATPATH: "/datRoot"
+      DATOSO.DOWNLOADPATH: "/download"
+      DATOSO.DATABASEFILE: "datoso.json"
+      FBNEO.FETCHFULL: "true"
+      FBNEO.FETCHLIGHT: "false"
+      UPDATE_URLS.GOOGLESHEETURL: "https://sheets.googleapis.com/v4/spreadsheets/1LgU7uJOtVOUWYkdoaeSbux41biFwpbzVosm98bgdN3k/values/Systems!A1:E300?key=AIzaSyA2pmHY5FVJFEjauoE8kKV6-UcCM4Tfk44"
+      DOWNLOAD.PREFFERDOWNLOADUTILITY: "wget"
+      IMPORT.IGNOREREGEX: ".*(?:MAME|FruitMachines|Fruit Machine|TeknoParrotGames|PleasureDome|fixDat).*"
+      LOG.LOGGING: "true"
+      LOG.LOGLEVEL: "INFO"
+      LOG.LOGFILE: "datoso.log"
+      PREFFIXES.ARCADE: "Arcade"
+      PREFFIXES.AUDIO: "Other/Audio"
+      PREFFIXES.BOOK: "Other/Book"
+      PREFFIXES.CALCULATOR: "Other/Calculator"
+      PREFFIXES.COMPUTER: "Computer"
+      PREFFIXES.CONSOLE: "Consoles"
+      PREFFIXES.HANDHELD: "Consoles"
+      PREFFIXES.PDA: "Mobile"
+      PREFFIXES.PHONE: "Mobile"
+      PREFFIXES.SOURCECODE: "Other/Source Code"
+      PREFFIXES.VIDEO: "Other/Video"
+      PREFFIXES.MOBILE: "Mobile"
+      PREFFIXES.MANUALS: "Other/Manuals"
+      PREFFIXES.BIOSIMAGES: "Other/BIOS Images"
+

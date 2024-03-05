@@ -18,10 +18,49 @@ class Seed:
 
     def __init__(self, **kwargs) -> None:
         self.__dict__.update(kwargs)
-        actions = get_seed(self.name, 'actions')
-        if actions:
-            self.actions = actions.get_actions()
         self.config = config[self.name.upper()] if config.has_section(self.name.upper()) else None
+        configs = []
+        seed = get_seed(self.name, 'actions')
+        if seed:
+            self.actions = seed.get_actions()
+        for path, actions in self.actions.items():
+            config_path = path.replace('{dat_origin}', self.name.upper()).replace('/', '.')
+            if config.has_section(config_path):
+                configs.append(config[config_path])
+                # print(self.actions)
+                # exit()
+                for path, actions in self.actions.items():
+                    new_steps = {action['action']: action for action in actions}
+                    new_actions = []
+                    if override_actions := config[config_path].get('OverrideActions'):
+                        override_actions = override_actions.split(',')
+                        for override_action in override_actions:
+                            if override_action in new_steps:
+                                new_actions.append(new_steps[override_action])
+                            else:
+                                new_actions.append({'action': override_action})
+
+
+        # if configs:
+        #     for path, actions in self.actions.items():
+        #         config_path = path.replace('{dat_origin}', self.name.upper()).replace('/', '.')
+        #         if config.has_section(config_path):
+
+                # action_name =
+                # for action_name, action_value in action.items():
+                #     if isinstance(action_value, str):
+                #         action[action_name] = action_value.format(**config)
+
+        # if self.config and self.config.get('OverrideActions'):
+        #     for path, actions in self.actions.items():
+        #         for action in actions:
+        #             if action.get('action') == 'Copy':
+        #                 action['folder'] = action.get('folder', 'ToSort')
+        #                 action['destination'] = action.get('destination', 'tmp')
+        #             if action.get('action') == 'LoadDatFile':
+        #                 action['_class'] = action.get('_class', None)
+        # if self.config and self.config.get('Actions'):
+        #     self.actions = self.config.get('Actions')
 
 
     def fetch(self):

@@ -544,6 +544,11 @@
     },
     {
         "company": "LeapFrog",
+        "system": "Explorer",
+        "system_type": "Console"
+    },
+    {
+        "company": "LeapFrog",
         "system": "LeapPad",
         "system_type": "Console"
     },
@@ -1298,6 +1303,9 @@
             "if_suffix": {
                 "Development Kit Hard Drives": {
                     "modifier": "Source Code"
+                },
+                "Private": {
+                    "suffix": "Private"
                 }
             },
             "empty_suffix": {
