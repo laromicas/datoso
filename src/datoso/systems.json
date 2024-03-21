@@ -386,6 +386,11 @@
         "system_type": "Console"
     },
     {
+        "company": "FuRyu",
+        "system": "Katy",
+        "system_type": "Arcade"
+    },
+    {
         "company": "funworld",
         "system": "Photo Play",
         "system_type": "Arcade"
@@ -732,6 +737,11 @@
         "company": "Mobile",
         "system": "Symbian",
         "system_type": "Mobile"
+    },
+    {
+        "company": "Namco",
+        "system": "Purikura",
+        "system_type": "Arcade"
     },
     {
         "company": "Namco",
@@ -1422,6 +1432,21 @@
     },
     {
         "company": "Sega",
+        "system": "Nu 2",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Sega",
+        "system": "Nu 1.1",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Sega",
+        "system": "Nu",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Sega",
         "system": "Master System",
         "override": {
             "system": "Master System - Mark III"
@@ -1511,6 +1536,11 @@
         "company": "Sharp",
         "system": "X1",
         "system_type": "Computer"
+    },
+    {
+        "company": "Sharp",
+        "system": "Zaurus",
+        "system_type": "Mobile"
     },
     {
         "company": "Sinclair",
