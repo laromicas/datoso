@@ -7,7 +7,8 @@ import shlex
 import xmltodict
 
 from datoso.database.models.datfile import System
-
+from datoso.helpers import FileHeaders
+from datoso.configuration import config
 
 class DatFile:
     """ Base class for dat files. """
@@ -94,6 +95,16 @@ class DatFile:
             "path": self.get_path(),
         }
 
+    @staticmethod
+    def from_file(dat_file):
+        """ Create a class dynamically """
+        with open(dat_file, 'r', encoding='utf-8') as file:
+            file_header = file.read(5)
+        if file_header == FileHeaders.XML.value:
+            return XMLDatFile(file=dat_file)
+        if file_header == FileHeaders.CLRMAMEPRO.value:
+            return ClrMameProDatFile(file=dat_file)
+
 
 class XMLDatFile(DatFile):
     """ XML dat file. """
@@ -109,9 +120,9 @@ class XMLDatFile(DatFile):
             self.detect_main_key()
             self.header = self.data[self.main_key].get('header', {})
             if self.header:
-                self.name = self.header['name'] if 'name' in self.header else None
-                self.full_name = self.header['description'] if 'description' in self.header else None
-                self.date = self.header['date'] if 'date' in self.header else None
+                self.name = self.header.get('name')
+                self.full_name = self.header.get('description')
+                self.date = self.header.get('date')
                 self.homepage = self.header['homepage'] if 'homepage' in self.header and self.header['homepage'] and 'insert' not in self.header['homepage'] else None
                 self.url = self.header['url'] if 'url' in self.header and self.header['url'] and 'insert' not in self.header['url'] else None
                 self.author = self.header['author'] if 'author' in self.header and self.header['author'] and 'insert' not in self.header['author'] else None
@@ -150,6 +161,40 @@ class XMLDatFile(DatFile):
     def add_rom(self, rom: dict) -> None:
         """ Add a rom to the dat file. """
         self.shas.add_rom(self.parse_rom(rom))
+
+    def mark_mia(self, rom: dict, mias: dict) -> None:
+        """ Mark the mias in the dat file. """
+        key = rom.get('@sha1') or rom.get('@md5') or rom.get('@crc32') or f"{self.get_system()} - {rom.get('name')}"
+        # print(rom.get('@sha1'))
+        # print(rom.get('@md5'))
+        # print(rom.get('@crc32'))
+        # print(f"{self.get_system()} - {rom.get('name')}")
+        # print(key)
+        if key in mias:
+            rom['@mia'] = 'yes'
+            return True
+        return False
+
+    def mark_mias(self, mias: dict) -> None:
+        """ Mark the mias in the dat file. """
+        # print(self.data)
+        # print(self.data[self.main_key][self.game_key])
+        # exit()
+        mark_all_roms_in_set = config.getboolean('PROCESS', 'MarkAllRomsInSet', fallback=False)
+        if not isinstance(self.data[self.main_key][self.game_key], list):
+            self.data[self.main_key][self.game_key] = [self.data[self.main_key][self.game_key]]
+        for game in self.data[self.main_key][self.game_key]:
+            if 'rom' not in game:
+                continue
+            if not isinstance(game['rom'], list):
+                self.mark_mia(game['rom'], mias)
+            else:
+                for rom in game['rom']:
+                    miad = self.mark_mia(rom, mias)
+                    if miad and mark_all_roms_in_set:
+                        for rom in game['rom']:
+                            rom['@mia'] = 'yes'
+                        break
 
     def get_rom_shas(self) -> None:
         """ Get the shas for the roms and creates an index. """
@@ -295,7 +340,7 @@ class ClrMameProDatFile(DatFile):
                         data = line.split(' ')
                     for i in range(0, len(data), 2):
                         rom[f'@{data[i]}'] = data[i+1]
-                    dictionary['rom'] = [] if 'rom' not in dictionary else dictionary['rom']
+                    dictionary['rom'] = dictionary.get('rom', [])
                     dictionary['rom'].append(rom)
                 else:
                     try:

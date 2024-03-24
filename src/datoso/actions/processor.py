@@ -119,38 +119,58 @@ class Copy(Process):
 
         destination = os.path.join(self.folder, self.destination, filename)
         result = None
-        if self.previous:
-            self.database = Dat(seed=self.previous['seed'], name=self.previous['name'])
-            self.database.load()
-            if self.database.is_enabled():
-                old_file = self.database.dict().get('new_file', '')
-                new_file = destination
-                if old_file != new_file or config.getboolean('GENERAL', 'Overwrite', fallback=False) or not os.path.exists(destination):
-                    if not old_file:
-                        result = "Created"
-                    elif old_file != new_file:
-                        result = "Updated"
-                    elif config.getboolean('GENERAL', 'Overwrite', fallback=False):
-                        result = "Overwritten"
-                    try:
-                        if getattr(self.database, 'date', None) and self.previous.get('date', None) and compare_dates(self.database.date, self.previous['date']):
-                            result = "No Action Taken, Newer Found"
-                        else:
-                            self.previous['new_file'] = destination
-                            FileUtils.copy(origin, destination)
-                    except ValueError:
-                        pass
-                else:
-                    result = "Exists"
-            else:
-                self.previous['new_file'] = None
-                result = "Ignored"
-        else:
+        self.output = self.previous
+        if not self.previous:
             FileUtils.copy(origin, destination)
-            result = "Copied"
+            return "Copied"
+        self.database = Dat(seed=self.previous['seed'], name=self.previous['name'])
+        self.database.load()
+        if not self.database.is_enabled():
+            self.previous['new_file'] = None
+            return "Ignored"
+
+        old_file = self.database.dict().get('new_file', '')
+        new_file = destination
+
+        if old_file == new_file and os.path.exists(destination) and not config.getboolean('GENERAL', 'Overwrite', fallback=False):
+            return "Exists"
+
+        if not old_file:
+            result = "Created"
+        elif old_file != new_file:
+            result = "Updated"
+        elif config.getboolean('GENERAL', 'Overwrite', fallback=False):
+            result = "Overwritten"
+
+        try:
+            if getattr(self.database, 'date', None) and self.previous.get('date', None) and compare_dates(self.database.date, self.previous['date']):
+                result = "No Action Taken, Newer Found"
+            else:
+                self.previous['new_file'] = destination
+                FileUtils.copy(origin, destination)
+        except ValueError:
+            pass
 
         self.output = self.previous
         return result
+
+
+class MarkMias(Process):
+    """ Mark missing in action. """
+    database = None
+    def process(self):
+        """ Mark missing in action. """
+        self.output = self.previous
+        if not config.getboolean('PROCESS', 'ProcessMissingInAction', fallback=False):
+            return "Skipped"
+        from datoso.mias.mia import mark_mias
+        database = Dat(seed=self.previous['seed'], name=self.previous['name'])
+        database.load()
+
+        if not database.is_enabled():
+            return "Ignored"
+        mark_mias(dat_file=self.previous['new_file'])
+        return "Marked"
 
 
 class SaveToDatabase(Process):

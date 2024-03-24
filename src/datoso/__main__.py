@@ -50,6 +50,7 @@ def parse_args() -> argparse.Namespace:
     parser_config.add_argument('-d', '--directory', default='~', choices=['~', '.'], help='Directory to save .datosorc')
     parser_config.set_defaults(func=command_config)
     parser_config.add_argument('-ru', '--rules-update', action='store_true', help='Update system rules from GoogleSheets Url')
+    parser_config.add_argument('-mu', '--mia-update', action='store_true', help='Update MIA from GoogleSheets Url')
 
     group_save = parser_config.add_mutually_exclusive_group()
     group_save.add_argument('--set', nargs=2, metavar=('configuration', 'value'), help='Set Configuration Option separated by point with new value e.g. <GENERAL.Overwrite> <false>')
@@ -73,6 +74,7 @@ def parse_args() -> argparse.Namespace:
     group_dat_action.add_argument('-dt', '--details', help='Show details of dat', action='store_true')
     group_dat_action.add_argument('-s', '--set', help='Manually set variable, must be in format "variable=value"')
     group_dat_action.add_argument('--delete', action='store_true', default=False, help='Delete Dat')
+    group_dat_action.add_argument('--mark-mias', action='store_true', default=False, help='Mark Dat MIAs')
 
     parser_dat.add_argument('-on', '--only-names', action='store_true', help='Only show names')
 
@@ -208,7 +210,7 @@ def command_dat(args):
         output = []
         for dat in dats:
             new_dat = { k:dat[k] for k in fields if k in dat and dat[k] }
-            new_dat['status'] = dat['status'] if 'status' in dat else 'enabled'
+            new_dat['status'] = dat.get('status', 'enabled')
             output.append(new_dat)
         if getattr(args, 'only_names', False):
             for dat in output:
@@ -258,6 +260,11 @@ def command_dat(args):
                 table.remove(doc_ids=[result.doc_id])
                 table.storage.flush()
                 print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} removed{Bcolors.ENDC}')
+                sys.exit(0)
+            if args.mark_mias:
+                from datoso.mias.mia import mark_mias
+                mark_mias(dat_file=result['new_file'])
+                print(f'{Bcolors.OKGREEN}Set Dats {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} marked MIAs{Bcolors.ENDC}')
                 sys.exit(0)
             if args.details:
                 print_dats([result], fields=["name", "modifier", "company", "system", "seed", "date", "path", "system_type", "full_name", "automerge", "parent"])
@@ -415,6 +422,20 @@ def command_config_rules_update(args) -> None:
         command_doctor(args)
 
 
+def command_config_mia_update(args) -> None:
+    """ Update rules from google sheet """
+    from datoso.database.seeds import mia
+    print('Updating MIA')
+    try:
+        mia.import_mias()
+        print('MIA updated')
+    except Exception as exc:
+        print(f'{Bcolors.FAIL}Error updating MIA{Bcolors.ENDC}')
+        print(exc)
+        print('Please enable logs for more information or use -v parameter')
+        command_doctor(args)
+
+
 def command_config(args) -> None:
     """ Config commands """
     if args.save:
@@ -425,6 +446,8 @@ def command_config(args) -> None:
         command_config_get(args)
     elif args.rules_update:
         command_config_rules_update(args)
+    elif args.mia_update:
+        command_config_mia_update(args)
     else:
         config_dict = {s:dict(config.items(s)) for s in config.sections()}
         print(json.dumps(config_dict, indent=4))

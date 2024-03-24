@@ -39,7 +39,7 @@ all = [
     "datoso-seed-md-enhanced>=0.3.0",
     "datoso-seed-nointro>=0.3.5",
     "datoso-seed-pleasuredome>=0.3.3",
-    "datoso-seed-redump>=0.3.1",
+    "datoso-seed-redump>=0.3.2",
     "datoso-seed-sfc-enhancedcolors>=0.3.0",
     "datoso-seed-sfc-msu1>=0.3.0",
     "datoso-seed-sfc-speedhacks>=0.3.0",
@@ -50,14 +50,14 @@ fbneo = [ "datoso-seed-fbneo>=0.3.3" ]
 md-enhanced = [ "datoso-seed-md-enhanced>=0.3.0" ]
 nointro = [ "datoso-seed-nointro>=0.3.5" ]
 pleasuredome = [ "datoso-seed-pleasuredome>=0.3.3" ]
-redump = [ "datoso-seed-redump>=0.3.1" ]
+redump = [ "datoso-seed-redump>=0.3.2" ]
 sfc-enhancedcolors = [ "datoso-seed-sfc-enhancedcolors>=0.3.0" ]
 sfc-msu1 = [ "datoso-seed-sfc-msu1>=0.3.0" ]
 sfc-speedhacks = [ "datoso-seed-sfc-speedhacks>=0.3.0" ]
 translatedenglish = [ "datoso-seed-translatedenglish>=0.3.1" ]
 vpinmame = [ "datoso-seed-vpinmame>=0.3.0" ]
 dev = [
-    "ruff>=0.0.272",
+    "ruff>=0.3.4",
     "line_profiler==4.0.3"
     ]
 
@@ -84,13 +84,13 @@ include-package-data = true
 version = {attr = "datoso.__version__"}
 
 [tool.ruff]
-extend-select = ["C4", "SIM", "TCH"]
-ignore = []
-fixable = ["F541"]
+lint.extend-select = ["C4", "SIM", "TCH"]
+lint.ignore = []
+lint.fixable = ["F541"]
 # fixable = ["A", "ANN", "ARG", "B", "BLE", "C", "COM", "D", "DTZ", "E", "EM", "ERA", "EXE", "F", "FBT", "G", "I", "ICN", "INP", "ISC", "N", "PD", "PGH", "PIE", "PL", "PT", "PTH", "Q", "RET", "RUF", "S", "SIM", "T", "TCH", "TID", "TRY", "UP", "W", "YTT"]
 line-length = 120
 show-fixes = true
 target-version = "py310"
-ignore-init-module-imports = true
+lint.ignore-init-module-imports = true
 
 # TODO Maybe change license to "BSD 3-Clause License"

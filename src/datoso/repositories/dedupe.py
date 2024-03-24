@@ -1,6 +1,6 @@
 import logging
 from datoso.database.models.datfile import Dat
-from datoso.repositories.dat import DatFile, XMLDatFile, ClrMameProDatFile
+from datoso.repositories.dat import DatFile
 
 class Dedupe:
     """ Merge two dat files. """
@@ -40,18 +40,11 @@ class Dedupe:
 
     def get_dat_file(self, file):
         try:
-            dat = XMLDatFile(file=file)
+            dat = DatFile.from_file(file)
             dat.load()
             return dat
         except Exception:
-            pass
-        try:
-            dat = ClrMameProDatFile(file=file)
-            dat.load()
-            return dat
-        except Exception:
-            pass
-        raise Exception("Invalid dat file")
+            raise Exception("Invalid dat file")
 
     def dedupe(self):
         if self.parent:

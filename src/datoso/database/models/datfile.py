@@ -100,3 +100,30 @@ class System(DatabaseModel):
         System._DB.DB = DB  # pylint: disable=invalid-name
         System._DB.table = DB.table(System._table_name)
         return System._DB.table.all()
+
+class MIA(DatabaseModel):
+    """ MIA file model. """
+    _table_name = 'mia'
+    system: str
+    game: str
+    size: str
+    crc32: str
+    sha1: str
+    md5: str
+
+    def query(self):
+        """ Query to update or load a record. """
+        query = Query()
+        if self.sha1:
+            return (query.sha1 == self.sha1)
+        if self.md5:
+            return (query.md5 == self.md5)
+        if self.crc32:
+            return (query.crc32 == self.crc32)
+
+    @staticmethod
+    def all():
+        """ Get all systems. """
+        MIA._DB.DB = DB  # pylint: disable=invalid-name
+        MIA._DB.table = DB.table(MIA._table_name)
+        return MIA._DB.table.all()
