@@ -7,6 +7,15 @@ As today the tool supports dat-omatic, redump, and translated-english dats.
 It merges all the dats in a tree folder structure thought to use with Emulators rather than dats.
 The dat file format must be compatible with [ROMVault](https://www.romvault.com/).
 
+# Features
+
+- It can download dats from different sources (dat-omatic, redump, translated-english)
+- It can process dats to generate a folder structure compatible with emulators
+- It can deduplicate dats
+- It can import dats from existing RomVault
+- It can mark MIA roms
+
+
 ## Installation
 
 Datoso requires python 3.10+.
@@ -138,8 +147,8 @@ $ find . | sort -f | uniq -i -d
     -   Lambda to download dats and upload to S3
     -   Downloading from S3
 -   Auto-Import MIA Lists (for redump)
-    -   Add \[MIA\] to dat roms
--   Remove MIA from dats
+    -   Add \[MIA\] to dat roms **(DONE)**
+-   Remove MIA from dats **(probably not needed as it already can mark them)**
 -   .cue Generator
 
 ## Contributing
