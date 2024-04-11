@@ -5,7 +5,7 @@ Process actions.
 from contextlib import suppress
 import os
 import shutil
-from datoso.configuration import config
+from datoso.configuration import config, logger
 from datoso.helpers import FileUtils, compare_dates
 from datoso.repositories.dedupe import Dedupe
 from datoso.database.models.datfile import Dat
@@ -64,9 +64,10 @@ class LoadDatFile(Process):
             self._dat.load()
             self.database = Dat(seed=self.seed, **self._dat.dict())
             self.output = self.database.dict()
-        except Exception:
+        except Exception as e:
             self._dat = None
             self.status = "Error"
+            logger.error(e)
             return "Error"
         return "Loaded"
 

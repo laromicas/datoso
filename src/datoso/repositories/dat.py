@@ -351,7 +351,7 @@ class ClrMameProDatFile(DatFile):
 
         return dictionary
 
-    def load(self) -> None:
+    def load(self, load_games: bool = False) -> None:
         """ Load the data from a ClrMamePro file. """
         self.games = []
         self.main_key = 'datafile'
@@ -360,10 +360,12 @@ class ClrMameProDatFile(DatFile):
 
             block, next_block = self.get_next_block(data)
             self.header = self.read_block(block)
+            self.header = {k.lower(): v for k, v in self.header.items()}
 
-            while next_block:
-                block, next_block = self.get_next_block(next_block)
-                self.games.append(self.read_block(block))
+            if load_games:
+                while next_block:
+                    block, next_block = self.get_next_block(next_block)
+                    self.games.append(self.read_block(block))
 
         self.data = {
             self.main_key: {
@@ -376,6 +378,39 @@ class ClrMameProDatFile(DatFile):
 
     def get_rom_shas(self) -> None:
         """ TODO Method """
+
+class DOSCenterDatFile(ClrMameProDatFile):
+    """ DOSCenter dat file. """
+    def read_block(self, data) -> dict:
+        """ Read a block of data from a ClrMame dat and parses it. """
+        dictionary = {}
+        for line in iter(data.splitlines()):
+            line = line.strip()
+            if line:
+                if line.startswith('rom'):
+                    line = line[6:-2]
+                    rom = {'@name': None, '@crc': None, '@md5': None, '@sha1': None}
+                    try:
+                        data = shlex.split(line)
+                    except ValueError:
+                        data = line.split(' ')
+                    for i in range(0, len(data), 2):
+                        rom[f'@{data[i]}'] = data[i+1]
+                    dictionary['rom'] = dictionary.get('rom', [])
+                    dictionary['rom'].append(rom)
+                else:
+                    try:
+                        key = None
+                        if ":" in line:
+                            key, value = line.split(':', 1)
+                        if not key or "'" in key or '"' in key:
+                            key, value = shlex.split(line)
+                    except ValueError as exc:
+                        split = " ".split(line)
+                        key, value = split[0], " ".join(split[1:])
+                        # raise ValueError(f'Error parsing line: {line} from: {self.file}') from exc
+                    dictionary[key] = value
+        return dictionary
 
 
 class ZipMultiDatFile(DatFile):

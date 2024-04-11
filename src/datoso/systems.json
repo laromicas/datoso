@@ -1191,6 +1191,16 @@
         "system_type": "Console"
     },
     {
+        "company": null,
+        "system": "Super Mario Maker Courses",
+        "override": {
+            "system": "Wii U",
+            "company": "Nintendo",
+            "suffix": "Super Mario Maker Courses"
+        },
+        "system_type": "Console"
+    },
+    {
         "company": "Nintendo",
         "system": "Super Nintendo Entertainment System",
         "system_type": "Console"
@@ -1924,11 +1934,6 @@
     },
     {
         "company": null,
-        "system": "Video Game Scans",
-        "system_type": "Manuals"
-    },
-    {
-        "company": null,
         "system": "Video Game OSTs",
         "system_type": "Audio"
     },
@@ -1940,11 +1945,6 @@
     {
         "company": null,
         "system": "Video Game Manual Scans",
-        "system_type": "Manuals"
-    },
-    {
-        "company": null,
-        "system": "Video Game Magazine Scans",
         "system_type": "Manuals"
     }
 ]

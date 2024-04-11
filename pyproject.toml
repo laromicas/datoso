@@ -43,6 +43,7 @@ all = [
     "datoso-seed-sfc-enhancedcolors>=0.3.0",
     "datoso-seed-sfc-msu1>=0.3.0",
     "datoso-seed-sfc-speedhacks>=0.3.0",
+    "datoso-seed-tdc>=0.3.0",
     "datoso-seed-translatedenglish>=0.3.1",
     "datoso-seed-vpinmame>=0.3.0",
     ]
@@ -54,6 +55,7 @@ redump = [ "datoso-seed-redump>=0.3.2" ]
 sfc-enhancedcolors = [ "datoso-seed-sfc-enhancedcolors>=0.3.0" ]
 sfc-msu1 = [ "datoso-seed-sfc-msu1>=0.3.0" ]
 sfc-speedhacks = [ "datoso-seed-sfc-speedhacks>=0.3.0" ]
+tdc = [ "datoso-seed-tdc>=0.3.0" ]
 translatedenglish = [ "datoso-seed-translatedenglish>=0.3.1" ]
 vpinmame = [ "datoso-seed-vpinmame>=0.3.0" ]
 dev = [
