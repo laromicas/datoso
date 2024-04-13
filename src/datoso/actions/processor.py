@@ -86,8 +86,10 @@ class DeleteOld(Process):
                 result = "No Action Taken, Newer Found"
                 self.stop = True
                 return result
-        except ValueError:
+        except ValueError as e:
+            logger.error(e)
             print(self.database.date, self.previous['date'])
+            return "Error"
 
         result = None
         if 'new_file' in olddat and olddat['new_file']:

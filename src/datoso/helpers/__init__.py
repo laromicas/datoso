@@ -115,7 +115,7 @@ class FileUtils:
     @staticmethod
     def remove(path):
         """ Remove file or folder. """
-        if not os.path.exists(path):  
+        if not os.path.exists(path):
             return
         if os.path.isdir(path):
             FileUtils.remove_folder(path)
@@ -158,11 +158,12 @@ def show_progress(block_num, block_size, total_size):
 def compare_dates(date1, date2):
     if date1 is None or date2 is None:
         return False
+    #replace not_allowed characters for space in dates
+    date1 = re.sub(r'[^\w\s\,\-\:]', ' ', date1)
+    date2 = re.sub(r'[^\w\s\,\-\:]', ' ', date1)
     dayfirst = date1[2] in ['/', '-']
     if isinstance(date1, str):
-        date1 = date1.split(' ')[0]
         date1 = parser.parse(date1, fuzzy=True, dayfirst=dayfirst)
     if isinstance(date2, str):
-        date2 = date2.split(' ')[0]
         date2 = parser.parse(date2, fuzzy=True, dayfirst=dayfirst)
     return date1 > date2
