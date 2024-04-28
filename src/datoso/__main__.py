@@ -1,40 +1,42 @@
 """Main entry point for datoso"""
+import argparse
 import configparser
 import json
 import logging
 import os
-from pathlib import Path
 import re
 import sys
-import argparse
+from pathlib import Path
 from venv import logger
+
 from tabulate import tabulate
+
+from datoso import ROOT_FOLDER, __app_name__, __version__
+from datoso.commands.doctor import check_module, check_seed
+from datoso.commands.seed import Seed
+from datoso.configuration import config
 from datoso.configuration.configuration import get_seed_name
 from datoso.configuration.logger import enable_logging, set_verbosity
 from datoso.database.models.datfile import Dat
-
-from datoso import __version__, __app_name__, ROOT_FOLDER
 from datoso.helpers import Bcolors, FileUtils
-from datoso.configuration import config
-
 from datoso.helpers.plugins import installed_seeds, seed_description
-from datoso.commands.doctor import check_module, check_seed
-from datoso.commands.seed import Seed
 from datoso.repositories.dedupe import Dedupe
 from datoso.seeds.rules import Rules
 from datoso.seeds.unknown_seed import detect_seed
 
 #---------Boilerplate to check python version ----------
 if sys.version_info < (3, 10):
-    print("This is a Python 3 script. Please run it with Python 3.9 or above")
+    print('This is a Python 3 script. Please run it with Python 3.9 or above')
     sys.exit(1)
 
 
 def parse_args() -> argparse.Namespace:
     """Parse command line arguments
 
-    Returns:
+    Returns
+    -------
         argparse.Namespace: An object to take the attributes.
+
     """
     #pylint: disable=too-many-locals,too-many-statements
     parser = argparse.ArgumentParser(description='Update dats from different sources.')
@@ -102,21 +104,25 @@ def parse_args() -> argparse.Namespace:
 
     parser_deduper.set_defaults(func=command_deduper)
 
-
-    # Seed commands
-    for seed, _ in list(installed_seeds().items()) + [('all', 'All seeds')]:
-        seed = get_seed_name(seed)
-        parser_command = subparser.add_parser(seed, help=f'Update seed {seed}')
-        parser_command.set_defaults(func=command_seed, seed=seed)
+    def parse_seed(seed_name, description, seed=None):
+        parser_command = subparser.add_parser(seed_name, help=f'Seed {seed_name}, {description}')
+        parser_command.set_defaults(func=command_seed, seed=seed_name)
         parser_command.add_argument('-d', '--details', action='store_true', help='Show details of seed')
         parser_command.add_argument('-f', '--fetch', action='store_true', help='Fetch seed')
         parser_command_process = parser_command.add_argument_group('process')
         parser_command_process.add_argument('-p', '--process', action='store_true', help='Process dats from seed')
-        parser_command_process.add_argument('-a', '--actions', action="append", help='Action to execute')
+        parser_command_process.add_argument('-a', '--actions', action='append', help='Action to execute')
         parser_command_process.add_argument('-fd', '--filter', help='Filter dats to process')
-        if seed == 'all':
+        if seed_name == 'all':
             parser_command.add_argument('-e', '--exclude', action='append', help='Exclude seed or seeds (only work with all)')
             parser_command.add_argument('-o', '--only', action='append', help='Only seed or seeds (only work with all)')
+        else:
+            seed.args(parser_command)
+
+    for seed in Seed.list_installed():
+        parse_seed(seed.name, seed.description(), seed=seed)
+    parse_seed('all', 'All seeds')
+
 
     # Common arguments
     subparsers = [subparser, subparser_seed]
@@ -136,7 +142,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def initial_setup(args) -> None:
-    """ Initial setup of datoso from command line arguments """
+    """Initial setup of datoso from command line arguments."""
     if getattr(args, 'version', False):
         print(__version__)
         sys.exit()
@@ -153,7 +159,7 @@ def initial_setup(args) -> None:
 
 
 def command_deduper(args) -> None:
-    """ Deduplicate dats, removes duplicates from input dat existing in parent dat """
+    """Deduplicate dats, removes duplicates from input dat existing in parent dat"""
     if not args.parent and args.input.endswith(('.dat', '.xml')):
         print('Parent dat is required when input is a dat file')
         sys.exit(1)
@@ -165,11 +171,15 @@ def command_deduper(args) -> None:
         merged.save(args.output)
     elif not args.dry_run:
         merged.save()
-    logging.info(f'{Bcolors.OKBLUE} File saved to {args.output if args.output else args.input}{Bcolors.ENDC}')
+    logging.info('%s File saved to %s %s',
+                 Bcolors.OKBLUE,
+                 args.output if args.output else args.input,
+                 Bcolors.ENDC,
+                 )
 
 
 def command_import(_) -> None:
-    """ Make changes in dat config """
+    """Make changes in dat config"""
     dat_root_path = config['PATHS']['DatPath']
 
     if not dat_root_path or not Path(dat_root_path).exists():
@@ -178,7 +188,7 @@ def command_import(_) -> None:
 
     rules = Rules().rules
 
-    dats = { str(x):None for x in Path(dat_root_path).rglob("*.[dD][aA][tT]") }
+    dats = { str(x):None for x in Path(dat_root_path).rglob('*.[dD][aA][tT]') }
 
     if config['IMPORT'].get('IgnoreRegEx'):
         ignore_regex = re.compile(config['IMPORT']['IgnoreRegEx'])
@@ -187,7 +197,7 @@ def command_import(_) -> None:
     fromhere = ''
     found = False
     for dat_name in dats:
-        if dat_name == fromhere or fromhere == '':
+        if fromhere in (dat_name, ''):
             found = True
         if not found:
             continue
@@ -199,18 +209,19 @@ def command_import(_) -> None:
             dat.load()
             database = Dat(seed=seed, new_file=dat_name, **dat.dict())
             database.save()
-            database.close()
+            database.flush()
 
 
 def command_dat(args):
-    """ Make changes in dat config """
+    """Make changes in dat config"""
 
-    def print_dats(dats, fields = ['seed', 'name', 'status']):
-        """ Print dats """
+    def print_dats(dats, fields = None):
+        """Print dats"""
         output = []
+        fields = fields if fields else ['seed', 'name', 'status']
         for dat in dats:
-            new_dat = { k:dat[k] for k in fields if k in dat and dat[k] }
-            new_dat['status'] = dat.get('status', 'enabled')
+            new_dat = { k:dat[k] for k in fields if dat.get(k) }
+            new_dat['status'] = dat.get('status', 'enabled') or 'enabled'
             output.append(new_dat)
         if getattr(args, 'only_names', False):
             for dat in output:
@@ -218,10 +229,9 @@ def command_dat(args):
             return
         print(tabulate(output, headers='keys', tablefmt='psql'))
 
-    from datoso.database import DB
     from tinydb import Query
+
     query = Query()
-    table = DB.table('dats')
     if args.dat_name:
         splitted = args.dat_name.split(':')
         if len(splitted) != 2:
@@ -229,13 +239,15 @@ def command_dat(args):
             print(f'Showing results for filter: {Bcolors.OKCYAN}name~={args.dat_name}{Bcolors.ENDC}')
             print('--------------------------------------------------------------')
             name = args.dat_name
-            result = table.search(query.name.matches(r'^.*' + name + r'.*', flags=re.IGNORECASE))
-
-            print_dats(result)
-
+            result = Dat.search(query.name.matches(r'^.*' + name + r'.*', flags=re.IGNORECASE))
+            if args.details:
+                print_dats(result, fields=['name', 'modifier', 'company', 'system', 'seed', 'date', 'path', 'system_type', 'full_name', 'automerge', 'parent'])
+            else:
+                print_dats(result)
         else:
             seed, name = splitted
-            result = table.get((query.name == name) & (query.seed == seed))
+            dat = Dat(seed=seed, name=name)
+            result = dat.get_one()
             if not result:
                 print(f'{Bcolors.FAIL}Dat not found{Bcolors.ENDC}')
                 sys.exit(1)
@@ -245,20 +257,21 @@ def command_dat(args):
                     value = int(value)
                 if value.lower() == 'true':
                     value = True
-                table.update({key: value}, doc_ids=[result.doc_id])
-                table.storage.flush()
+                dat.update({key: value}, doc_ids=[result.doc_id])
+                dat.flush()
                 print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} {key} set to {Bcolors.OKBLUE}{value}{Bcolors.ENDC}')
                 sys.exit(0)
+            # ruff: noqa: ERA001
+            # TODO(laromicas): unset
             # if args.unset:
-            #     # TODO: unset
-            #     key = args.unset
-            #     table.update({key: value}, doc_ids=[result.doc_id])
-            #     table.storage.flush()
-            #     print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} {key} set to {Bcolors.OKBLUE}{value}{Bcolors.ENDC}')
-            #     sys.exit(0)
+                #     key = args.unset
+                #     table.update({key: value}, doc_ids=[result.doc_id])
+                #     table.storage.flush()
+                #     print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} {key} set to {Bcolors.OKBLUE}{value}{Bcolors.ENDC}')
+                #     sys.exit(0)
             if args.delete:
-                table.remove(doc_ids=[result.doc_id])
-                table.storage.flush()
+                dat.remove(doc_ids=[result.doc_id])
+                dat.flush()
                 print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} removed{Bcolors.ENDC}')
                 sys.exit(0)
             if args.mark_mias:
@@ -267,12 +280,12 @@ def command_dat(args):
                 print(f'{Bcolors.OKGREEN}Set Dats {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} marked MIAs{Bcolors.ENDC}')
                 sys.exit(0)
             if args.details:
-                print_dats([result], fields=["name", "modifier", "company", "system", "seed", "date", "path", "system_type", "full_name", "automerge", "parent"])
+                print_dats([result], fields=['name', 'modifier', 'company', 'system', 'seed', 'date', 'path', 'system_type', 'full_name', 'automerge', 'parent'])
             else:
                 print_dats([result])
     elif args.all:
         # Show all dats
-        print_dats(table.all())
+        print_dats(dat.all())
 
     elif args.find:
         # Find dats TODO: finish
@@ -280,12 +293,12 @@ def command_dat(args):
         print('--------------------------------------------------------------')
         name, value = args.find.split('=')
         from tinydb import where
-        result = table.search(where(name) == value)
+        result = Dat.search(where(name) == value)
         print_dats(result)
 
 
 def command_seed_installed(_) -> None:
-    """ List available seeds """
+    """List available seeds"""
     print('Installed seeds:')
     for seed, seed_module in installed_seeds().items():
         description = seed_description(seed_module)
@@ -311,23 +324,30 @@ def command_seed_details(args) -> None:
 
 
 def command_seed(args) -> None:
-    """ Commands with the seed (must be installed) """
+    """Commands with the seed (must be installed)"""
     def parse_actions(args):
         if args.actions and len(args.actions) == 1:
                 args.actions = args.actions[0].split(',')
+        if args.seed != 'all':
+            seed_object = Seed(name=args.seed)
+            if seed_object.parse_args:
+                seed_object.parse_args(args)
+        if not any([getattr(args, 'fetch', False), getattr(args, 'process', False), getattr(args, 'details', False)]):
+            print(f'{Bcolors.FAIL}No action specified{Bcolors.ENDC} (fetch, process, details)')
+            sys.exit(1)
     parse_actions(args)
     if args.seed == 'all':
-        for seed, _ in installed_seeds().items():
-            seed = get_seed_name(seed)
-            if args.exclude and seed in args.exclude:
+        for seed in installed_seeds():
+            seed_name = get_seed_name(seed)
+            if args.exclude and seed_name in args.exclude:
                 continue
-            if args.only and seed not in args.only:
+            if args.only and seed_name not in args.only:
                 continue
             if config['PROCESS'].get('SeedIgnoreRegEx'):
                 ignore_regex = re.compile(config['PROCESS']['SeedIgnoreRegEx'])
-                if ignore_regex.match(seed):
+                if ignore_regex.match(seed_name):
                     continue
-            args.seed = seed
+            args.seed = seed_name
             command_seed(args)
         sys.exit(0)
     seed = Seed(name=args.seed)
@@ -358,15 +378,15 @@ def command_seed(args) -> None:
 
 
 def command_config_save(args) -> None:
-    """ Save config to file """
-    config_file = os.path.expanduser('~/.datosorc') if args.directory == '~' else os.path.join(os.getcwd(), '.datosorc')
+    """Save config to file"""
+    config_file = Path('~/datosorc').expanduser() if args.directory == '~' else Path.cwd() / '.datosorc'
     with open(config_file, 'w', encoding='utf-8') as file:
         config.write(file)
     print(f'Config saved to {Bcolors.OKGREEN}{config_file}{Bcolors.ENDC}')
 
 
 def command_config_set(args) -> None:
-    """ Set config value, if global is set, it will be set in datoso.ini file """
+    """Set config value, if global is set, it will be set in datoso.ini file"""
     myconfig = args.set[0].split('.')
     if len(myconfig) != 2:
         print(f'{Bcolors.FAIL}Invalid config key, must be in <SECTION>.<Option> format. {Bcolors.ENDC}')
@@ -378,11 +398,11 @@ def command_config_set(args) -> None:
     newconfig = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
     newconfig.optionxform = lambda option: option
     if getattr(args, 'global', False):
-        file = os.path.join(ROOT_FOLDER, 'datoso.ini')
+        file = Path(ROOT_FOLDER) / 'datoso.ini'
     else:
-        file = os.path.join(os.getcwd(), '.datosorc')
-        if not os.path.isfile(file):
-            file = os.path.expanduser('~/.datosorc')
+        file = Path.cwd() / '.datosorc'
+        if not Path.is_file(file):
+            file = Path('~/datosorc').expanduser()
     newconfig.read(file)
     if not newconfig.has_section(myconfig[0]):
         newconfig.add_section(myconfig[0])
@@ -396,7 +416,7 @@ def command_config_set(args) -> None:
 
 
 def command_config_get(args) -> None:
-    """ Get active config value """
+    """Get active config value"""
     myconfig = args.get.split('.')
     if len(myconfig) != 2:
         print(myconfig)
@@ -409,7 +429,7 @@ def command_config_get(args) -> None:
 
 
 def command_config_rules_update(args) -> None:
-    """ Update rules from google sheet """
+    """Update rules from google sheet"""
     from datoso.database.seeds import dat_rules
     print('Updating rules')
     try:
@@ -423,7 +443,7 @@ def command_config_rules_update(args) -> None:
 
 
 def command_config_mia_update(args) -> None:
-    """ Update rules from google sheet """
+    """Update rules from google sheet"""
     from datoso.database.seeds import mia
     print('Updating MIA')
     try:
@@ -437,7 +457,7 @@ def command_config_mia_update(args) -> None:
 
 
 def command_config(args) -> None:
-    """ Config commands """
+    """Config commands"""
     if args.save:
         command_config_save(args)
     elif args.set:
@@ -454,13 +474,13 @@ def command_config(args) -> None:
 
 
 def command_list(_):
-    """ List installed seeds """
+    """List installed seeds"""
     for seed, seed_class in installed_seeds().items():
         description = seed_class.description()
         print(f'* {Bcolors.OKCYAN}{seed}{Bcolors.ENDC} - {description[0:60] if len(description) > 60 else description}...')
 
 def command_doctor(args):
-    """ Doctor installed seeds """
+    """Doctor installed seeds"""
     if getattr(args, 'seed', False):
         seed = check_seed(args.seed)
         if not seed:
@@ -474,13 +494,13 @@ def command_doctor(args):
         print(f'Checking seed {Bcolors.OKCYAN}{seed}{Bcolors.ENDC}')
         check_module(seed, module, args.repair)
 
-def command_log(args):
+def command_log(_):
     log_path = FileUtils.parse_folder(config.get('PATHS','DatosoPath', fallback='~/.datoso'))
-    logfile = os.path.join(log_path, config['LOG'].get('LogFile', 'datoso.log'))
+    logfile = log_path / config['LOG'].get('LogFile', 'datoso.log')
     os.system(f'cat {logfile}')
 
 def main():
-    """ Main function """
+    """Main function"""
     from datoso.database.seeds.dat_rules import detect_first_run
     detect_first_run()
     args = parse_args()

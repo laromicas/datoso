@@ -1,11 +1,13 @@
-""" Configuration module. """
+"""Configuration module."""
 import configparser
 import os
+from pathlib import Path
 
-from datoso import __app_name__, ROOT_FOLDER
+from datoso import ROOT_FOLDER, __app_name__
+
 
 def get_seed_name(seed):
-    """ Get seed name. """
+    """Get seed name."""
     return seed.replace(f'{__app_name__}_seed_', '')
 
 
@@ -28,9 +30,8 @@ class Config(configparser.ConfigParser):
         except configparser.NoOptionError:
             return None
 
-
 config = Config(allow_no_value=True)
 config.optionxform = lambda option: option
-config.read(os.path.join(ROOT_FOLDER, 'datoso.ini'))
-config.read(os.path.expanduser('~/.datosorc'))
-config.read(os.path.join(os.getcwd(), '.datosorc'))
+config.read(ROOT_FOLDER / 'datoso.ini')
+config.read(Path('~/.datosorc').expanduser())
+config.read(Path.cwd() / '.datosorc')

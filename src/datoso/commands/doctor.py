@@ -1,19 +1,21 @@
 """Check if all dependencies are installed"""
 from pydoc import locate
 from shutil import which
+
 import pkg_resources
+
 from datoso import __app_name__
-from datoso.helpers.plugins import installed_seeds
 from datoso.helpers import Bcolors
+from datoso.helpers.plugins import installed_seeds
 
 
 def check_seed(seed):
-    """ Check if seed is installed """
+    """Check if seed is installed"""
     return f'{__app_name__}_seed_{seed}' in installed_seeds()
 
 
 def check_version(detected, required, expression):
-    """ Check if version of required package is correct """
+    """Check if version of required package is correct"""
     detected = pkg_resources.parse_version(detected)
     required = pkg_resources.parse_version(required)
     match expression:
@@ -32,9 +34,9 @@ def check_version(detected, required, expression):
 
 
 def check_module_attributes(seed, module):
-    """ Check if all needed files are present """
+    """Check if all needed files are present"""
     reqs = {
-        '__preffix__': 'Preffix for identification of dats',
+        '__prefix__': 'Prefix for identification of dats',
         '__description__': 'Description of module',
         'fetch.fetch': 'Function to fetch data',
         'rules.get_rules': 'Rules for the rules engine',
@@ -48,12 +50,13 @@ def check_module_attributes(seed, module):
 
 
 def check_executable(executable):
-    """ Check if executable is installed """
+    """Check if executable is installed"""
     return which(executable) is not None or which(executable + '.exe') is not None
 
 
-def check_module(seed, module, repair=False):
-    """ Check if all dependencies are installed """
+def check_module(seed, module, repair=False): # noqa: ARG001
+    """Check if all dependencies are installed"""
+    # TODO(laromicas): Add repair functionality
     if not module:
         module = locate(seed)
     check_module_attributes(seed, module)

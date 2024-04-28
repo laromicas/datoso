@@ -2,7 +2,9 @@
 from enum import Enum
 from pydoc import locate
 from types import ModuleType
+
 from datoso import __app_name__
+
 
 class PluginType(Enum):
     SEED = 'seed'
@@ -14,10 +16,9 @@ def get(plugin, module, plugin_type):
     return locate(f'{__app_name__}_{plugin_type}_{plugin}')
 
 def installed(plugin_type):
-    import importlib
     import pkgutil
     return {
-        name: importlib.import_module(name)
+        name: __import__(name)
         for finder, name, ispkg
         in pkgutil.iter_modules()
         if name.startswith(f'{__app_name__}_{plugin_type}_')

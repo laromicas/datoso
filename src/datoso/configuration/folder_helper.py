@@ -1,33 +1,32 @@
 
-import os
-from datoso.helpers import FileUtils
+from pathlib import Path
+
 from datoso.configuration import config
+from datoso.helpers import FileUtils
 
 
 class Folders:
-    base: str = None
-    download: str = None
-    dats: str = None
-    backup: str = None
-    extras: dict = None
+    base: Path = None
+    download: Path = None
+    dats: Path = None
+    backup: Path = None
+    extras: list = None
 
-    def __init__(self, seed, extras=[]) -> None:
+    def __init__(self, seed, extras=None) -> None:
         self.base = FileUtils.parse_folder(config['PATHS'].get('DownloadPath'))
-        self.download = os.path.join(self.base, seed)
-        self.dats = os.path.join(self.download, 'dats')
-        self.backup = os.path.join(self.download, 'backup')
-        self.extras = []
-        for extra in extras:
-            self.extras.append(os.path.join(self.dats, extra))
+        self.download = Path(self.base) / seed
+        self.dats = Path(self.download) / 'dats'
+        self.backup = Path(self.download) / 'backup'
+        extras = extras if extras else []
+        self.extras = [] if not extras else [Path(self.dats) / extra for extra in extras]
 
     def clean_dats(self):
         FileUtils.remove(self.dats)
-        os.makedirs(self.dats, exist_ok=True)
+        Path(self.dats).mkdir(parents=True, exist_ok=True)
 
     def create_all(self):
-        os.makedirs(self.download, exist_ok=True)
-        os.makedirs(self.dats, exist_ok=True)
-        os.makedirs(self.backup, exist_ok=True)
+        self.download.mkdir(parents=True, exist_ok=True)
+        self.dats.mkdir(parents=True, exist_ok=True)
+        self.backup.mkdir(parents=True, exist_ok=True)
         for extra in self.extras:
-            os.makedirs(extra, exist_ok=True)
-
+            extra.mkdir(parents=True, exist_ok=True)

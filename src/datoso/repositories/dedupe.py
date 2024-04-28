@@ -1,14 +1,17 @@
 import logging
+
 from datoso.database.models.datfile import Dat
 from datoso.repositories.dat import DatFile
 
-class Dedupe:
-    """ Merge two dat files. """
 
-    child = {}
-    parent = {}
+class Dedupe:
+    """Merge two dat files."""
+
+    child: dict | None
+    parent: dict | None
 
     def __init__(self, child, parent=None):
+        """Initialize Dedupe."""
         self.child = {}
         self.parent = {}
 
@@ -24,7 +27,8 @@ class Dedupe:
                 elif var.endswith(('.dat', '.xml')):
                     obj['file'] = var
                 else:
-                    raise Exception("Invalid dat file")
+                    msg = 'Invalid dat file'
+                    raise Exception(msg)
             if isinstance(var, Dat):
                 obj['db'] = var
                 obj['file'] = getattr(var, 'new_file', None) or var.file
@@ -42,16 +46,16 @@ class Dedupe:
         try:
             dat = DatFile.from_file(file)
             dat.load()
-            return dat
         except Exception:
-            raise Exception("Invalid dat file")
-
+            msg = 'Invalid dat file'
+            raise Exception(msg) from None
+        return dat
     def dedupe(self):
         if self.parent:
             self.child['dat'].merge_with(self.parent['dat'])
         else:
             self.child['dat'].dedupe()
-        logging.info("Deduped %i roms", len(self.child['dat'].merged_roms))
+        logging.info('Deduped %i roms', len(self.child['dat'].merged_roms))
         return self.child['dat']
 
     def save(self, file=None):

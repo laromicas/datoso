@@ -1,9 +1,8 @@
-"""
-__init__.py
-"""
-import os
-# Version of the datoso package
-__version__ = "0.3.14"
-__app_name__ = "datoso"
+"""__init__.py"""
+from pathlib import Path
 
-ROOT_FOLDER = os.path.dirname(os.path.abspath(__file__))
+# Version of the datoso package
+__version__ = '1.0a0.dev0'
+__app_name__ = 'datoso'
+
+ROOT_FOLDER = Path(__file__).resolve().parent

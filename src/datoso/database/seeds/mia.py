@@ -1,12 +1,11 @@
-"""
-    Seed the database with mia.
-"""
+"""Seed the database with mia."""
 import json
-import requests
 from pathlib import Path
-from datoso.configuration import config
-from datoso import ROOT_FOLDER
 
+import requests
+
+from datoso import ROOT_FOLDER
+from datoso.configuration import config
 
 fields = [
     'system',
@@ -14,12 +13,12 @@ fields = [
     'size',
     'crc32',
     'md5',
-    'sha1'
+    'sha1',
 ]
 
 
 def get_mia():
-    """ Get MIA from the Google Sheets. """
+    """Get MIA from the Google Sheets."""
     if not config['UPDATE_URLS']['GoogleSheetMIAUrl']:
         return []
     result = requests.get(config['UPDATE_URLS']['GoogleSheetMIAUrl'], timeout=300)
@@ -37,7 +36,7 @@ def get_mia():
 
 
 def import_mias():
-    """ Seed the database with mia. """
+    """Seed the database with mia."""
     # pylint: disable=protected-access
     mias = get_mia()
     with open(Path(ROOT_FOLDER,'mia.json'), 'w', encoding='utf-8') as file:
@@ -45,8 +44,8 @@ def import_mias():
 
 
 def get_mias():
-    """ Seed the database with mia. """
+    """Seed the database with mia."""
     # pylint: disable=protected-access
-    with open(Path(ROOT_FOLDER,'mia.json'), 'r', encoding='utf-8') as file:
+    with open(Path(ROOT_FOLDER,'mia.json'), encoding='utf-8') as file:
         mias = json.loads(file.read())
-    return mias
+    return mias # noqa: RET504

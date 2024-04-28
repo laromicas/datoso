@@ -1,33 +1,30 @@
-""" Unknown seed, detects version and type of dat already in DatRoot. """
-import re
+"""Unknown seed, detects version and type of dat already in DatRoot."""
 import logging
+import re
+
 from datoso.helpers import FileHeaders
 from datoso.repositories.dat import ClrMameProDatFile, XMLDatFile
 
+
 def detect_xml(dat_file: str, rules):
-    """ Detect the seed for a XML dat file. """
+    """Detect the seed for a XML dat file."""
     dat = XMLDatFile(file=dat_file)
     for rule_details in rules:
         found = True
-        # print(dat.header)
         for rule in rule_details['rules']:
-            # print(rule['key'], dat.header.get(rule['key']), rule['value'], rule['operator'], comparator(dat.header.get(rule['key']), rule['value'], rule.get('operator', 'eq')))
             if not comparator(dat.header.get(rule['key']), rule['value'], rule.get('operator', 'eq')):
                 found = False
                 break
-        # print(f'found: {found}')
         if found:
             return rule_details['seed'], rule_details['_class']
     return None, None
 
 def detect_clrmame(dat_file: str, rules):
-    """ Detect the seed for a ClrMamePro dat file. """
+    """Detect the seed for a ClrMamePro dat file."""
     dat = ClrMameProDatFile(file=dat_file)
     for rule_details in rules:
         found = True
-        # print(dat.header)
         for rule in rule_details['rules']:
-            # print(rule['key'], rule['value'], rule['operator'])
             if not comparator(dat.header.get(rule['key']), rule['value'], rule.get('operator', 'eq')):
                 found = False
                 break
@@ -36,29 +33,23 @@ def detect_clrmame(dat_file: str, rules):
     return None, None
 
 def detect_seed(dat_file: str, rules):
-    """ Detect the seed for a dat file. """
+    """Detect the seed for a dat file."""
     # Read first 5 chars of file to determine type
-    with open(dat_file, 'r', encoding='utf-8') as file:
+    with open(dat_file, encoding='utf-8') as file:
         file_header = file.read(5)
     try:
         if file_header == FileHeaders.XML.value:
             return detect_xml(dat_file, rules)
         if file_header == FileHeaders.CLRMAMEPRO.value:
             return detect_clrmame(dat_file, rules)
-        raise Exception('Unknown file header', dat_file, file_header)
     except Exception as e:
-        logging.exception('Error detecting seed type', e)
+        logging.exception('Error detecting seed type')
+        raise
+    msg = f'Unknown seed type {dat_file} {file_header}'
+    raise Exception(msg)
 
-    try:
-        return detect_xml(dat_file, rules)
-    except Exception:
-        try:
-            return detect_clrmame(dat_file, rules)
-        except Exception:
-            return None, None
-
-def comparator(key, value, operator='eq'): # pylint: disable=too-many-return-statements
-    """ Returns a boolean based on the comparison of the key and value. """
+def comparator(key, value, operator='eq'):
+    """Returns a boolean based on the comparison of the key and value."""
     match operator:
         case 'eq' | 'equals' | '==':
             return key == value

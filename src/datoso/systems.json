@@ -682,6 +682,15 @@
     {
         "company": "Microsoft",
         "system": "Pocket PC",
+        "override": {
+            "company": "Microsoft"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Roms",
+                "redump": "Discs"
+            }
+        },
         "system_type": "Mobile"
     },
     {
@@ -1286,6 +1295,20 @@
         "company": "Philips",
         "system": "Videopac+",
         "system_type": "Console"
+    },
+    {
+        "company": null,
+        "system": "Pocket PC",
+        "override": {
+            "company": "Microsoft"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Roms",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Mobile"
     },
     {
         "company": "Pocket PC",
@@ -1900,11 +1923,6 @@
     {
         "company": null,
         "system": "Video Game Documents",
-        "system_type": "Manuals"
-    },
-    {
-        "company": null,
-        "system": "Video Game Magazine Scans",
         "system_type": "Manuals"
     },
     {
