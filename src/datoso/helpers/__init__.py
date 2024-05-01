@@ -51,24 +51,26 @@ class Bcolors:
             string = string.replace(getattr(Bcolors, color), '')
         return string
 
-def is_date(string, fuzzy=False) -> bool:
+def is_date(string, fuzzy=None) -> bool:
     """Return whether the string can be interpreted as a date.
 
     :param string: str, string to check for date
     :param fuzzy: bool, ignore unknown tokens in string if True
     """
     try:
-        parser.parse(string, fuzzy=fuzzy)
+        parser.parse(string, fuzzy=fuzzy or False)
     except ValueError:
         return False
     return True
 
+KB = 1024
+
 def sizeof_fmt(num, suffix='B') -> str:
     """Convert bytes to human readable format."""
     for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
-        if abs(num) < 1024.0:
+        if abs(num) < KB:
             return f'{num:3.1f}{unit}{suffix}'
-        num /= 1024.0
+        num /= KB
     return f'{num: .1f}Yi{suffix}'
 
 def is_git_path(path) -> bool:

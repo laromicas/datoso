@@ -56,6 +56,10 @@ class DatFile:
     def close(self) -> None:
         """Close the dat file if needed."""
 
+    def get_version(self) -> str:
+        """Get the version from the dat file."""
+        return getattr(self, 'version', None)
+
     def get_modifier(self) -> str:
         """Get the modifier ej. 'Source Code', 'etc'"""
         return getattr(self, 'modifier', None)
@@ -92,6 +96,7 @@ class DatFile:
             'name': self.name,
             'file': self.file,
             'full_name': self.full_name,
+            'version': self.get_version(),
             'date': self.get_date(),
             'modifier': self.get_modifier(),
             'company': self.get_company(),
@@ -442,6 +447,7 @@ class ZipMultiDatFile(DatFile):
         }
         self.name = self.header['name']
         self.full_name = self.header['description']
+
 
 class DirMultiDatFile(DatFile):
     """Base class for dat files."""

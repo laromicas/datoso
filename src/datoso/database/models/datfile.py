@@ -11,117 +11,6 @@ from tinydb import Query
 from datoso.database import DatabaseSingleton
 
 
-class Database:
-    _DB = None
-    _table = None
-    _id: int = None
-    _table_name: str = None
-
-    def __init__(self, **kwargs) -> None:
-        self._DB = DatabaseSingleton()
-        self._table = self._DB.DB.table(self._table_name)
-        super().__init__(**kwargs)
-
-    def load(self):
-        """Load record from the database."""
-        result = self._table.search(self.query())
-        if result:
-            self.__dict__.update(result[0])
-
-    def save(self):
-        """Save record to the database."""
-        query = Query()
-        if self._id:
-            self._table.upsert(self.dict(), query.id == self._id)
-        else:
-            self._id = self._table.upsert(self.dict(), self.query())
-
-    def query(self):
-        """Query to update or load a record."""
-        query = Query()
-        return query.id == self._id
-
-    def close(self):
-        """Close the database."""
-        self._table.storage.flush()
-
-    def flush(self):
-        """Flush the database."""
-        self._table.storage.flush()
-
-    def dict(self):
-        """Get the dictionary representation of the model."""
-        super_dict = super().dict()
-        for key, value in super_dict.items():
-            if isinstance(value, PosixPath):
-                super_dict[key] = str(value)
-        return super_dict
-
-    @staticmethod
-    def all():
-        """Get all records."""
-        Database._DB = DatabaseSingleton()
-        Database._table = Database._DB.DB.table(Database._table_name)
-        return Database._table.all()
-
-
-# class DatabaseModel(BaseModel): # BaseModel needed for initialization, TODO: find a better way
-#     """ Base model for TinyDB. """
-#     class Config:
-#         """ Pydantic default config. """
-#         extra = Extra.allow
-#         arbitrary_types_allowed = True
-
-#     _DB = None
-#     _table = None
-#     _id: int = None
-#     _table_name: str = None
-
-#     def __init__(self, **kwargs) -> None:
-#         self._DB = DatabaseSingleton()
-#         self._table = self._DB.DB.table(self._table_name)
-#         super().__init__(**kwargs)
-
-#     def load(self):
-#         """ Load record from the database. """
-#         result = self._table.search(self.query())
-#         if result:
-#             self.__dict__.update(result[0])
-
-#     def save(self):
-#         """ Save record to the database. """
-#         query = Query()
-#         if self._id:
-#             self._table.upsert(self.dict(), query.id == self._id)
-#         else:
-#             self._id = self._table.upsert(self.dict(), self.query())
-
-#     def query(self):
-#         """ Query to update or load a record. """
-#         query = Query()
-#         return query.id == self._id
-
-#     def close(self):
-#         """ Close the database. """
-#         self._table.storage.flush()
-
-#     def flush(self):
-#         """ Flush the database. """
-#         self._table.storage.flush()
-
-#     def dict(self):
-#         """ Get the dictionary representation of the model. """
-#         super_dict = super().dict()
-#         for key, value in super_dict.items():
-#             if isinstance(value, PosixPath):
-#                 super_dict[key] = str(value)
-#         return super_dict
-
-#     def all(self):
-#         """ Get all records. """
-#         return self._table.all()
-
-
 @dataclass
 class Base:
     _table_name = None
@@ -231,10 +120,11 @@ class Dat(Base):
     file: str | None = None
     new_file: str | None = None
     path: str | None = None
-    status: str | None = None
-    system_type: str | None = None
     date: str | None = None
     automerge: bool | None = None
+    version: str | None = None
+    system_type: str | None = None
+    status: str | None = None
 
     def query(self):
         """Query to update or load a record."""

@@ -57,7 +57,7 @@ def init():
     """Seed the database with Systems."""
     # pylint: disable=protected-access
     with open(Path(ROOT_FOLDER,'systems.json'), encoding='utf-8') as file:
-        systems = json.loads(file.read())
+        systems = json.load(file)
     for system in systems:
         row = System.from_dict(system)
         row.save()

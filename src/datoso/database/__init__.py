@@ -53,7 +53,7 @@ class JSONStorageWithBackup(JSONStorage):
         """Remove null values from the data."""
         if isinstance(data, dict):
             return {k: self.remove_nulls(v) for k, v in data.items() if v is not None}
-        elif isinstance(data, list):
+        if isinstance(data, list):
             return [self.remove_nulls(v) for v in data if v is not None]
         return data
 
@@ -61,7 +61,7 @@ class JSONStorageWithBackup(JSONStorage):
         """Write data to the storage."""
         self.make_backup()
         data = self.sanitize_data(data)
-        # data = self.remove_nulls(data)
+        # data = self.remove_nulls(data) # noqa: ERA001
         super().write(data)
 
     def make_backup(self):

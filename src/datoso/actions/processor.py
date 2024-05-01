@@ -128,7 +128,8 @@ class Copy(Process):
         filename = Path(origin).name
         self.destination = self.destination if self.destination else self.previous['path']
 
-        destination = Path(self.folder) / self.destination / filename
+        destination = Path(self.folder) / self.destination / filename if filename.endswith(('.dat', '.xml')) else Path(self.folder) / self.destination / self.previous['name']
+
         result = None
         self.output = self.previous
         if not self.previous:

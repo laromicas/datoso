@@ -1,6 +1,7 @@
 """Unknown seed, detects version and type of dat already in DatRoot."""
 import logging
 import re
+from typing import Any
 
 from datoso.helpers import FileHeaders
 from datoso.repositories.dat import ClrMameProDatFile, XMLDatFile
@@ -42,14 +43,14 @@ def detect_seed(dat_file: str, rules):
             return detect_xml(dat_file, rules)
         if file_header == FileHeaders.CLRMAMEPRO.value:
             return detect_clrmame(dat_file, rules)
-    except Exception as e:
+    except Exception:
         logging.exception('Error detecting seed type')
         raise
     msg = f'Unknown seed type {dat_file} {file_header}'
-    raise Exception(msg)
+    raise LookupError(msg)
 
-def comparator(key, value, operator='eq'):
-    """Returns a boolean based on the comparison of the key and value."""
+def comparator(key: Any, value: Any, operator: str = 'eq') -> bool:  # noqa: PLR0911
+    """Return a boolean based on the comparison of the key and value."""
     match operator:
         case 'eq' | 'equals' | '==':
             return key == value

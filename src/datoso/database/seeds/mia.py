@@ -47,5 +47,5 @@ def get_mias():
     """Seed the database with mia."""
     # pylint: disable=protected-access
     with open(Path(ROOT_FOLDER,'mia.json'), encoding='utf-8') as file:
-        mias = json.loads(file.read())
+        mias = json.load(file)
     return mias # noqa: RET504

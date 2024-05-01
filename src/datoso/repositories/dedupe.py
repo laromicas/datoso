@@ -28,7 +28,7 @@ class Dedupe:
                     obj['file'] = var
                 else:
                     msg = 'Invalid dat file'
-                    raise Exception(msg)
+                    raise LookupError(msg)
             if isinstance(var, Dat):
                 obj['db'] = var
                 obj['file'] = getattr(var, 'new_file', None) or var.file
@@ -48,7 +48,7 @@ class Dedupe:
             dat.load()
         except Exception:
             msg = 'Invalid dat file'
-            raise Exception(msg) from None
+            raise ValueError(msg) from None
         return dat
     def dedupe(self):
         if self.parent:

@@ -43,7 +43,7 @@ class UrllibDownload(Download):
             tmp_filename, headers = urllib.request.urlretrieve(url)
             local_filename = Path(destination) / headers.get_filename()
             shutil.move(tmp_filename, local_filename)
-        except Exception as e:
+        except Exception:
             logging.exception('Error downloading %s', url)
             return None
         return local_filename
