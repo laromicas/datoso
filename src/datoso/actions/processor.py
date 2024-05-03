@@ -141,6 +141,10 @@ class Copy(Process):
             self.previous['new_file'] = None
             return 'Ignored'
 
+        # TODO(laromicas): Check behavior with directories
+        if self.database.static_path:
+            destination = Path(self.folder) / self.database.static_path / filename
+
         old_file = Path(self.database.to_dict().get('new_file', '') or '')
         new_file = destination
 

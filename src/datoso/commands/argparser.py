@@ -54,8 +54,10 @@ def add_dat_parser(subparser):
             choices=[
                     'name', 'modifier', 'company', 'system', 'seed', 'date', 'path', 'system_type', 'full_name',
                     'automerge', 'parent', 'version', 'prefix', 'suffix', 'status', 'new_file', 'file', 'mias',
+                    'static_path',
                 ])
     group_dat_action.add_argument('-s', '--set', help='Manually set variable, must be in format "variable=value"')
+    group_dat_action.add_argument('-u', '--unset', help='Manually unset variable')
     group_dat_action.add_argument('--delete', action='store_true', default=False, help='Delete Dat')
     group_dat_action.add_argument('--mark-mias', action='store_true', default=False, help='Mark Dat MIAs')
 

@@ -130,18 +130,19 @@ def command_dat(args):
                 value = int(value)
             if value.lower() == 'true':
                 value = True
+            if value.lower() in ('none', 'null'):
+                value = None
             dat.update({key: value}, doc_ids=[result.doc_id])
             dat.flush()
             print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} {key} set to {Bcolors.OKBLUE}{value}{Bcolors.ENDC}')
             sys.exit(0)
-        # ruff: noqa: ERA001
-        # TODO(laromicas): unset
-        # if args.unset:
-            #     key = args.unset
-            #     table.update({key: value}, doc_ids=[result.doc_id])
-            #     table.storage.flush()
-            #     print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} {key} set to {Bcolors.OKBLUE}{value}{Bcolors.ENDC}')
-            #     sys.exit(0)
+        if args.unset:
+            key = args.unset
+            value = None
+            dat.update({key: value}, doc_ids=[result.doc_id])
+            dat.flush()
+            print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} {key} set to {Bcolors.OKBLUE}{value}{Bcolors.ENDC}')
+            sys.exit(0)
         if args.delete:
             dat.remove(doc_ids=[result.doc_id])
             dat.flush()

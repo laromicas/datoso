@@ -86,7 +86,10 @@ class DatFile:
 
     def get_path(self) -> str:
         """Get the path for the dat file."""
-        self.path = os.path.join(*[x for x in [self.get_prefix(), self.get_company(), self.get_system(), self.get_suffix()] if x]) # noqa: PTH118
+        suffixes = self.get_suffix()
+        if not isinstance(suffixes, list):
+            suffixes = [suffixes]
+        self.path = os.path.join(*[x for x in [self.get_prefix(), self.get_company(), self.get_system(), *suffixes] if x]) # noqa: PTH118
         return self.path
 
     def dict(self) -> dict:

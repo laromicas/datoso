@@ -124,6 +124,7 @@ class Dat(Base):
     automerge: bool | None = None
     version: str | None = None
     system_type: str | None = None
+    static_path: str | None = None
     status: str | None = None
 
     def query(self):
