@@ -17,6 +17,7 @@ from datoso.commands.argparser import (
 )
 from datoso.configuration import config
 from datoso.configuration.logger import enable_logging, set_verbosity
+from datoso.database.seeds.dat_rules import detect_first_run
 from datoso.helpers import Bcolors
 
 #---------Boilerplate to check python version ----------
@@ -73,7 +74,6 @@ def initial_setup(args) -> None:
 
 def main():
     """Main function"""
-    from datoso.database.seeds.dat_rules import detect_first_run
     detect_first_run()
     args = parse_args()
     args.func(args)

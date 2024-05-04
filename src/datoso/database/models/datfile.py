@@ -216,11 +216,11 @@ class MIA(Base):
         """Query to update or load a record."""
         query = Query()
         if self.sha1:
-            return (query.sha1 == self.sha1)
+            return query.sha1 == self.sha1
         if self.md5:
-            return (query.md5 == self.md5)
+            return query.md5 == self.md5
         if self.crc32:
-            return (query.crc32 == self.crc32)
+            return query.crc32 == self.crc32
         return None
 
 if __name__ == '__main__':
@@ -233,5 +233,3 @@ if __name__ == '__main__':
     print(ec.to_dict())
     syst = System.from_dict({'system': 'Nintendo 64', 'company': 'Nintendo', 'override': ov, 'extra_configs': ec, 'system_type': 'ROM'})
     print(syst)
-
-

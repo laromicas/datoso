@@ -38,18 +38,20 @@ class Seed:
             self.actions = actions.get_actions()
         for path, actions in self.actions.items():
             config_path = path.replace('{dat_origin}', self.name.upper()).replace('/', '.')
-            if config.has_section(config_path):
-                configs.append(config[config_path])
-                for actions in self.actions.values():
-                    new_steps = {action['action']: action for action in actions}
-                    new_actions = []
-                    if override_actions := config[config_path].get('OverrideActions'):
-                        override_actions = override_actions.split(',')
-                        for override_action in override_actions:
-                            if override_action in new_steps:
-                                new_actions.append(new_steps[override_action])
-                            else:
-                                new_actions.append({'action': override_action})
+            if not config.has_section(config_path):
+                continue
+            configs.append(config[config_path])
+            for actions in self.actions.values():
+                new_steps = {action['action']: action for action in actions}
+                new_actions = []
+                if not (override_actions := config[config_path].get('OverrideActions')):
+                    continue
+                override_actions = override_actions.split(',')
+                for override_action in override_actions:
+                    if override_action in new_steps:
+                        new_actions.append(new_steps[override_action])
+                    else:
+                        new_actions.append({'action': override_action})
 
 
         # if configs:
@@ -126,18 +128,40 @@ class Seed:
                     action[action_name] = action_value.format(**data)
         return actions
 
+    def delete_line(self, line):
+        # pylint: disable=expression-not-assigned
+        [print('\b \b', end='') for x in range(len(line))]
+        print(' ' * (len(line)), end='')
+        print('\r', end='')
+
+    def get_prefix(self, name) -> str:
+        seed = self.get_module()
+        return seed.__prefix__ if seed else name
+
+    def should_ignore_file(self, fltr, file):
+        if config['PROCESS'].get('DatIgnoreRegEx'):
+            ignore_regex = re.compile(config['PROCESS']['DatIgnoreRegEx'])
+            if ignore_regex.match(str(file)):
+                return True
+        if (file.suffix not in ('.dat', '.xml') and not file.is_dir()) or (fltr and fltr not in str(file)):
+            return True
+        return False
+
+    def process_action(self, procesor):
+        output = []
+        for process in procesor.process():
+            if process in STATUS_TO_SHOW or Command.verbose:
+                output.append(process)
+            if process == 'Error':
+                break
+        if 'Deleted' in output or 'Ignored' in output:
+            output.append('Disabled')
+        return output
+
     def process_dats(self, fltr=None, actions_to_execute=None):
         """Process dats."""
-        def delete_line(line):
-            # pylint: disable=expression-not-assigned
-            [print('\b \b', end='') for x in range(len(line))]
-            print(' ' * (len(line)), end='')
-            print('\r', end='')
-        def get_prefix(name) -> str:
-            seed = self.get_module()
-            return seed.__prefix__ if seed else name
         tmp_path = config['PATHS'].get('DownloadPath', 'tmp')
-        dat_origin = FileUtils.parse_folder(tmp_path) / get_prefix(self.name) / 'dats'
+        dat_origin = FileUtils.parse_folder(tmp_path) / self.get_prefix(self.name) / 'dats'
         line = ''
         self.get_actions()
         for path, actions in self.actions.items():
@@ -147,31 +171,16 @@ class Seed:
             if actions_to_execute:
                 actions = [x for x in actions if x['action'] in actions_to_execute]
             for file in new_path.iterdir() if new_path.is_dir() else []:
-                if config['PROCESS'].get('DatIgnoreRegEx'):
-                    ignore_regex = re.compile(config['PROCESS']['DatIgnoreRegEx'])
-                    if ignore_regex.match(str(file)):
-                        continue
-
-                if (file.suffix not in ('.dat', '.xml') \
-                    and not file.is_dir()) \
-                    or (fltr and fltr not in str(file)):
+                if self.should_ignore_file(fltr, file):
                     continue
-
                 if not config.getboolean('COMMAND', 'Quiet', fallback=False):
-                    delete_line(line)
+                    self.delete_line(line)
                     line = f'Processing {Bcolors.OKCYAN}{file.name}{Bcolors.ENDC}'
                     print(line, end=' ', flush=True)
                 procesor = Processor(seed=self.name, file=file, actions=actions)
-                output = []
-                for process in procesor.process():
-                    if process in STATUS_TO_SHOW or Command.verbose:
-                        output.append(process)
-                    if process == 'Error':
-                        break
-                if 'Deleted' in output and 'Ignored' in output:
-                    output.append('Disabled')
+                output = self.process_action(procesor)
                 if not config.getboolean('COMMAND', 'Quiet', fallback=False):
-                    delete_line(line)
+                    self.delete_line(line)
                     line = f'Processed {Bcolors.OKCYAN}{file.name}{Bcolors.ENDC}'
                     print(line, end=' ', flush=True)
 
@@ -181,7 +190,7 @@ class Seed:
                 if output or config.getboolean('COMMAND', 'Verbose', fallback=False):
                     line = ''
                     print(line)
-        delete_line(line)
+        self.delete_line(line)
 
     @staticmethod
     def list_installed():

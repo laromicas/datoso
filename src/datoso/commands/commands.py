@@ -102,7 +102,8 @@ def command_dat(args):
     query = Query()
     if args.dat_name:
         splitted = args.dat_name.split(':')
-        if len(splitted) != 2:
+        expected_dat_array_len = 2
+        if len(splitted) != expected_dat_array_len:
             print(f'{Bcolors.WARNING}Invalid dat name, must be in format "seed:name"{Bcolors.ENDC}')
             print(f'Showing results for filter: {Bcolors.OKCYAN}name~={args.dat_name}{Bcolors.ENDC}')
             print('--------------------------------------------------------------')
@@ -111,7 +112,8 @@ def command_dat(args):
             if args.fields:
                 print_dats(result, fields=args.fields)
             elif args.details:
-                print_dats(result, fields=['name', 'modifier', 'company', 'system', 'seed', 'date', 'path', 'system_type', 'automerge', 'parent'])
+                print_dats(result, fields=['name', 'modifier', 'company', 'system', 'seed', 'date',
+                                           'path', 'system_type', 'automerge', 'parent'])
             else:
                 print_dats(result)
             return
@@ -134,14 +136,16 @@ def command_dat(args):
                 value = None
             dat.update({key: value}, doc_ids=[result.doc_id])
             dat.flush()
-            print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} {key} set to {Bcolors.OKBLUE}{value}{Bcolors.ENDC}')
+            print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} ' \
+                  f'{key} set to {Bcolors.OKBLUE}{value}{Bcolors.ENDC}')
             sys.exit(0)
         if args.unset:
             key = args.unset
             value = None
             dat.update({key: value}, doc_ids=[result.doc_id])
             dat.flush()
-            print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} {key} set to {Bcolors.OKBLUE}{value}{Bcolors.ENDC}')
+            print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} ' \
+                  f'{key} set to {Bcolors.OKBLUE}{value}{Bcolors.ENDC}')
             sys.exit(0)
         if args.delete:
             dat.remove(doc_ids=[result.doc_id])
@@ -176,9 +180,10 @@ def command_dat(args):
 def command_seed_installed(_) -> None:
     """List available seeds"""
     print('Installed seeds:')
+    description_len = 60
     for seed, seed_module in installed_seeds().items():
         description = seed_description(seed_module)
-        description = {description[0:60]+'...' if len(description) > 60 else description}
+        description = {description[0:description_len]+'...' if len(description) > description_len else description}
         seed_name = seed[12:]
         print(f'* {Bcolors.OKGREEN}{seed_name}{Bcolors.ENDC} - {description}')
 
@@ -264,7 +269,8 @@ def command_config_save(args) -> None:
 def command_config_set(args) -> None:
     """Set config value, if global is set, it will be set in datoso.ini file"""
     myconfig = args.set[0].split('.')
-    if len(myconfig) != 2:
+    expected_config_array_len = 2
+    if len(myconfig) != expected_config_array_len:
         print(f'{Bcolors.FAIL}Invalid config key, must be in <SECTION>.<Option> format. {Bcolors.ENDC}')
         sys.exit(1)
     if myconfig[1] not in config[myconfig[0]]:
@@ -294,7 +300,8 @@ def command_config_set(args) -> None:
 def command_config_get(args) -> None:
     """Get active config value"""
     myconfig = args.get.split('.')
-    if len(myconfig) != 2:
+    expected_config_array_len = 2
+    if len(myconfig) != expected_config_array_len:
         print(myconfig)
         print(f'{Bcolors.FAIL}Invalid config key, must be in <SECTION>.<Option> format. {Bcolors.ENDC}')
         sys.exit(1)
@@ -351,9 +358,11 @@ def command_config(args) -> None:
 
 def command_list(_):
     """List installed seeds"""
+    description_len = 60
     for seed, seed_class in installed_seeds().items():
         description = seed_class.description()
-        print(f'* {Bcolors.OKCYAN}{seed}{Bcolors.ENDC} - {description[0:60] if len(description) > 60 else description}...')
+        print(f'* {Bcolors.OKCYAN}{seed}{Bcolors.ENDC} - ' \
+              f'{description[0:description_len] if len(description) > description_len else description}...')
 
 def command_doctor(args):
     """Doctor installed seeds"""

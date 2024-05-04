@@ -9,24 +9,28 @@ from pathlib import Path
 from datoso.configuration import config
 
 
-def downloader(url, destination, reporthook=None, filename_from_headers=False):
+def downloader(url, destination, reporthook=None, filename_from_headers=None):
     match config.get('DOWNLOAD', 'PrefferDownloadUtility', fallback='urllib'):
         case 'wget':
             download = WgetDownload()
-            return download.download(url, destination, filename_from_headers=filename_from_headers, reporthook=reporthook)
+            return download.download(url, destination,filename_from_headers=filename_from_headers or False,
+                reporthook=reporthook)
         case 'curl':
             download = CurlDownload()
-            return download.download(url, destination, filename_from_headers=filename_from_headers, reporthook=reporthook)
+            return download.download(url, destination,filename_from_headers=filename_from_headers or False,
+                reporthook=reporthook)
         case 'aria2c':
             download = Aria2cDownload()
-            return download.download(url, destination, filename_from_headers=filename_from_headers, reporthook=reporthook)
+            return download.download(url, destination,filename_from_headers=filename_from_headers or False,
+                reporthook=reporthook)
         case _:
             download = UrllibDownload()
-            return download.download(url, destination, filename_from_headers=filename_from_headers, reporthook=reporthook)
+            return download.download(url, destination,filename_from_headers=filename_from_headers or False,
+                reporthook=reporthook)
 
 class Download:
     @abstractmethod
-    def download(self, url, destination, filename_from_headers=False, reporthook=None):
+    def download(self, url, destination, filename_from_headers=None, reporthook=None):
         pass
 
     def popen(self, args, cwd=None, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
@@ -35,12 +39,16 @@ class Download:
         return std_out, std_err
 
 class UrllibDownload(Download):
-    def download(self, url, destination, filename_from_headers=False, reporthook=None):
+    def download(self, url, destination, filename_from_headers=None, reporthook=None):
+        if not url.startswith(('http:', 'https:')):
+            msg = 'URL must start with "http:" or "https:"'
+            raise ValueError(msg)
+
         if not filename_from_headers:
-            urllib.request.urlretrieve(url, destination, reporthook=reporthook)
+            urllib.request.urlretrieve(url, destination, reporthook=reporthook)  # noqa: S310
             return destination
         try:
-            tmp_filename, headers = urllib.request.urlretrieve(url)
+            tmp_filename, headers = urllib.request.urlretrieve(url)  # noqa: S310
             local_filename = Path(destination) / headers.get_filename()
             shutil.move(tmp_filename, local_filename)
         except Exception:
@@ -49,7 +57,7 @@ class UrllibDownload(Download):
         return local_filename
 
 class WgetDownload(Download):
-    def download(self, url, destination, filename_from_headers=False, reporthook=None): # noqa: ARG002
+    def download(self, url, destination, filename_from_headers=None, reporthook=None): # noqa: ARG002
         # TODO(laromicas): Add reporthook
         if filename_from_headers:
             args = ['wget', url, '--content-disposition', '--trust-server-names', '-nv']
@@ -64,14 +72,14 @@ class WgetDownload(Download):
         return my_list[-1]
 
 class CurlDownload(Download):
-    def download(self, url, destination, filename_from_headers=False, reporthook=None): # noqa: ARG002
+    def download(self, url, destination, filename_from_headers=None, reporthook=None): # noqa: ARG002
         # TODO(laromicas): Add reporthook
         if filename_from_headers:
             args = ['curl', '-JLOk', url]
-            std_out, std_err = self.popen(args, cwd=destination)
+            std_out, _ = self.popen(args, cwd=destination)
             return Path(destination) / self.parse_filename(std_out)
         args = ['curl', '-L', url, '-o', destination, '-J', '-L', '-k', '-s']
-        std_out, std_err = self.popen(args)
+        std_out, _ = self.popen(args)
         return destination
 
     def parse_filename(self, output):
@@ -79,7 +87,7 @@ class CurlDownload(Download):
         return my_list[-1]
 
 class Aria2cDownload(Download):
-    def download(self, url, destination, filename_from_headers=False, reporthook=None): # noqa: ARG002
+    def download(self, url, destination, filename_from_headers=None, reporthook=None): # noqa: ARG002
         # TODO(laromicas): Add reporthook
         if filename_from_headers:
             args = ['aria2c', '-x', '16', url, '--content-disposition', '--download-result=hide', '--summary-interval=0']

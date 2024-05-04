@@ -26,7 +26,8 @@ class Processor:
     def process(self):
         """Process actions."""
         for action in self.actions:
-            action_class = globals()[action['action']](file=self.file, seed=self.seed, previous=self._previous, **action)
+            action_class = globals()[
+                action['action']](file=self.file, seed=self.seed, previous=self._previous, **action)
             yield action_class.process()
             self._previous = action_class.output
             if action_class.stop:
@@ -52,12 +53,11 @@ class LoadDatFile(Process):
     seed = None
     database = None
     _class = None
-    _factory = None
+    _factory: callable = None
     _dat = None
 
     def process(self):
         """Load a dat file."""
-        from datoso.database.models.datfile import Dat
 
         # If there is a factory method, use it to create the class
         if getattr(self, '_factory', None) and self._factory:
@@ -87,7 +87,8 @@ class DeleteOld(Process):
         self.database.load()
         olddat = self.database.to_dict()
         try:
-            if self.previous and getattr(self.database, 'date', None) and self.previous.get('date', None) and compare_dates(self.database.date, self.previous['date']):
+            if self.previous and getattr(self.database, 'date', None) and self.previous.get('date', None) \
+                and compare_dates(self.database.date, self.previous['date']):
                 result = 'No Action Taken, Newer Found'
                 self.stop = True
                 return result
@@ -128,7 +129,8 @@ class Copy(Process):
         filename = Path(origin).name
         self.destination = self.destination if self.destination else self.previous['path']
 
-        destination = Path(self.folder) / self.destination / filename if filename.endswith(('.dat', '.xml')) else Path(self.folder) / self.destination / self.previous['name']
+        destination = Path(self.folder) / self.destination / filename if filename.endswith(('.dat', '.xml')) \
+            else Path(self.folder) / self.destination / self.previous['name']
 
         result = None
         self.output = self.previous
@@ -148,7 +150,8 @@ class Copy(Process):
         old_file = Path(self.database.to_dict().get('new_file', '') or '')
         new_file = destination
 
-        if old_file == new_file and destination.exists() and not config.getboolean('GENERAL', 'Overwrite', fallback=False):
+        if old_file == new_file and destination.exists() \
+            and not config.getboolean('GENERAL', 'Overwrite', fallback=False):
             return 'Exists'
 
         if not old_file:
@@ -159,7 +162,8 @@ class Copy(Process):
             result = 'Overwritten'
 
         try:
-            if getattr(self.database, 'date', None) and self.previous.get('date', None) and compare_dates(self.database.date, self.previous['date']):
+            if getattr(self.database, 'date', None) and self.previous.get('date', None) \
+                and compare_dates(self.database.date, self.previous['date']):
                 result = 'No Action Taken, Newer Found'
             else:
                 self.previous['new_file'] = destination

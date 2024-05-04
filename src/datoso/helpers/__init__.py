@@ -1,5 +1,4 @@
 """Helpers"""
-__all__ = ['downloader']
 import re
 import shutil
 from contextlib import suppress

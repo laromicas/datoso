@@ -43,7 +43,6 @@ def get_systems():
 
 def import_dats():
     """Seed the database with Systems."""
-    # pylint: disable=protected-access
     systems = get_systems()
     with open(Path(ROOT_FOLDER,'systems.json'), 'w', encoding='utf-8') as file:
         json.dump(systems, file, indent=4)
@@ -55,7 +54,6 @@ def import_dats():
 
 def init():
     """Seed the database with Systems."""
-    # pylint: disable=protected-access
     with open(Path(ROOT_FOLDER,'systems.json'), encoding='utf-8') as file:
         systems = json.load(file)
     for system in systems:
@@ -65,6 +63,5 @@ def init():
 
 def detect_first_run():
     """Detect if this is the first run."""
-    # pylint: disable=protected-access
-    if not len(System.all()):
+    if not System.all():
         init()

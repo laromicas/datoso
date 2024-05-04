@@ -29,9 +29,9 @@ class JSONStorageWithBackup(JSONStorage):
 
     path: str = DATABASE_URL
 
-    def __init__(self, path: str, create_dirs=False, encoding=None, access_mode='r+', **kwargs):
+    def __init__(self, path: str, create_dirs=None, encoding=None, access_mode='r+', **kwargs):
         self.path = path
-        super().__init__(path, create_dirs, encoding, access_mode, **kwargs)
+        super().__init__(path, create_dirs or False, encoding, access_mode, **kwargs)
 
     def sanitize_data(self, data):
         """Sanitize recursively data before writing to the storage."""

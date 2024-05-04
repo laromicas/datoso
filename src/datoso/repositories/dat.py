@@ -124,6 +124,7 @@ class XMLDatFile(DatFile):
     """XML dat file."""
 
     shas = None
+    main_key = 'datafile'
     game_key = 'game'
     header: dict = None
     merged_roms: list = None
@@ -289,7 +290,6 @@ class XMLDatFile(DatFile):
         """Overrides data for some systems."""
         find_system = System(company=self.get_company(), system=self.get_system())
         find_system.load()
-        # print(find_system.__dict__)
         if getattr(find_system, 'system_type', None):
             self.system_type = find_system.system_type
             if getattr(find_system, 'override', None):
@@ -327,7 +327,7 @@ class ClrMameProDatFile(DatFile):
         within_string = False
         for i, char in enumerate(data):
             if char == '"':
-                within_string = not(within_string)
+                within_string = not within_string
             if not within_string:
                 if char == '(':
                     if parenthesis == 0:
