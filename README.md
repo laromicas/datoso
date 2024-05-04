@@ -1,4 +1,4 @@
-![Datoso](/bearlogo.png)
+![Datoso](/bearlogo.svg)
 
 # Datoso
 
