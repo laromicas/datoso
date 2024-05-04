@@ -36,29 +36,29 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 all = [
-    "datoso-seed-fbneo>='1.0a0.dev0'",
-    "datoso-seed-md-enhanced>='1.0a0.dev0'",
-    "datoso-seed-nointro>='1.0a0.dev0'",
+    "datoso-seed-fbneo>=1.0a0.dev0",
+    "datoso-seed-md-enhanced>=1.0a0.dev0",
+    "datoso-seed-nointro>=1.0a0.dev0",
     "datoso-seed-pleasuredome>=1.0a0.dev0",
-    "datoso-seed-redump>='1.0a0.dev0'",
-    "datoso-seed-sfc-enhancedcolors>='1.0a0.dev0'",
-    "datoso-seed-sfc-msu1>='1.0a0.dev0'",
-    "datoso-seed-sfc-speedhacks>='1.0a0.dev0'",
-    "datoso-seed-tdc>='1.0a0.dev0'",
-    "datoso-seed-translatedenglish>='1.0a0.dev0'",
-    "datoso-seed-vpinmame>='1.0a0.dev0'",
+    "datoso-seed-redump>=1.0a0.dev0",
+    "datoso-seed-sfc-enhancedcolors>=1.0a0.dev0",
+    "datoso-seed-sfc-msu1>=1.0a0.dev0",
+    "datoso-seed-sfc-speedhacks>=1.0a0.dev0",
+    "datoso-seed-tdc>=1.0a0.dev0",
+    "datoso-seed-translatedenglish>=1.0a0.dev0",
+    "datoso-seed-vpinmame>=1.0a0.dev0",
     ]
-fbneo = [ "datoso-seed-fbneo>='1.0a0.dev0'" ]
+fbneo = [ "datoso-seed-fbneo>=1.0a0.dev0" ]
 md-enhanced = [ "datoso-seed-md-enhanced>=0.3.0" ]
-nointro = [ "datoso-seed-nointro>='1.0a0.dev0'" ]
+nointro = [ "datoso-seed-nointro>=1.0a0.dev0" ]
 pleasuredome = [ "datoso-seed-pleasuredome>=1.0a0.dev0" ]
-redump = [ "datoso-seed-redump>='1.0a0.dev0'" ]
+redump = [ "datoso-seed-redump>=1.0a0.dev0" ]
 sfc-enhancedcolors = [ "datoso-seed-sfc-enhancedcolors>=0.3.0" ]
 sfc-msu1 = [ "datoso-seed-sfc-msu1>=0.3.0" ]
 sfc-speedhacks = [ "datoso-seed-sfc-speedhacks>=0.3.0" ]
-tdc = [ "datoso-seed-tdc>='1.0a0.dev0'" ]
-translatedenglish = [ "datoso-seed-translatedenglish>='1.0a0.dev0'" ]
-vpinmame = [ "datoso-seed-vpinmame>='1.0a0.dev0'" ]
+tdc = [ "datoso-seed-tdc>=1.0a0.dev0" ]
+translatedenglish = [ "datoso-seed-translatedenglish>=1.0a0.dev0" ]
+vpinmame = [ "datoso-seed-vpinmame>=1.0a0.dev0" ]
 dev = [
     "ruff>=0.3.4",
     "line_profiler==4.0.3"
