@@ -6,7 +6,7 @@ from pathlib import Path
 import xmltodict
 
 from datoso.configuration import config
-from datoso.database.models.datfile import System
+from datoso.database.models.dat import System
 from datoso.helpers import FileHeaders
 
 
@@ -89,7 +89,8 @@ class DatFile:
         suffixes = self.get_suffix()
         if not isinstance(suffixes, list):
             suffixes = [suffixes]
-        self.path = os.path.join(*[x for x in [self.get_prefix(), self.get_company(), self.get_system(), *suffixes] if x]) # noqa: PTH118
+        self.path = os.path.join(*[x for x in [self.get_prefix(), self.get_company(), self.get_system(), # noqa: PTH118
+                                               *suffixes] if x])
         return self.path
 
     def dict(self) -> dict:
@@ -99,6 +100,7 @@ class DatFile:
             'name': self.name,
             'file': self.file,
             'full_name': self.full_name,
+            'seed': self.seed,
             'version': self.get_version(),
             'date': self.get_date(),
             'modifier': self.get_modifier(),
@@ -117,6 +119,8 @@ class DatFile:
             return XMLDatFile(file=dat_file)
         if file_header == FileHeaders.CLRMAMEPRO.value:
             return ClrMameProDatFile(file=dat_file)
+        if file_header == FileHeaders.DOSCENTER.value:
+            return DOSCenterDatFile(file=dat_file)
         return None
 
 
@@ -128,6 +132,7 @@ class XMLDatFile(DatFile):
     game_key = 'game'
     header: dict = None
     merged_roms: list = None
+    merge_options = 'dedupe' # dedupe, merge
 
     def load(self) -> None:
         """Load the data from a XML file."""
@@ -139,10 +144,14 @@ class XMLDatFile(DatFile):
                 self.name = self.header.get('name')
                 self.full_name = self.header.get('description')
                 self.date = self.header.get('date')
-                self.homepage = self.header['homepage'] if 'homepage' in self.header and self.header['homepage'] and 'insert' not in self.header['homepage'] else None
-                self.url = self.header['url'] if 'url' in self.header and self.header['url'] and 'insert' not in self.header['url'] else None
-                self.author = self.header['author'] if 'author' in self.header and self.header['author'] and 'insert' not in self.header['author'] else None
-                self.email = self.header['email'] if 'email' in self.header and self.header['email'] and 'insert' not in self.header['email'] else None
+                self.homepage = self.header['homepage'] if 'homepage' in self.header and self.header['homepage'] \
+                    and 'insert' not in self.header['homepage'] else None
+                self.url = self.header['url'] if 'url' in self.header and self.header['url'] \
+                    and 'insert' not in self.header['url'] else None
+                self.author = self.header['author'] if 'author' in self.header and self.header['author'] \
+                    and 'insert' not in self.header['author'] else None
+                self.email = self.header['email'] if 'email' in self.header and self.header['email'] \
+                    and 'insert' not in self.header['email'] else None
             else:
                 self.name = self.data[self.main_key].get('@name')
                 self.full_name = self.data[self.main_key].get('@description')
@@ -399,7 +408,7 @@ class DOSCenterDatFile(ClrMameProDatFile):
     """DOSCenter dat file."""
 
     def read_block(self, data) -> dict:
-        """Read a block of data from a ClrMame dat and parses it."""
+        """Read a block of data from a DOSCenter dat and parses it."""
         dictionary = {}
         for line in iter(data.splitlines()):
             line = line.strip()

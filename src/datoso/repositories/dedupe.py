@@ -1,7 +1,7 @@
 import logging
 
-from datoso.database.models.datfile import Dat
-from datoso.repositories.dat import DatFile
+from datoso.database.models.dat import Dat
+from datoso.repositories.dat_file import DatFile
 
 
 class Dedupe:

@@ -7,14 +7,11 @@ import sys
 from pathlib import Path
 from venv import logger
 
-from tabulate import tabulate
-
 from datoso import ROOT_FOLDER, __app_name__
 from datoso.commands.doctor import check_module, check_seed
 from datoso.commands.seed import Seed
 from datoso.configuration import config
-from datoso.configuration.configuration import get_seed_name
-from datoso.database.models.datfile import Dat
+from datoso.database.models.dat import Dat
 from datoso.helpers import Bcolors, FileUtils
 from datoso.helpers.plugins import installed_seeds, seed_description
 from datoso.repositories.dedupe import Dedupe
@@ -71,110 +68,15 @@ def command_import(_) -> None:
         if _class:
             dat = _class(file=dat_name)
             dat.load()
-            database = Dat(seed=seed, new_file=dat_name, **dat.dict())
+            database = Dat(**{**dat.dict(), 'seed': seed, 'new_file': dat_name})
             database.save()
             database.flush()
 
 
 def command_dat(args):
     """Make changes in dat config"""
-
-    def print_dats(dats, fields = None):
-        """Print dats"""
-        output = []
-        fields = fields if fields else ['seed', 'name', 'status']
-        for field in ['seed', 'name']:
-            if field not in fields:
-                fields.append(field)
-        for dat in dats:
-            new_dat = { k:dat[k] for k in fields if dat.get(k) }
-            if 'status' in fields:
-                new_dat['status'] = dat.get('status', 'enabled') or 'enabled'
-            output.append(new_dat)
-        if getattr(args, 'only_names', False):
-            for dat in output:
-                print(f"{dat['seed']}:{dat['name']}")
-            return
-        print(tabulate(output, headers='keys', tablefmt='psql'))
-
-    from tinydb import Query
-
-    query = Query()
-    if args.dat_name:
-        splitted = args.dat_name.split(':')
-        expected_dat_array_len = 2
-        if len(splitted) != expected_dat_array_len:
-            print(f'{Bcolors.WARNING}Invalid dat name, must be in format "seed:name"{Bcolors.ENDC}')
-            print(f'Showing results for filter: {Bcolors.OKCYAN}name~={args.dat_name}{Bcolors.ENDC}')
-            print('--------------------------------------------------------------')
-            name = args.dat_name
-            result = Dat.search(query.name.matches(r'^.*' + name + r'.*', flags=re.IGNORECASE))
-            if args.fields:
-                print_dats(result, fields=args.fields)
-            elif args.details:
-                print_dats(result, fields=['name', 'modifier', 'company', 'system', 'seed', 'date',
-                                           'path', 'system_type', 'automerge', 'parent'])
-            else:
-                print_dats(result)
-            return
-        seed, name = splitted
-        dat = Dat(seed=seed, name=name)
-        result = dat.get_one()
-        if not result:
-            print(f'{Bcolors.FAIL}Dat not found{Bcolors.ENDC}')
-            sys.exit(1)
-        if args.set:
-            if '=' not in args.set:
-                print(f'{Bcolors.FAIL}Invalid set command, must be in format "variable=value"{Bcolors.ENDC}')
-                sys.exit(1)
-            key, value = args.set.split('=') if '=' in args.set else (args.set, 'True')
-            if value.isdigit():
-                value = int(value)
-            if value.lower() == 'true':
-                value = True
-            if value.lower() in ('none', 'null'):
-                value = None
-            dat.update({key: value}, doc_ids=[result.doc_id])
-            dat.flush()
-            print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} ' \
-                  f'{key} set to {Bcolors.OKBLUE}{value}{Bcolors.ENDC}')
-            sys.exit(0)
-        if args.unset:
-            key = args.unset
-            value = None
-            dat.update({key: value}, doc_ids=[result.doc_id])
-            dat.flush()
-            print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} ' \
-                  f'{key} set to {Bcolors.OKBLUE}{value}{Bcolors.ENDC}')
-            sys.exit(0)
-        if args.delete:
-            dat.remove(doc_ids=[result.doc_id])
-            dat.flush()
-            print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} removed{Bcolors.ENDC}')
-            sys.exit(0)
-        if args.mark_mias:
-            from datoso.mias.mia import mark_mias
-            mark_mias(dat_file=result['new_file'])
-            print(f'{Bcolors.OKGREEN}Set Dats {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} marked MIAs{Bcolors.ENDC}')
-            sys.exit(0)
-        if args.fields:
-            print_dats(result, fields=args.fields)
-        elif args.details:
-            print_dats([result], fields=['name', 'modifier', 'company', 'system', 'seed', 'date', 'path', 'system_type', 'full_name', 'automerge', 'parent'])
-        else:
-            print_dats([result])
-    elif args.all:
-        # Show all dats
-        print_dats(dat.all())
-
-    elif args.find:
-        # Find dats TODO: finish
-        print(f'Showing results for filter: {Bcolors.OKCYAN}{args.find}{Bcolors.ENDC}')
-        print('--------------------------------------------------------------')
-        name, value = args.find.split('=')
-        from tinydb import where
-        result = Dat.search(where(name) == value)
-        print_dats(result)
+    from datoso.commands.helpers.dat import helper_command_dat
+    helper_command_dat(args)
 
 
 def command_seed_installed(_) -> None:
@@ -206,61 +108,42 @@ def command_seed_details(args) -> None:
 
 def command_seed(args) -> None:
     """Commands with the seed (must be installed)"""
-    def parse_actions(args):
-        if args.actions and len(args.actions) == 1:
-                args.actions = args.actions[0].split(',')
-        if args.seed != 'all':
-            seed_object = Seed(name=args.seed)
-            if seed_object.parse_args:
-                seed_object.parse_args(args)
-        if not any([getattr(args, 'fetch', False), getattr(args, 'process', False), getattr(args, 'details', False)]):
-            print(f'{Bcolors.FAIL}No action specified{Bcolors.ENDC} (fetch, process, details)')
-            sys.exit(1)
-    parse_actions(args)
+    from datoso.commands.helpers.seed import command_seed_all, command_seed_parse_actions
+    command_seed_parse_actions(args)
     if args.seed == 'all':
-        for seed in installed_seeds():
-            seed_name = get_seed_name(seed)
-            if args.exclude and seed_name in args.exclude:
-                continue
-            if args.only and seed_name not in args.only:
-                continue
-            if config['PROCESS'].get('SeedIgnoreRegEx'):
-                ignore_regex = re.compile(config['PROCESS']['SeedIgnoreRegEx'])
-                if ignore_regex.match(seed_name):
-                    continue
-            args.seed = seed_name
-            command_seed(args)
+        command_seed_all(args, command_seed)
         sys.exit(0)
-    seed = Seed(name=args.seed)
     if getattr(args, 'details', False):
         command_seed_details(args)
-    if getattr(args, 'fetch', False):
-        message = f'{Bcolors.OKCYAN}Fetching seed {Bcolors.OKGREEN}{args.seed}{Bcolors.ENDC}'
-        print('='*(len(message)-14))
-        print(message)
-        print('='*(len(message)-14))
-        if seed.fetch():
-            print(f'Errors fetching {Bcolors.FAIL}{args.seed}{Bcolors.ENDC}')
-            print('Please enable logs for more information or use -v parameter')
-            command_doctor(args)
-            sys.exit(1)
-        print(f'{Bcolors.OKBLUE}Finished fetching {Bcolors.OKGREEN}{args.seed}{Bcolors.ENDC}')
-    if getattr(args, 'process', False):
-        message = f'{Bcolors.OKCYAN}Processing seed {Bcolors.OKGREEN}{args.seed}{Bcolors.ENDC}'
-        print('='*(len(message)-14))
-        print(message)
-        print('='*(len(message)-14))
-        if seed.process_dats(fltr=getattr(args, 'filter', None), actions_to_execute=args.actions):
-            print(f'Errors processing {Bcolors.FAIL}{args.seed}{Bcolors.ENDC}')
-            print('Please enable logs for more information or use -v parameter')
-            command_doctor(args)
-            sys.exit(1)
-        print(f'{Bcolors.OKBLUE}Finished processing {Bcolors.OKGREEN}{args.seed}{Bcolors.ENDC}')
+    else:
+        seed = Seed(name=args.seed)
+        if getattr(args, 'fetch', False):
+            message = f'{Bcolors.OKCYAN}Fetching seed {Bcolors.OKGREEN}{args.seed}{Bcolors.ENDC}'
+            print('='*(len(message)-14))
+            print(message)
+            print('='*(len(message)-14))
+            if seed.fetch():
+                print(f'Errors fetching {Bcolors.FAIL}{args.seed}{Bcolors.ENDC}')
+                print('Please enable logs for more information or use -v parameter')
+                command_doctor(args)
+                sys.exit(1)
+            print(f'{Bcolors.OKBLUE}Finished fetching {Bcolors.OKGREEN}{args.seed}{Bcolors.ENDC}')
+        if getattr(args, 'process', False):
+            message = f'{Bcolors.OKCYAN}Processing seed {Bcolors.OKGREEN}{args.seed}{Bcolors.ENDC}'
+            print('='*(len(message)-14))
+            print(message)
+            print('='*(len(message)-14))
+            if seed.process_dats(fltr=getattr(args, 'filter', None), actions_to_execute=args.actions):
+                print(f'Errors processing {Bcolors.FAIL}{args.seed}{Bcolors.ENDC}')
+                print('Please enable logs for more information or use -v parameter')
+                command_doctor(args)
+                sys.exit(1)
+            print(f'{Bcolors.OKBLUE}Finished processing {Bcolors.OKGREEN}{args.seed}{Bcolors.ENDC}')
 
 
 def command_config_save(args) -> None:
     """Save config to file"""
-    config_file = Path('~/datosorc').expanduser() if args.directory == '~' else Path.cwd() / '.datosorc'
+    config_file = Path('~/.config/datoso/datoso.config').expanduser() if args.directory == '~' else Path.cwd() / '.datosorc'
     with open(config_file, 'w', encoding='utf-8') as file:
         config.write(file)
     print(f'Config saved to {Bcolors.OKGREEN}{config_file}{Bcolors.ENDC}')
@@ -292,9 +175,11 @@ def command_config_set(args) -> None:
     with open(file, 'w', encoding='utf-8') as file:
         newconfig.write(file)
     if getattr(args, 'global', False):
-        print(f'{Bcolors.OKGREEN}Global config {Bcolors.OKCYAN}{myconfig[0]}.{myconfig[1]}{Bcolors.OKGREEN} set to {Bcolors.OKBLUE}{args.set[1]}{Bcolors.ENDC}')
+        print(f'{Bcolors.OKGREEN}Global config {Bcolors.OKCYAN}{myconfig[0]}.{myconfig[1]}{Bcolors.OKGREEN}' \
+            f' set to {Bcolors.OKBLUE}{args.set[1]}{Bcolors.ENDC}')
     else:
-        print(f'{Bcolors.OKGREEN}Local Config {Bcolors.OKCYAN}{myconfig[0]}.{myconfig[1]}{Bcolors.OKGREEN} set to {Bcolors.OKBLUE}{args.set[1]}{Bcolors.ENDC}')
+        print(f'{Bcolors.OKGREEN}Local Config {Bcolors.OKCYAN}{myconfig[0]}.{myconfig[1]}{Bcolors.OKGREEN}' \
+            f' set to {Bcolors.OKBLUE}{args.set[1]}{Bcolors.ENDC}')
 
 
 def command_config_get(args) -> None:
@@ -380,6 +265,6 @@ def command_doctor(args):
         check_module(seed, module, args.repair)
 
 def command_log(_):
-    log_path = FileUtils.parse_folder(config.get('PATHS','DatosoPath', fallback='~/.datoso'))
+    log_path = FileUtils.parse_path(config.get('PATHS','DatosoPath', fallback='~/.datoso'))
     logfile = log_path / config['LOG'].get('LogFile', 'datoso.log')
-    os.system(f'cat {logfile}')
+    os.system(f'cat {logfile}') # noqa: S605

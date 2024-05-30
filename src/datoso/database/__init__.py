@@ -1,5 +1,6 @@
 """Database module"""
-from pathlib import PosixPath
+import os
+from pathlib import Path, PosixPath
 from threading import Lock
 from typing import Any
 
@@ -9,10 +10,12 @@ from tinydb.middlewares import CachingMiddleware
 from datoso.configuration import config
 from datoso.helpers import FileUtils
 
-database_path = FileUtils.parse_folder(config['PATHS'].get('DatosoPath','~/.datoso'))
+XDG_DATA_HOME = Path(os.environ.get('XDG_DATA_HOME', '~/.local/share')).expanduser()
+
+database_path = FileUtils.parse_path(config['PATHS'].get('DatosoPath', '~/.local/share/datoso'))
 database_path.mkdir(parents=True, exist_ok=True)
 
-DATABASE_URL = str(database_path / config['PATHS'].get('DatabaseFile','datoso.json'))
+DATABASE_URL = str(database_path / config['PATHS'].get('DatabaseFile', 'datoso.json'))
 
 class Types:
     str = str

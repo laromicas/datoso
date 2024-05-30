@@ -13,7 +13,7 @@ class Folders:
     extras: list = None
 
     def __init__(self, seed, extras=None) -> None:
-        self.base = FileUtils.parse_folder(config['PATHS'].get('DownloadPath'))
+        self.base = FileUtils.parse_path(config['PATHS'].get('DownloadPath'))
         self.download = Path(self.base) / seed
         self.dats = Path(self.download) / 'dats'
         self.backup = Path(self.download) / 'backup'

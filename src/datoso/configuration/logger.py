@@ -64,7 +64,7 @@ logger.setLevel(logging.DEBUG)
 
 def enable_logging():
     """Enable logging to file"""
-    log_path = FileUtils.parse_folder(config.get('PATHS','DatosoPath', fallback='~/.datoso'))
+    log_path = FileUtils.parse_path(config.get('PATHS','DatosoPath', fallback='~/.config/datoso'))
     log_path.mkdir(parents=True, exist_ok=True)
     log_file = log_path / config['LOG'].get('LogFile', 'datoso.log')
     file_handler = TrimmedFileHandler(log_file)

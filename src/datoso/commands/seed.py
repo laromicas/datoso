@@ -33,25 +33,28 @@ class Seed:
         """Get actions"""
         actions = self.get_module('actions')
         self.config = config[self.name.upper()] if config.has_section(self.name.upper()) else None
-        configs = []
         if actions:
             self.actions = actions.get_actions()
-        for path, actions in self.actions.items():
-            config_path = path.replace('{dat_origin}', self.name.upper()).replace('/', '.')
-            if not config.has_section(config_path):
-                continue
-            configs.append(config[config_path])
-            for actions in self.actions.values():
-                new_steps = {action['action']: action for action in actions}
-                new_actions = []
-                if not (override_actions := config[config_path].get('OverrideActions')):
-                    continue
-                override_actions = override_actions.split(',')
-                for override_action in override_actions:
-                    if override_action in new_steps:
-                        new_actions.append(new_steps[override_action])
-                    else:
-                        new_actions.append({'action': override_action})
+
+        # TODO(laromicas) This is a work in progress, it should be able to override actions
+        # configs = []
+        # for path, actions in self.actions.items():
+        #     config_path = path.replace('{dat_origin}', self.name.upper()).replace('/', '.')
+        #     if not config.has_section(config_path):
+        #         continue
+        #     configs.append(config[config_path])
+
+        # # for actions in self.actions.values():
+        #     new_steps = {action['action']: action for action in actions}
+        #     new_actions = []
+        #     if not (override_actions := config[config_path].get('OverrideActions')):
+        #         continue
+        #     override_actions = override_actions.split(',')
+        #     for override_action in override_actions:
+        #         if override_action in new_steps:
+        #             new_actions.append(new_steps[override_action])
+        #         else:
+        #             new_actions.append({'action': override_action})
 
 
         # if configs:
@@ -161,12 +164,14 @@ class Seed:
     def process_dats(self, fltr=None, actions_to_execute=None):
         """Process dats."""
         tmp_path = config['PATHS'].get('DownloadPath', 'tmp')
-        dat_origin = FileUtils.parse_folder(tmp_path) / self.get_prefix(self.name) / 'dats'
+        dat_origin = FileUtils.parse_path(tmp_path) / self.get_prefix(self.name) / 'dats'
         line = ''
         self.get_actions()
-        for path, actions in self.actions.items():
+        for path, seed_actions in self.actions.items():
             new_path = Path(path.format(dat_origin=dat_origin))
-            actions = self.format_actions(actions, data={'dat_destination': config['PATHS'].get('DatPath', 'DatRoot')})
+            actions = self.format_actions(seed_actions, data={
+                'dat_destination': config['PATHS'].get('DatPath', 'DatRoot'),
+                })
             # TODO(laromicas): override actions to process from config
             if actions_to_execute:
                 actions = [x for x in actions if x['action'] in actions_to_execute]

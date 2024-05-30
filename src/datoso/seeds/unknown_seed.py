@@ -4,45 +4,47 @@ import re
 from typing import Any
 
 from datoso.helpers import FileHeaders
-from datoso.repositories.dat import ClrMameProDatFile, XMLDatFile
+from datoso.repositories.dat_file import ClrMameProDatFile, DOSCenterDatFile, XMLDatFile
 
+
+def detect_from_rules(dat, rules):
+    for rule_details in rules:
+        found = True
+        for rule in rule_details['rules']:
+            if not comparator(dat.header.get(rule['key']), rule['value'], rule.get('operator', 'eq')):
+                found = False
+                break
+        if found:
+            return rule_details['seed'], rule_details['_class']
+    return None, None
 
 def detect_xml(dat_file: str, rules):
     """Detect the seed for a XML dat file."""
     dat = XMLDatFile(file=dat_file)
-    for rule_details in rules:
-        found = True
-        for rule in rule_details['rules']:
-            if not comparator(dat.header.get(rule['key']), rule['value'], rule.get('operator', 'eq')):
-                found = False
-                break
-        if found:
-            return rule_details['seed'], rule_details['_class']
-    return None, None
+    return detect_from_rules(dat, rules)
 
 def detect_clrmame(dat_file: str, rules):
     """Detect the seed for a ClrMamePro dat file."""
     dat = ClrMameProDatFile(file=dat_file)
-    for rule_details in rules:
-        found = True
-        for rule in rule_details['rules']:
-            if not comparator(dat.header.get(rule['key']), rule['value'], rule.get('operator', 'eq')):
-                found = False
-                break
-        if found:
-            return rule_details['seed'], rule_details['_class']
-    return None, None
+    return detect_from_rules(dat, rules)
+
+def detect_doscenter(dat_file: str, rules):
+    """Detect the seed for a ClrMamePro dat file."""
+    dat = DOSCenterDatFile(file=dat_file)
+    return detect_from_rules(dat, rules)
 
 def detect_seed(dat_file: str, rules):
     """Detect the seed for a dat file."""
     # Read first 5 chars of file to determine type
-    with open(dat_file, encoding='utf-8') as file:
-        file_header = file.read(5)
+    with open(dat_file, encoding='utf-8', errors='ignore') as file:
+        file_header = file.read(10).encode('ascii', errors='ignore')[:5].decode()
     try:
         if file_header == FileHeaders.XML.value:
             return detect_xml(dat_file, rules)
         if file_header == FileHeaders.CLRMAMEPRO.value:
             return detect_clrmame(dat_file, rules)
+        if file_header == FileHeaders.DOSCENTER.value:
+            return detect_doscenter(dat_file, rules)
     except Exception:
         logging.exception('Error detecting seed type')
         raise

@@ -1,24 +1,27 @@
 """Process actions."""
-import shutil
-from contextlib import suppress
+from abc import ABC, abstractmethod
 from pathlib import Path
 
 from datoso.configuration import config, logger
-from datoso.database.models.datfile import Dat
+from datoso.database.models.dat import Dat
 from datoso.helpers import FileUtils, compare_dates
+from datoso.repositories.dat_file import DatFile
 from datoso.repositories.dedupe import Dedupe
 
 
 class Processor:
     """Process actions."""
 
-    _previous = None
+    _file_data = None
+    _file_dat = None
+    _database_data = None
+    _database_dat = None
     actions: list = None
     seed = None
     file = None
 
     def __init__(self, **kwargs):
-        self._previous = None
+        self._file_data = None
         self.__dict__.update(kwargs)
         if not self.actions:
             self.actions = []
@@ -27,49 +30,92 @@ class Processor:
         """Process actions."""
         for action in self.actions:
             action_class = globals()[
-                action['action']](file=self.file, seed=self.seed, previous=self._previous, **action)
+                action['action']](
+                    file=self.file, seed=self.seed, previous=self._file_data,
+                    _file_data=self._file_data, _database_data=self._database_data,
+                    _file_dat=self._file_dat, _database_dat=self._database_dat,
+                    **action)
             yield action_class.process()
-            self._previous = action_class.output
+            self._file_data = action_class.file_data
+            self._file_dat = action_class.file_dat
+            self._database_data = action_class.database_data
+            self._database_dat = action_class.database_dat
             if action_class.stop:
                 break
 
 
-class Process:
+
+class Process(ABC):
     """Process Base class."""
 
-    output = None
+    _file_data = None
+    _file_dat = None
+    _database_data = None
+    _database_dat = None
     status = None
     stop = False
-    previous: dict = None
-    def __init__(self, **kwargs):
+
+    def __init__(self, **kwargs) -> None:
         self.__dict__.update(kwargs)
+
+    @abstractmethod
+    def process(self):
+        """Process."""
+
+    def load_file_dat(self) -> dict:
+        """Load file."""
+        if getattr(self, '_factory', None) and self._factory:
+            self._class = self._factory(self.file)
+        self._file_dat = self._class(file=self.file)
+        self._file_dat.load()
+        self._file_data = self._file_dat.dict()
+        return self._file_data
+
+    @property
+    def file_data(self) -> dict:
+        """Get file data."""
+        return self.file_dat.dict()
+
+    @property
+    def file_dat(self) -> DatFile:
+        """Get file dat."""
+        return self._file_dat if self._file_dat else self.load_file_dat()
+
+    def load_database_dat(self) -> Dat:
+        """Load database data."""
+        self._database_dat = Dat(**self.file_data)
+        self._database_dat.load()
+        self._database_data = self._database_dat.to_dict()
+        return self._database_dat
+
+    @property
+    def database_data(self) -> dict:
+        """Get database data."""
+        return self.database_dat.to_dict()
+
+    @property
+    def database_dat(self) -> Dat:
+        """Get database dat."""
+        return self._database_dat if self._database_dat else self.load_database_dat()
+
+    @database_dat.setter
+    def database_dat(self, value):
+        self._database_dat = value
+
 
 class LoadDatFile(Process):
     """Load a dat file."""
 
-    # pylint: disable=no-member
-    class_name = None
-    file = None
-    seed = None
-    database = None
-    _class = None
-    _factory: callable = None
-    _dat = None
-
     def process(self):
         """Load a dat file."""
-
-        # If there is a factory method, use it to create the class
+       # If there is a factory method, use it to create the class
         if getattr(self, '_factory', None) and self._factory:
             self._class = self._factory(self.file)
 
         try:
-            self._dat = self._class(file=self.file)
-            self._dat.load()
-            self.database = Dat(seed=str(self.seed), **self._dat.dict())
-            self.output = self.database.to_dict()
+            self.load_file_dat()
+            self.load_database_dat()
         except Exception as e:
-            self._dat = None
             self.status = 'Error'
             logger.exception(e)
             return 'Error'
@@ -79,75 +125,75 @@ class LoadDatFile(Process):
 class DeleteOld(Process):
     """Delete old dat file."""
 
-    database = None
+    def destination(self):
+        """Parse path."""
+        static_path = self.database_dat.static_path if self.database_dat else None
+        path = self.file_dat.path if self.file_dat.path is not None else static_path
+        if path.startswith(('/', '~')):
+            return Path(path).expanduser()
+        if not getattr(self, 'folder', None):
+            return None
+        return Path(self.folder) / path / self.file_dat.file.name \
+            if FileUtils.get_ext(self.file_dat.file) in ('.dat', '.xml') \
+            else Path(self.folder) / path / self.file_dat.name
+
     def process(self):
         """Delete old dat file."""
-        from datoso.database.models.datfile import Dat
-        self.database = Dat(seed=self.previous['seed'], name=self.previous['name'])
-        self.database.load()
-        olddat = self.database.to_dict()
+
         try:
-            if self.previous and getattr(self.database, 'date', None) and self.previous.get('date', None) \
-                and compare_dates(self.database.date, self.previous['date']):
-                result = 'No Action Taken, Newer Found'
+            if self.database_data and self.database_data.get('date', None) and self.file_data.get('date', None) \
+                and compare_dates(self.database_dat.date, self.file_dat.date):
                 self.stop = True
-                return result
+                return 'No Action Taken, Newer Found'
         except ValueError as e:
             logger.exception(e)
-            print(self.database.date, self.previous['date'])
+            print(self.database_dat.date, self.file_dat.date)
             return 'Error'
 
-        result = None
-        if olddat.get('new_file'):
-            try:
-                shutil.rmtree(olddat['new_file'])
-            except NotADirectoryError:
-                with suppress(FileNotFoundError):
-                    Path(olddat['new_file']).unlink()
-            except FileNotFoundError:
-                pass
-            if not self.database.is_enabled():
-                self.stop = True
-            result = 'Deleted'
+        if not self.database_data.get('new_file', None):
+            return 'New'
 
-        self.output = self.previous
-        return result
+        if getattr(self, 'folder', None):
+            old_file = Path(self.database_data.get('new_file', '') or '')
+            new_file = self.destination()
+            if old_file == new_file and self.database_data.get('date', None) \
+                and self.database_data.get('date', None) == self.file_data.get('date', None) \
+                and compare_dates(self.database_dat.date, self.file_dat.date) \
+                and not config.getboolean('GENERAL', 'Overwrite', fallback=False):
+                return 'Exists'
+
+        FileUtils.remove(self.database_dat.new_file)
+        if not self.database_dat.is_enabled():
+            self.stop = True
+        return 'Deleted'
 
 
 class Copy(Process):
     """Copy files."""
 
-    destination = None
-    file = None
-    folder = None
-    database = None
+    def destination(self):
+        """Parse path."""
+        static_path = self.database_dat.static_path if self.database_dat else None
+        path = self.file_dat.path if self.file_dat.path is not None else static_path
+        if path.startswith(('/', '~')):
+            return Path(path).expanduser()
+        return Path(self.folder) / path / self.file_dat.file.name \
+            if FileUtils.get_ext(self.file_dat.file) in ('.dat', '.xml') \
+            else Path(self.folder) / path / self.file_dat.name
 
     def process(self):
-        """Copy files."""
-        from datoso.database.models.datfile import Dat
-        origin = self.file if self.file else None
-        filename = Path(origin).name
-        self.destination = self.destination if self.destination else self.previous['path']
-
-        destination = Path(self.folder) / self.destination / filename if filename.endswith(('.dat', '.xml')) \
-            else Path(self.folder) / self.destination / self.previous['name']
-
         result = None
-        self.output = self.previous
-        if not self.previous:
+
+        origin = self.file if self.file else None
+        destination = self.destination()
+        if not self.database_dat:
             FileUtils.copy(origin, destination)
             return 'Copied'
-        self.database = Dat(seed=self.previous['seed'], name=self.previous['name'])
-        self.database.load()
-        if not self.database.is_enabled():
-            self.previous['new_file'] = None
+        if not self.database_dat.is_enabled():
+            self.file_dat.new_file = None
             return 'Ignored'
 
-        # TODO(laromicas): Check behavior with directories
-        if self.database.static_path:
-            destination = Path(self.folder) / self.database.static_path / filename
-
-        old_file = Path(self.database.to_dict().get('new_file', '') or '')
+        old_file = Path(self.database_data.get('new_file', '') or '')
         new_file = destination
 
         if old_file == new_file and destination.exists() \
@@ -162,49 +208,44 @@ class Copy(Process):
             result = 'Overwritten'
 
         try:
-            if getattr(self.database, 'date', None) and self.previous.get('date', None) \
-                and compare_dates(self.database.date, self.previous['date']):
-                result = 'No Action Taken, Newer Found'
-            else:
-                self.previous['new_file'] = destination
-                FileUtils.copy(origin, destination)
+            if self.database_data \
+                and self.database_data.get('date', None) \
+                and self.file_data.get('date', None) \
+                and compare_dates(self.database_dat.date, self.file_dat.date):
+                return 'No Action Taken, Newer Found'
+
+            self.file_dat.new_file = destination
+            FileUtils.copy(origin, destination)
         except ValueError:
             pass
 
-        self.output = self.previous
         return result
 
 
 class MarkMias(Process):
     """Mark missing in action."""
 
-    database = None
     def process(self):
         """Mark missing in action."""
-        self.output = self.previous
         if not config.getboolean('PROCESS', 'ProcessMissingInAction', fallback=False):
             return 'Skipped'
-        from datoso.mias.mia import mark_mias
-        database = Dat(seed=self.previous['seed'], name=self.previous['name'])
-        database.load()
 
-        if not database.is_enabled():
+        if not self.database_dat.is_enabled():
             return 'Ignored'
-        mark_mias(dat_file=self.previous['new_file'])
+        from datoso.mias.mia import mark_mias
+        mark_mias(dat_file=self.file_dat.new_file)
         return 'Marked'
 
 
 class SaveToDatabase(Process):
     """Save process to database."""
 
-    database = None
     def process(self):
         """Save process to database."""
-        from datoso.database.models.datfile import Dat
-        self.database = Dat(**self.previous)
-        self.database.save()
-        self.database.flush()
-        self.output = self.previous
+        data_to_save = {**self.database_data, **self.file_data}
+        self.database_dat = Dat(**data_to_save)
+        self.database_dat.save()
+        self.database_dat.flush()
         return 'Saved'
 
 
@@ -216,25 +257,23 @@ class Deduplicate(Process):
 
     def get_dat(self, name, seed):
         """Get dat file."""
-        from datoso.database.models.datfile import Dat
+        from datoso.database.models.dat import Dat
         dat = Dat(name=name, seed=seed)
         dat.load()
         return dat
 
     def process(self):
         """Save process to database."""
-        child_db = Dat(**self.previous)
-        child_db.load()
-        if parent := getattr(child_db, 'parent', None):
-            merged = Dedupe(child_db, parent)
-        elif getattr(child_db, 'automerge', None):
-            merged = Dedupe(child_db)
+        self.child_db = self.file_dat
+        if parent := getattr(self.child_db, 'parent', None):
+            merged = Dedupe(self.child_db, parent)
+        elif getattr(self.child_db, 'automerge', None):
+            merged = Dedupe(self.child_db)
         else:
             return 'Skipped'
 
         merged.dedupe()
         merged.save()
-        self.output = self.previous
         return 'Deduped'
 
 

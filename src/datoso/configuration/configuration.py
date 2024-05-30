@@ -5,6 +5,8 @@ from pathlib import Path
 
 from datoso import ROOT_FOLDER, __app_name__
 
+HOME = Path.home()
+XDG_CONFIG_HOME = Path(os.environ.get('XDG_CONFIG_HOME', '~/.config')).expanduser()
 
 def get_seed_name(seed):
     """Get seed name."""
@@ -30,8 +32,14 @@ class Config(configparser.ConfigParser):
         except configparser.NoOptionError:
             return None
 
+config_paths = [
+    ROOT_FOLDER / 'datoso.ini',
+    XDG_CONFIG_HOME / 'datoso/datoso.config',
+    HOME / '.datosorc',
+    Path.cwd() / '.datosorc',
+]
+
 config = Config(allow_no_value=True)
 config.optionxform = lambda option: option
-config.read(ROOT_FOLDER / 'datoso.ini')
-config.read(Path('~/.datosorc').expanduser())
-config.read(Path.cwd() / '.datosorc')
+for config_path in config_paths:
+    config.read(config_path)

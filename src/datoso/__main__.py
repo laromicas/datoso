@@ -39,6 +39,7 @@ def parse_args() -> argparse.Namespace:
     subparser = parser.add_subparsers(help='sub-command help')
 
     parser.add_argument('-v', '--version', action='store_true', help='show version')
+    parser.add_argument('-V', '--verbose', action='store_true', help='verbose output')
 
     add_log_parser(subparser)
     add_config_parser(subparser)

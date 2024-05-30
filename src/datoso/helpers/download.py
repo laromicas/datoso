@@ -90,7 +90,8 @@ class Aria2cDownload(Download):
     def download(self, url, destination, filename_from_headers=None, reporthook=None): # noqa: ARG002
         # TODO(laromicas): Add reporthook
         if filename_from_headers:
-            args = ['aria2c', '-x', '16', url, '--content-disposition', '--download-result=hide', '--summary-interval=0']
+            args = ['aria2c', '-x', '16', url, '--content-disposition',
+                    '--download-result=hide', '--summary-interval=0']
             std_out, std_err = self.popen(args, cwd=destination)
             return Path(destination) / self.parse_filename(std_out)
         folder = Path(destination).parent

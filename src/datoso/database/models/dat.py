@@ -1,11 +1,8 @@
 """Database models for the datfile."""
-# pylint: disable=too-few-public-methods
 from dataclasses import dataclass
 from pathlib import PosixPath
 
 from dataclasses_json import dataclass_json
-
-# from pydantic import BaseModel, Extra
 from tinydb import Query
 
 from datoso.database import DatabaseSingleton
@@ -225,11 +222,14 @@ class MIA(Base):
 
 if __name__ == '__main__':
     print(System.all())
-    ov = Override.from_dict({'company': 'Nintendo', 'system': 'Nintendo 64', 'modifier': 'No-Intro', 'system_type': 'ROM'})
+    ov = Override.from_dict({'company': 'Nintendo', 'system': 'Nintendo 64',
+                             'modifier': 'No-Intro', 'system_type': 'ROM'})
     print(ov)
     print(ov.to_dict())
-    ec = ExtraConfig.from_dict({'empty_suffix': {'suffix': ' (Empty)', 'enabled': True}, 'if_suffix': {'suffix': ' (if not empty)', 'enabled': True}})
+    ec = ExtraConfig.from_dict({'empty_suffix': {'suffix': ' (Empty)', 'enabled': True},
+                                'if_suffix': {'suffix': ' (if not empty)', 'enabled': True}})
     print(ec)
     print(ec.to_dict())
-    syst = System.from_dict({'system': 'Nintendo 64', 'company': 'Nintendo', 'override': ov, 'extra_configs': ec, 'system_type': 'ROM'})
+    syst = System.from_dict({'system': 'Nintendo 64', 'company': 'Nintendo',
+                             'override': ov, 'extra_configs': ec, 'system_type': 'ROM'})
     print(syst)

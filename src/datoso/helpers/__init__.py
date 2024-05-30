@@ -103,23 +103,24 @@ class FileUtils:
             raise FileNotFoundError(msg) from None
 
     @staticmethod
-    def remove_folder(path):
+    def remove_folder(path: str | Path):
         """Remove folder."""
         with suppress(PermissionError):
             shutil.rmtree(path)
 
     @staticmethod
-    def remove(path):
+    def remove(pathstring: str | Path) -> None:
+        path = pathstring if isinstance(pathstring, Path) else FileUtils.parse_path(pathstring)
         """Remove file or folder."""
-        if not Path.exists(path):
+        if not path.exists():
             return
-        if Path.is_dir(path):
+        if path.is_dir():
             FileUtils.remove_folder(path)
         else:
-            Path(path).unlink()
+            path.unlink()
 
     @staticmethod
-    def parse_folder(path) -> Path:
+    def parse_path(path: str) -> Path:
         """Get folder from config."""
         path = path if path is not None else ''
         if path.startswith(('/', '~')):
@@ -135,6 +136,11 @@ class FileUtils:
         except shutil.Error:
             FileUtils.remove(origin)
 
+    @staticmethod
+    def get_ext(path: str | Path):
+        """Get extension of file."""
+        return Path(path).suffix
+
 class RequestUtils:
     @staticmethod
     def urljoin(*args):
@@ -144,6 +150,7 @@ class RequestUtils:
 class FileHeaders(Enum):
     XML = '<?xml'
     CLRMAMEPRO = 'clrma'
+    DOSCENTER = 'DOSCe'
 
 def show_progress(block_num, block_size, total_size):
     if total_size != -1:
