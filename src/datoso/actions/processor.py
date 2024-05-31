@@ -249,29 +249,36 @@ class SaveToDatabase(Process):
         return 'Saved'
 
 
+class AutoMerge(Process):
+    """Save process to database."""
+
+    child_db = None
+
+    def process(self):
+        """Save process to database."""
+        self.child_db = self.database_dat
+        if getattr(self.child_db, 'automerge', None):
+            merged = Dedupe(self.child_db)
+        else:
+            return 'Skipped'
+        merged.dedupe()
+        merged.save()
+        return 'Deduped'
+
+
 class Deduplicate(Process):
     """Save process to database."""
 
     parent_db = None
     child_db = None
 
-    def get_dat(self, name, seed):
-        """Get dat file."""
-        from datoso.database.models.dat import Dat
-        dat = Dat(name=name, seed=seed)
-        dat.load()
-        return dat
-
     def process(self):
         """Save process to database."""
-        self.child_db = self.file_dat
+        self.child_db = self.database_dat
         if parent := getattr(self.child_db, 'parent', None):
             merged = Dedupe(self.child_db, parent)
-        elif getattr(self.child_db, 'automerge', None):
-            merged = Dedupe(self.child_db)
         else:
             return 'Skipped'
-
         merged.dedupe()
         merged.save()
         return 'Deduped'

@@ -118,11 +118,12 @@ class Dat(Base):
     new_file: str | None = None
     path: str | None = None
     date: str | None = None
-    automerge: bool | None = None
     version: str | None = None
     system_type: str | None = None
     static_path: str | None = None
     status: str | None = None
+    automerge: bool | None = None
+    parent: str | None = None
 
     def query(self):
         """Query to update or load a record."""

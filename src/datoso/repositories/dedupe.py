@@ -38,8 +38,7 @@ class Dedupe:
                 obj['dat'] = self.get_dat_file(obj['file'])
 
         load_metadata(child, self.child)
-        if not parent:
-            parent = self.child['db'].parent
+        if parent:
             load_metadata(parent, self.parent)
 
     def get_dat_file(self, file):
@@ -50,6 +49,7 @@ class Dedupe:
             msg = 'Invalid dat file'
             raise ValueError(msg) from None
         return dat
+
     def dedupe(self):
         if self.parent:
             self.child['dat'].merge_with(self.parent['dat'])

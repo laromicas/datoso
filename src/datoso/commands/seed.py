@@ -167,6 +167,11 @@ class Seed:
         dat_origin = FileUtils.parse_path(tmp_path) / self.get_prefix(self.name) / 'dats'
         line = ''
         self.get_actions()
+        if config.getboolean('PROCESS', 'AutoMergeEnabled', fallback=False):
+            self.actions.append({ 'action': 'AutoMerge' })
+        if config.getboolean('PROCESS', 'ParentMergeEnabled', fallback=False):
+            self.actions.append({ 'action': 'Deduplicate' })
+
         for path, seed_actions in self.actions.items():
             new_path = Path(path.format(dat_origin=dat_origin))
             actions = self.format_actions(seed_actions, data={
