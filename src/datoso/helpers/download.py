@@ -28,15 +28,17 @@ def downloader(url, destination, reporthook=None, filename_from_headers=None):
             return download.download(url, destination,filename_from_headers=filename_from_headers or False,
                 reporthook=reporthook)
 
+
 class Download:
     @abstractmethod
     def download(self, url, destination, filename_from_headers=None, reporthook=None):
         pass
 
-    def popen(self, args, cwd=None, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
+    def popen(self, args, cwd=None, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE): # noqa: PLR0913
         pipes = subprocess.Popen(args, cwd=cwd, text=text, stdout=stdout, stderr=stderr)
         std_out, std_err = pipes.communicate()
         return std_out, std_err
+
 
 class UrllibDownload(Download):
     def download(self, url, destination, filename_from_headers=None, reporthook=None):
@@ -56,6 +58,7 @@ class UrllibDownload(Download):
             return None
         return local_filename
 
+
 class WgetDownload(Download):
     def download(self, url, destination, filename_from_headers=None, reporthook=None): # noqa: ARG002
         # TODO(laromicas): Add reporthook
@@ -71,6 +74,7 @@ class WgetDownload(Download):
         my_list = re.findall(r'"([^"]*)"', output)
         return my_list[-1]
 
+
 class CurlDownload(Download):
     def download(self, url, destination, filename_from_headers=None, reporthook=None): # noqa: ARG002
         # TODO(laromicas): Add reporthook
@@ -85,6 +89,7 @@ class CurlDownload(Download):
     def parse_filename(self, output):
         my_list = re.findall(r"'([^']*)'", output)
         return my_list[-1]
+
 
 class Aria2cDownload(Download):
     def download(self, url, destination, filename_from_headers=None, reporthook=None): # noqa: ARG002

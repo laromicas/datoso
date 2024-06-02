@@ -109,7 +109,7 @@ class FileUtils:
             shutil.rmtree(path)
 
     @staticmethod
-    def remove(pathstring: str | Path) -> None:
+    def remove(pathstring: str | Path, remove_empty_parent = None) -> None:
         path = pathstring if isinstance(pathstring, Path) else FileUtils.parse_path(pathstring)
         """Remove file or folder."""
         if not path.exists():
@@ -118,6 +118,8 @@ class FileUtils:
             FileUtils.remove_folder(path)
         else:
             path.unlink()
+        if remove_empty_parent and not list(path.parent.iterdir()):
+            FileUtils.remove(path.parent, remove_empty_parent)
 
     @staticmethod
     def parse_path(path: str) -> Path:

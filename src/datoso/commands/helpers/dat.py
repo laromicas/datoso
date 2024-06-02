@@ -10,8 +10,9 @@ from datoso.helpers import Bcolors
 def print_dats(args, dats, fields = None):
     """Print dats"""
     output = []
-    fields = fields if fields else ['seed', 'name', 'status']
-    for field in ['seed', 'name']:
+    old_fields = fields if fields else ['seed', 'name', 'status']
+    fields = ['seed', 'name']
+    for field in old_fields:
         if field not in fields:
             fields.append(field)
     for dat in dats:
@@ -37,7 +38,7 @@ def command_dat_name_search(args):
     if args.fields:
         print_dats(args, result, fields=args.fields)
     elif args.details:
-        print_dats(args, result, fields=['name', 'modifier', 'company', 'system', 'seed', 'date',
+        print_dats(args, result, fields=['seed', 'name', 'modifier', 'company', 'system', 'date',
                                     'path', 'system_type', 'automerge', 'parent'])
     else:
         print_dats(args, result)

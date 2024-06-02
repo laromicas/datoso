@@ -161,16 +161,19 @@ class Seed:
             output.append('Disabled')
         return output
 
+    def add_default_actions(self):
+        for seed_actions in self.actions.values():
+            if config.getboolean('PROCESS', 'AutoMergeEnabled', fallback=False):
+                seed_actions.append({ 'action': 'AutoMerge' })
+            if config.getboolean('PROCESS', 'ParentMergeEnabled', fallback=False):
+                seed_actions.append({ 'action': 'Deduplicate' })
+
     def process_dats(self, fltr=None, actions_to_execute=None):
         """Process dats."""
         tmp_path = config['PATHS'].get('DownloadPath', 'tmp')
         dat_origin = FileUtils.parse_path(tmp_path) / self.get_prefix(self.name) / 'dats'
         line = ''
         self.get_actions()
-        if config.getboolean('PROCESS', 'AutoMergeEnabled', fallback=False):
-            self.actions.append({ 'action': 'AutoMerge' })
-        if config.getboolean('PROCESS', 'ParentMergeEnabled', fallback=False):
-            self.actions.append({ 'action': 'Deduplicate' })
 
         for path, seed_actions in self.actions.items():
             new_path = Path(path.format(dat_origin=dat_origin))

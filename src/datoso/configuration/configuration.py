@@ -8,6 +8,8 @@ from datoso import ROOT_FOLDER, __app_name__
 HOME = Path.home()
 XDG_CONFIG_HOME = Path(os.environ.get('XDG_CONFIG_HOME', '~/.config')).expanduser()
 
+(XDG_CONFIG_HOME / 'datoso/datoso.config').mkdir(parents=True, exist_ok=True)
+
 def get_seed_name(seed):
     """Get seed name."""
     return seed.replace(f'{__app_name__}_seed_', '')

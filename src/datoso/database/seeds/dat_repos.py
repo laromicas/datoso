@@ -16,7 +16,8 @@ repositories = [
         'name': 'Redump',
         'short_name': 'redump',
         'description': 'Redump.org is a disc preservation database and internet community dedicated ' \
-            'to collecting precise and accurate information about every video game ever released on optical media of any system.',
+            'to collecting precise and accurate information about every video game ever released on ' \
+            'optical media of any system.',
         'url': 'http://redump.org/',
         'icon': 'http://redump.org/favicon.ico',
         'update_script': 'lib/redump/update',

@@ -44,7 +44,6 @@ class Processor:
                 break
 
 
-
 class Process(ABC):
     """Process Base class."""
 
@@ -162,9 +161,13 @@ class DeleteOld(Process):
                 and not config.getboolean('GENERAL', 'Overwrite', fallback=False):
                 return 'Exists'
 
-        FileUtils.remove(self.database_dat.new_file)
+        FileUtils.remove(self.database_dat.new_file, remove_empty_parent=True)
         if not self.database_dat.is_enabled():
             self.stop = True
+            self.database_dat.new_file = None
+            self.database_dat.save()
+            self.database_dat.flush()
+            return 'Disabled'
         return 'Deleted'
 
 
@@ -183,7 +186,6 @@ class Copy(Process):
 
     def process(self):
         result = None
-
         origin = self.file if self.file else None
         destination = self.destination()
         if not self.database_dat:
@@ -192,7 +194,6 @@ class Copy(Process):
         if not self.database_dat.is_enabled():
             self.file_dat.new_file = None
             return 'Ignored'
-
         old_file = Path(self.database_data.get('new_file', '') or '')
         new_file = destination
 
@@ -214,11 +215,10 @@ class Copy(Process):
                 and compare_dates(self.database_dat.date, self.file_dat.date):
                 return 'No Action Taken, Newer Found'
 
-            self.file_dat.new_file = destination
+            self.database_dat.new_file = destination
             FileUtils.copy(origin, destination)
         except ValueError:
             pass
-
         return result
 
 
