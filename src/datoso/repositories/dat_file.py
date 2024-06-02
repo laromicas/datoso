@@ -263,6 +263,8 @@ class XMLDatFile(DatFile):
         """Dedupe the dat file."""
         new_games = []
         self.shas = HashesIndex()
+        if not self.merged_roms:
+            self.merged_roms = []
 
         for game in self.data[self.main_key][self.game_key]:
             if 'rom' not in game:

@@ -1,3 +1,5 @@
+""" Argument parser for datoso commands """
+
 from datoso.commands.commands import (
     command_config,
     command_dat,
@@ -27,7 +29,7 @@ def add_config_parser(subparser):
 
     group_save = parser_config.add_mutually_exclusive_group()
     group_save.add_argument('--set', nargs=2, metavar=('configuration', 'value'),
-                    help='Set Configuration Option separated by point with new value e.g. <GENERAL.Overwrite> <false>')
+                    help='Set Configuration Option separated by point with new value e.g. <PROCESS.Overwrite> <false>')
     group_save.add_argument('--get', metavar=('configuration'), help='Get value of Configuration Option.')
     parser_config.add_argument('-g','--global', action='store_true',
                     help='When set, saves to global config, else to `.datosorc`')
@@ -110,6 +112,7 @@ def add_all_seed_parser(subparser):
                                         help='Exclude seed or seeds (only work with all)')
             parser_command.add_argument('-o', '--only', action='append', help='Only seed or seeds (only work with all)')
         else:
+            parser_command_process.add_argument('-o', '--overwrite', action='store_true', help='Force overwrite dats')
             seed.args(parser_command)
 
     for seed in Seed.list_installed():

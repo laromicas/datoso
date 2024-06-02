@@ -51,7 +51,7 @@ def detect_seed(dat_file: str, rules):
     msg = f'Unknown seed type {dat_file} {file_header}'
     raise LookupError(msg)
 
-def comparator(key: Any, value: Any, operator: str = 'eq') -> bool:  # noqa: C901, PLR0911, PLR0912
+def comparator(key: Any, value: Any, operator: str = 'eq') -> bool:  # noqa: PLR0911
     """Return a boolean based on the comparison of the key and value."""
     match operator:
         case 'eq' | 'equals' | '==':

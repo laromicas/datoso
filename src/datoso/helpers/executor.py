@@ -5,16 +5,9 @@ This module provides a wrapper for subprocess.Popen to execute commands.
 import logging
 from subprocess import PIPE, CalledProcessError, Popen
 
-from datoso.configuration import config
-
 
 class Command:
     """Subprocess wrapper"""
-
-    quiet = config.getboolean('COMMAND', 'Quiet', fallback=False)
-    verbose = config.getboolean('COMMAND', 'Verbose', fallback=False)
-    logging = config.getboolean('LOG', 'Logging', fallback=False)
-    logfile = config.get('LOG', 'LogFile', fallback='datoso.log')
 
     def __init__(self, command):
         self.command = command

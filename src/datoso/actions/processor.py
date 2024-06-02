@@ -157,8 +157,7 @@ class DeleteOld(Process):
             new_file = self.destination()
             if old_file == new_file and self.database_data.get('date', None) \
                 and self.database_data.get('date', None) == self.file_data.get('date', None) \
-                and compare_dates(self.database_dat.date, self.file_dat.date) \
-                and not config.getboolean('GENERAL', 'Overwrite', fallback=False):
+                and not config.getboolean('PROCESS', 'Overwrite', fallback=False):
                 return 'Exists'
 
         FileUtils.remove(self.database_dat.new_file, remove_empty_parent=True)
@@ -198,15 +197,19 @@ class Copy(Process):
         new_file = destination
 
         if old_file == new_file and destination.exists() \
-            and not config.getboolean('GENERAL', 'Overwrite', fallback=False):
+            and not config.getboolean('PROCESS', 'Overwrite', fallback=False):
+            self.stop = True
             return 'Exists'
 
         if not old_file:
             result = 'Created'
         elif old_file != new_file:
             result = 'Updated'
-        elif config.getboolean('GENERAL', 'Overwrite', fallback=False):
+        elif config.getboolean('PROCESS', 'Overwrite', fallback=False):
             result = 'Overwritten'
+        else:
+            msg = 'Unknown state'
+            raise TypeError(msg)
 
         try:
             if self.database_data \
@@ -222,21 +225,6 @@ class Copy(Process):
         return result
 
 
-class MarkMias(Process):
-    """Mark missing in action."""
-
-    def process(self):
-        """Mark missing in action."""
-        if not config.getboolean('PROCESS', 'ProcessMissingInAction', fallback=False):
-            return 'Skipped'
-
-        if not self.database_dat.is_enabled():
-            return 'Ignored'
-        from datoso.mias.mia import mark_mias
-        mark_mias(dat_file=self.file_dat.new_file)
-        return 'Marked'
-
-
 class SaveToDatabase(Process):
     """Save process to database."""
 
@@ -247,6 +235,18 @@ class SaveToDatabase(Process):
         self.database_dat.save()
         self.database_dat.flush()
         return 'Saved'
+
+
+class MarkMias(Process):
+    """Mark missing in action."""
+
+    def process(self):
+        """Mark missing in action."""
+        if not config.getboolean('PROCESS', 'ProcessMissingInAction', fallback=False):
+            return 'Skipped'
+        from datoso.mias.mia import mark_mias
+        mark_mias(dat_file=self.file_dat.new_file)
+        return 'Marked'
 
 
 class AutoMerge(Process):
@@ -261,9 +261,10 @@ class AutoMerge(Process):
             merged = Dedupe(self.child_db)
         else:
             return 'Skipped'
-        merged.dedupe()
-        merged.save()
-        return 'Deduped'
+        if merged.dedupe() > 0:
+            merged.save()
+            return 'Automerged'
+        return 'Skipped'
 
 
 class Deduplicate(Process):
@@ -279,9 +280,11 @@ class Deduplicate(Process):
             merged = Dedupe(self.child_db, parent)
         else:
             return 'Skipped'
-        merged.dedupe()
-        merged.save()
-        return 'Deduped'
+        if merged.dedupe() > 0:
+            merged.save()
+            return 'Deduped'
+        return 'Skipped'
+
 
 
 if __name__ == '__main__':

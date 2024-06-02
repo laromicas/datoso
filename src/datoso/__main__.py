@@ -70,6 +70,8 @@ def initial_setup(args) -> None:
     if getattr(args, 'verbose', False):
         set_verbosity(logging.DEBUG)
         config['COMMAND']['Verbose'] = 'true'
+    if getattr(args, 'overwrite', False):
+        config['PROCESS']['Overwrite'] = 'true'
     if getattr(args, 'logging', False):
         enable_logging()
 

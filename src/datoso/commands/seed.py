@@ -7,10 +7,9 @@ from datoso import __app_name__
 from datoso.actions.processor import Processor
 from datoso.configuration import config
 from datoso.helpers import Bcolors, FileUtils
-from datoso.helpers.executor import Command
 from datoso.helpers.plugins import PluginType, installed_seeds
 
-STATUS_TO_SHOW = ['Updated', 'Created', 'Error', 'Disabled', 'Deduped', 'No Action Taken, Newer Found']
+STATUS_TO_SHOW = ['Updated', 'Created', 'Error', 'Disabled', 'Deduped', 'Automerged', 'No Action Taken, Newer Found']
 
 class Seed:
     """Seed class"""
@@ -153,7 +152,7 @@ class Seed:
     def process_action(self, procesor):
         output = []
         for process in procesor.process():
-            if process in STATUS_TO_SHOW or Command.verbose:
+            if process in STATUS_TO_SHOW or config.getboolean('COMMAND', 'Verbose', fallback=False):
                 output.append(process)
             if process == 'Error':
                 break
@@ -174,6 +173,7 @@ class Seed:
         dat_origin = FileUtils.parse_path(tmp_path) / self.get_prefix(self.name) / 'dats'
         line = ''
         self.get_actions()
+        self.add_default_actions()
 
         for path, seed_actions in self.actions.items():
             new_path = Path(path.format(dat_origin=dat_origin))
