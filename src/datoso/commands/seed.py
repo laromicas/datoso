@@ -35,7 +35,7 @@ class Seed:
         if actions:
             self.actions = actions.get_actions()
 
-        # TODO(laromicas) This is a work in progress, it should be able to override actions
+        # TODO(laromicas): This is a work in progress, it should be able to override actions
         # configs = []
         # for path, actions in self.actions.items():
         #     config_path = path.replace('{dat_origin}', self.name.upper()).replace('/', '.')
@@ -208,8 +208,8 @@ class Seed:
     @staticmethod
     def list_installed():
         """Installed seeds"""
-        for seed in installed_seeds():
-            seed = seed.replace(f'{__app_name__}_seed_', '')
+        for unformatted_seed in installed_seeds():
+            seed = unformatted_seed.replace(f'{__app_name__}_seed_', '')
             yield Seed(name=seed, module=__import__(f'{__app_name__}_{PluginType.SEED.value}_{seed}'))
 
     @staticmethod

@@ -354,8 +354,8 @@ class ClrMameProDatFile(DatFile):
     def read_block(self, data) -> dict:
         """Read a block of data from a ClrMame dat and parses it."""
         dictionary = {}
-        for line in iter(data.splitlines()):
-            line = line.strip()
+        for unstripped_line in iter(data.splitlines()):
+            line = unstripped_line.strip()
             if line:
                 if line.startswith('rom'):
                     line = line[6:-2]
@@ -412,8 +412,8 @@ class DOSCenterDatFile(ClrMameProDatFile):
     def read_block(self, data) -> dict:
         """Read a block of data from a DOSCenter dat and parses it."""
         dictionary = {}
-        for line in iter(data.splitlines()):
-            line = line.strip()
+        for unstripped_line in iter(data.splitlines()):
+            line = unstripped_line.strip()
             if line:
                 if line.startswith('rom'):
                     line = line[6:-2]
