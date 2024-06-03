@@ -121,7 +121,7 @@ class FileUtils:
         else:
             path.unlink()
         if remove_empty_parent and not list(path.parent.iterdir()):
-            FileUtils.remove(path.parent, remove_empty_parent)
+            FileUtils.remove(path.parent, remove_empty_parent=True)
 
     @staticmethod
     def parse_path(path: str) -> Path:
