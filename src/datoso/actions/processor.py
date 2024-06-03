@@ -12,9 +12,7 @@ from datoso.repositories.dedupe import Dedupe
 class Processor:
     """Process actions."""
 
-    _file_data = None
     _file_dat = None
-    _database_data = None
     _database_dat = None
     actions: list = None
     seed = None
@@ -32,13 +30,10 @@ class Processor:
             action_class = globals()[
                 action['action']](
                     file=self.file, seed=self.seed, previous=self._file_data,
-                    _file_data=self._file_data, _database_data=self._database_data,
                     _file_dat=self._file_dat, _database_dat=self._database_dat,
                     **action)
             yield action_class.process()
-            self._file_data = action_class.file_data
             self._file_dat = action_class.file_dat
-            self._database_data = action_class.database_data
             self._database_dat = action_class.database_dat
             if action_class.stop:
                 break
@@ -47,9 +42,7 @@ class Processor:
 class Process(ABC):
     """Process Base class."""
 
-    _file_data = None
     _file_dat = None
-    _database_data = None
     _database_dat = None
     status = None
     stop = False
@@ -67,13 +60,12 @@ class Process(ABC):
             self._class = self._factory(self.file)
         self._file_dat = self._class(file=self.file)
         self._file_dat.load()
-        self._file_data = self._file_dat.dict()
-        return self._file_data
+        return self._file_dat
 
     @property
     def file_data(self) -> dict:
         """Get file data."""
-        return self.file_dat.dict()
+        return self.file_dat.dict() if self.file_dat else {}
 
     @property
     def file_dat(self) -> DatFile:
@@ -84,13 +76,12 @@ class Process(ABC):
         """Load database data."""
         self._database_dat = Dat(**self.file_data)
         self._database_dat.load()
-        self._database_data = self._database_dat.to_dict()
         return self._database_dat
 
     @property
     def database_data(self) -> dict:
         """Get database data."""
-        return self.database_dat.to_dict()
+        return self.database_dat.to_dict() if self.database_dat else {}
 
     @property
     def database_dat(self) -> Dat:
@@ -207,6 +198,8 @@ class Copy(Process):
             result = 'Updated'
         elif config.getboolean('PROCESS', 'Overwrite', fallback=False):
             result = 'Overwritten'
+        elif not new_file.exists():
+            result = 'Updated'
         else:
             msg = 'Unknown state'
             raise TypeError(msg)
@@ -256,9 +249,8 @@ class AutoMerge(Process):
 
     def process(self):
         """Save process to database."""
-        self.child_db = self.database_dat
-        if getattr(self.child_db, 'automerge', None):
-            merged = Dedupe(self.child_db)
+        if getattr(self.database_dat, 'automerge', None):
+            merged = Dedupe(self.database_dat)
         else:
             return 'Skipped'
         if merged.dedupe() > 0:
@@ -270,14 +262,10 @@ class AutoMerge(Process):
 class Deduplicate(Process):
     """Save process to database."""
 
-    parent_db = None
-    child_db = None
-
     def process(self):
         """Save process to database."""
-        self.child_db = self.database_dat
-        if parent := getattr(self.child_db, 'parent', None):
-            merged = Dedupe(self.child_db, parent)
+        if parent := getattr(self.database_dat, 'parent', None):
+            merged = Dedupe(self.database_dat, parent)
         else:
             return 'Skipped'
         if merged.dedupe() > 0:
