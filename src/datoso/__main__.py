@@ -20,11 +20,6 @@ from datoso.configuration.logger import enable_logging, set_verbosity
 from datoso.database.seeds.dat_rules import detect_first_run
 from datoso.helpers import Bcolors
 
-# ---------Boilerplate to check python version ----------
-if sys.version_info < (3, 10):  # noqa: UP036
-    print('This is a Python 3 script. Please run it with Python 3.10 or above')
-    sys.exit(1)
-
 
 def parse_args() -> Namespace:
     """Parse command line arguments.

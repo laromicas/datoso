@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 name        = "datoso"
 description = "Python command line tool to download and organize your Rom Dat files."
 readme      = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license     = {text = "MIT License"}
 authors     = [
     {name = 'Lacides Miranda', email = 'laromicas@hotmail.com'},
@@ -60,7 +60,7 @@ tdc = [ "datoso-seed-tdc>=1.0b0.dev0" ]
 translatedenglish = [ "datoso-seed-translatedenglish>=1.0b0.dev0" ]
 vpinmame = [ "datoso-seed-vpinmame>=1.0b0.dev0" ]
 dev = [
-    "ruff>=0.3.4",
+    "ruff>=0.4.7",
     "line_profiler==4.0.3"
     ]
 
