@@ -1,45 +1,52 @@
 """Database models for the datfile."""
 from dataclasses import dataclass
 from pathlib import PosixPath
+from typing import Any
 
 from dataclasses_json import dataclass_json
-from tinydb import Query
+from tinydb import Query, TinyDB
+from tinydb.queries import QueryInstance
+from tinydb.table import Document, Table
 
 from datoso.database import DatabaseSingleton
 
 
 @dataclass
 class Base:
-    _table_name = None
-    _table = None
-    _DB = None
+    """Base class for the database models."""
 
-    def __init__(self, **kwargs) -> None:
+    _table_name: str = None
+    _table: Table = None
+    _DB: TinyDB = None
+
+    def __init__(self, **kwargs: Any) -> None:  # noqa: ANN401
+        """Initialize the base."""
         self.__dict__.update(kwargs)
         self.db_init()
 
-    def db_init(self):
+    def db_init(self) -> None:
         """Initialize the database."""
         self._DB = DatabaseSingleton()
         self._table = self._DB.DB.table(self._table_name)
 
-    def check_init(self):
+    def check_init(self) -> None:
+        """Check if the database is initialized."""
         if not self._DB:
             self.db_init()
 
-    def get_one(self):
+    def get_one(self) -> Document | list | None:
         """Get a record."""
         self.check_init()
         return self._table.get(self.query())
 
-    def load(self, query=None):
+    def load(self, query: Query=None) -> None:
         """Load record from the database."""
         self.check_init()
         result = self._table.search(query or self.query())
         if result:
             self.__dict__.update(result[0])
 
-    def save(self, query=None):
+    def save(self, query: Query=None) -> None:
         """Save record to the database."""
         self.check_init()
         if getattr(self, '_id', None):
@@ -48,7 +55,7 @@ class Base:
         else:
             self._id = self._table.upsert(self.to_dict(), query or self.query())
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """Convert to dictionary."""
         dic = super().to_dict()
         for key, value in dic.items():
@@ -56,48 +63,48 @@ class Base:
                 dic[key] = str(value)
         return {key: value for key, value in dic.items() if value is not None}
 
-    def set_table(self, table_name):
+    def set_table(self, table_name: str) -> None:
         """Set the table."""
         self._table = table_name
 
-    def get_table(self):
+    def get_table(self) -> Table:
         """Get the table."""
         return self._table
 
     @classmethod
-    def search(cls, query):
+    def search(cls, query: Query) -> list[Document]:
         """Search for a record."""
         table_name = cls._table_name
         base = Base(_table_name=table_name)
         return base.get_table().search(query)
 
     @classmethod
-    def all(cls):
+    def all(cls) -> list[Document]:
         """Get all systems."""
         table_name = cls._table_name
         base = Base(_table_name=table_name)
         return base.get_table().all()
 
     @classmethod
-    def truncate(cls):
+    def truncate(cls) -> None:
         """Truncate the table."""
         table_name = cls._table_name
         base = Base(_table_name=table_name)
         base.get_table().truncate()
 
-    def update(self, *args, **kwargs):
+    def update(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401
         """Update a record."""
         self._table.update(*args, **kwargs)
 
-    def remove(self, *args, **kwargs):
+    def remove(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401
         """Remove a record."""
         self._table.remove(*args, **kwargs)
 
-    def flush(self):
+    def flush(self) -> None:
         """Flush the database."""
         self._table.storage.flush()
 
-    def get_db(self):
+    def get_db(self) -> TinyDB:
         """Get the database."""
         return self._DB
 
@@ -125,16 +132,16 @@ class Dat(Base):
     automerge: bool | None = None
     parent: str | None = None
 
-    def query(self):
+    def query(self) -> QueryInstance:
         """Query to update or load a record."""
         query = Query()
         return (query.name == self.name) & (query.seed == self.seed)
 
-    def is_enabled(self):
+    def is_enabled(self) -> bool:
         """Check if the dat is enabled."""
         return self.status is None or self.status == 'enabled'
 
-    def remove(self, **kwargs):
+    def remove(self, **kwargs) -> None:  # noqa: ANN003
         """Remove a record."""
         self._table.remove(**kwargs)
 
@@ -147,11 +154,12 @@ class Seed(Base):
     _table_name = 'repos'
     name: str
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs) -> None:  # noqa: ANN003
+        """Initialize the seed."""
         super().__init__(**kwargs)
         self.db_init()
 
-    def query(self):
+    def query(self) -> QueryInstance:
         """Query to update or load a record."""
         query = Query()
         return query.name == self.name
@@ -187,11 +195,12 @@ class System(Base):
     override: Override | None = None
     extra_configs: ExtraConfig | None = None
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs) -> None:  # noqa: ANN003
+        """Initialize the system."""
         super().__init__(**kwargs)
         self.db_init()
 
-    def query(self):
+    def query(self) -> QueryInstance:
         """Query to update or load a record."""
         query = Query()
         return (query.company == self.company) & (query.system == self.system)
@@ -210,7 +219,7 @@ class MIA(Base):
     sha1: str
     md5: str
 
-    def query(self):
+    def query(self) -> QueryInstance:
         """Query to update or load a record."""
         query = Query()
         if self.sha1:
@@ -220,17 +229,3 @@ class MIA(Base):
         if self.crc32:
             return query.crc32 == self.crc32
         return None
-
-if __name__ == '__main__':
-    print(System.all())
-    ov = Override.from_dict({'company': 'Nintendo', 'system': 'Nintendo 64',
-                             'modifier': 'No-Intro', 'system_type': 'ROM'})
-    print(ov)
-    print(ov.to_dict())
-    ec = ExtraConfig.from_dict({'empty_suffix': {'suffix': ' (Empty)', 'enabled': True},
-                                'if_suffix': {'suffix': ' (if not empty)', 'enabled': True}})
-    print(ec)
-    print(ec.to_dict())
-    syst = System.from_dict({'system': 'Nintendo 64', 'company': 'Nintendo',
-                             'override': ov, 'extra_configs': ec, 'system_type': 'ROM'})
-    print(syst)

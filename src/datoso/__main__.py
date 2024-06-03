@@ -1,8 +1,8 @@
-"""Main entry point for datoso"""
-import argparse
+"""Main entry point for datoso."""
 import logging
 import os
 import sys
+from argparse import ArgumentParser, Namespace
 
 from datoso import __version__
 from datoso.commands.argparser import (
@@ -20,22 +20,22 @@ from datoso.configuration.logger import enable_logging, set_verbosity
 from datoso.database.seeds.dat_rules import detect_first_run
 from datoso.helpers import Bcolors
 
-#---------Boilerplate to check python version ----------
+# ---------Boilerplate to check python version ----------
 if sys.version_info < (3, 10):  # noqa: UP036
     print('This is a Python 3 script. Please run it with Python 3.10 or above')
     sys.exit(1)
 
 
-def parse_args() -> argparse.Namespace:
-    """Parse command line arguments
+def parse_args() -> Namespace:
+    """Parse command line arguments.
 
     Returns
     -------
-        argparse.Namespace: An object to take the attributes.
+        Namespace: An object to take the attributes.
 
     """
-    #pylint: disable=too-many-locals,too-many-statements
-    parser = argparse.ArgumentParser(description='Update dats from different sources.')
+    # pylint: disable=too-many-locals,too-many-statements
+    parser = ArgumentParser(description='Update dats from different sources.')
     subparser = parser.add_subparsers(help='sub-command help')
 
     parser.add_argument('-v', '--version', action='store_true', help='show version')
@@ -57,8 +57,9 @@ def parse_args() -> argparse.Namespace:
     initial_setup(args)
     return args
 
-def initial_setup(args) -> None:
-    """Initial setup of datoso from command line arguments."""
+
+def initial_setup(args: Namespace) -> None:
+    """Initialize datoso from command line arguments."""
     if getattr(args, 'version', False):
         print(__version__)
         sys.exit()
@@ -75,8 +76,9 @@ def initial_setup(args) -> None:
     if getattr(args, 'logging', False):
         enable_logging()
 
-def main():
-    """Main function"""
+
+def main() -> None:
+    """Execute the main function."""
     detect_first_run()
     args = parse_args()
     args.func(args)

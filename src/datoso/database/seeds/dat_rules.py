@@ -17,7 +17,7 @@ fields = [
 ]
 
 
-def get_systems():
+def get_systems() -> list:
     """Get systems from the Google Sheets."""
     if not config['UPDATE_URLS']['GoogleSheetUrl']:
         return []
@@ -35,13 +35,13 @@ def get_systems():
             if field in ('override', 'extra_configs') and field in row:
                 try:
                     row[field] = json.loads(system[j])
-                except Exception:  # pylint: disable=broad-except
+                except Exception:  # noqa: BLE001
                     row[field] = system[j]
         systems.append(row)
     return systems
 
 
-def import_dats():
+def import_dats() -> None:
     """Seed the database with Systems."""
     systems = get_systems()
     with open(Path(ROOT_FOLDER,'systems.json'), 'w', encoding='utf-8') as file:
@@ -52,7 +52,8 @@ def import_dats():
         row.save()
         row.flush()
 
-def init():
+
+def init() -> None:
     """Seed the database with Systems."""
     with open(Path(ROOT_FOLDER,'systems.json'), encoding='utf-8') as file:
         systems = json.load(file)
@@ -61,7 +62,8 @@ def init():
         row.save()
         row.flush()
 
-def detect_first_run():
+
+def detect_first_run() -> None:
     """Detect if this is the first run."""
     if not System.all():
         init()

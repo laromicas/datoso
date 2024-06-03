@@ -1,6 +1,8 @@
-"""Fetch and Process Commands for Seeds"""
+"""Fetch and Process Commands for Seeds."""
 # ruff: noqa: ERA001
 import re
+from argparse import ArgumentParser
+from collections.abc import Iterator
 from pathlib import Path
 
 from datoso import __app_name__
@@ -12,15 +14,16 @@ from datoso.helpers.plugins import PluginType, installed_seeds
 STATUS_TO_SHOW = ['Updated', 'Created', 'Error', 'Disabled', 'Deduped', 'Automerged', 'No Action Taken, Newer Found']
 
 class Seed:
-    """Seed class"""
+    """Seed class."""
 
-    name = None
-    path = None
+    name: str = None
+    path: str = None
     module = None
     actions: dict = None
     config = None
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs) -> None:  # noqa: ANN003
+        """Initialize the seed."""
         self.__dict__.update(kwargs)
         if not self.name and self.module:
             self.name = self.module.__name__.split('_')[-1]
@@ -28,8 +31,8 @@ class Seed:
         if not config.has_section(self.name.upper()):
             self.init_config()
 
-    def get_actions(self):
-        """Get actions"""
+    def get_actions(self) -> None:
+        """Get actions."""
         actions = self.get_module('actions')
         self.config = config[self.name.upper()] if config.has_section(self.name.upper()) else None
         if actions:
@@ -77,8 +80,8 @@ class Seed:
             # if self.config and self.config.get('Actions'):
             #     self.actions = self.config.get('Actions')
 
-    def get_module(self, submodule=None):
-        """Module"""
+    def get_module(self, submodule: str | None=None) -> None:
+        """Get module."""
         try:
             self.module = __import__(self.full_name) if not self.module else self.module
             if submodule:
@@ -87,33 +90,33 @@ class Seed:
             return None
         return self.module
 
-    def description(self):
-        """Description"""
+    def description(self) -> str:
+        """Return the description of the seed."""
         return self.get_module().__description__
 
-    def fetch(self):
-        """Fetch seed"""
+    def fetch(self) -> None:
+        """Fetch seed."""
         fetch = self.get_module('fetch')
         fetch.fetch()
 
-    def args(self, args):
-        """Args"""
+    def args(self, parser: ArgumentParser) -> ArgumentParser:
+        """Seed args."""
         try:
             get_args = self.get_module('args')
         except AttributeError:
             return None
-        return get_args.seed_args(args) if get_args else None
+        return get_args.seed_args(parser) if get_args else None
 
-    def parse_args(self, args):
-        """Args"""
+    def parse_args(self, parser: ArgumentParser) -> None:
+        """Parse args."""
         try:
             get_args = self.get_module('args')
         except AttributeError:
-            return None
-        return get_args.post_parser(args) if get_args else None
+            return
+        get_args.post_parser(parser) if get_args else None
 
-    def init_config(self):
-        """Initial config"""
+    def init_config(self) -> None:
+        """Initialize configuration."""
         try:
             get_args = self.get_module('args')
         except AttributeError:
@@ -121,7 +124,7 @@ class Seed:
         if get_args:
             get_args.init_config()
 
-    def format_actions(self, actions, data: dict | None = None):
+    def format_actions(self, actions: dict, data: dict | None = None) -> dict:
         """Format actions."""
         data = data if data else {}
         for action in actions:
@@ -130,17 +133,20 @@ class Seed:
                     action[action_name] = action_value.format(**data)
         return actions
 
-    def delete_line(self, line):
+    def delete_line(self, line: str) -> None:
+        """Delete line."""
         # pylint: disable=expression-not-assigned
         [print('\b \b', end='') for x in range(len(line))]
         print(' ' * (len(line)), end='')
         print('\r', end='')
 
-    def get_prefix(self, name) -> str:
+    def get_prefix(self, name: str) -> str:
+        """Get prefix."""
         seed = self.get_module()
         return seed.__prefix__ if seed else name
 
-    def should_ignore_file(self, fltr, file):
+    def should_ignore_file(self, fltr: str | None, file: str) -> bool:
+        """Ignore file if necessary."""
         if config['PROCESS'].get('DatIgnoreRegEx'):
             ignore_regex = re.compile(config['PROCESS']['DatIgnoreRegEx'])
             if ignore_regex.match(str(file)):
@@ -149,7 +155,8 @@ class Seed:
             return True
         return False
 
-    def process_action(self, procesor):
+    def process_action(self, procesor: Processor) -> list:
+        """Process action."""
         output = []
         for process in procesor.process():
             if process in STATUS_TO_SHOW or config.getboolean('COMMAND', 'Verbose', fallback=False):
@@ -160,14 +167,15 @@ class Seed:
             output.append('Disabled')
         return output
 
-    def add_default_actions(self):
+    def add_default_actions(self) -> None:
+        """Add default actions."""
         for seed_actions in self.actions.values():
             if config.getboolean('PROCESS', 'AutoMergeEnabled', fallback=False):
                 seed_actions.append({ 'action': 'AutoMerge' })
             if config.getboolean('PROCESS', 'ParentMergeEnabled', fallback=False):
                 seed_actions.append({ 'action': 'Deduplicate' })
 
-    def process_dats(self, fltr=None, actions_to_execute=None):
+    def process_dats(self, fltr: str | None=None, actions_to_execute: list | None=None) -> None:
         """Process dats."""
         tmp_path = config['PATHS'].get('DownloadPath', 'tmp')
         dat_origin = FileUtils.parse_path(tmp_path) / self.get_prefix(self.name) / 'dats'
@@ -206,18 +214,18 @@ class Seed:
         self.delete_line(line)
 
     @staticmethod
-    def list_installed():
-        """Installed seeds"""
+    def list_installed() -> Iterator['Seed']:
+        """Installed seeds."""
         for unformatted_seed in installed_seeds():
             seed = unformatted_seed.replace(f'{__app_name__}_seed_', '')
             yield Seed(name=seed, module=__import__(f'{__app_name__}_{PluginType.SEED.value}_{seed}'))
 
     @staticmethod
-    def from_name(name):
-        """From name"""
+    def from_name(name: str) -> 'Seed':
+        """From name."""
         return Seed(name=name)
 
     @staticmethod
-    def from_module(module):
-        """From module"""
+    def from_module(module: object) -> 'Seed':
+        """From module."""
         return Seed(module=module)

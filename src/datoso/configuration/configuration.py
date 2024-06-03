@@ -10,13 +10,16 @@ XDG_CONFIG_HOME = Path(os.environ.get('XDG_CONFIG_HOME', '~/.config')).expanduse
 
 (XDG_CONFIG_HOME / 'datoso/datoso.config').mkdir(parents=True, exist_ok=True)
 
-def get_seed_name(seed):
+def get_seed_name(seed: str) -> str:
     """Get seed name."""
     return seed.replace(f'{__app_name__}_seed_', '')
 
 
 class Config(configparser.ConfigParser):
-    def get(self, section, option, **kwargs):
+    """Configuration class."""
+
+    def get(self, section: str, option: str, **kwargs) -> str | None:  # noqa: ANN003
+        """Get a configuration value."""
         envvar = f'{section}.{option.upper()}'
         if envvar in os.environ:
             return os.environ[envvar]
@@ -25,7 +28,8 @@ class Config(configparser.ConfigParser):
         except configparser.NoOptionError:
             return None
 
-    def getboolean(self, section, option, **kwargs):
+    def getboolean(self, section: str, option: str, **kwargs) -> bool | None:  # noqa: ANN003
+        """Get a boolean configuration value."""
         envvar = f'{section}.{option.upper()}'
         if envvar in os.environ:
             return os.environ[envvar].lower() in ['true', 'yes', '1']

@@ -2,6 +2,7 @@
 import os
 import shlex
 from pathlib import Path
+from typing import Any
 
 import xmltodict
 
@@ -33,7 +34,8 @@ class DatFile:
     header: dict = None
     games: list = None
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: Any) -> None:  # noqa: ANN401
+        """Initialize the dat file."""
         self.__dict__.update(kwargs)
         if not self.name and not self.file:
             msg = 'No file specified'
@@ -61,7 +63,7 @@ class DatFile:
         return getattr(self, 'version', None)
 
     def get_modifier(self) -> str:
-        """Get the modifier ej. 'Source Code', 'etc'"""
+        """Get the modifier ej. 'Source Code', 'etc'."""
         return getattr(self, 'modifier', None)
 
     def get_company(self) -> str:
@@ -111,8 +113,8 @@ class DatFile:
         }
 
     @staticmethod
-    def from_file(dat_file):
-        """Create a class dynamically"""
+    def from_file(dat_file: str | Path) -> 'DatFile':
+        """Create a class dynamically."""
         with open(dat_file, encoding='utf-8') as file:
             file_header = file.read(5)
         if file_header == FileHeaders.XML.value:
@@ -298,7 +300,7 @@ class XMLDatFile(DatFile):
         return self.name
 
     def overrides(self) -> System:
-        """Overrides data for some systems."""
+        """Override data for some systems."""
         find_system = System(company=self.get_company(), system=self.get_system())
         find_system.load()
         if getattr(find_system, 'system_type', None):
@@ -307,7 +309,7 @@ class XMLDatFile(DatFile):
                 self.__dict__.update({k: v for k, v in find_system.override.items() if v})
         return find_system
 
-    def extra_configs(self, find_system):
+    def extra_configs(self, find_system: System) -> None:
         """Extra configs for some systems."""
         extra_configs = getattr(find_system, 'extra_configs', None)
         if extra_configs:
@@ -320,7 +322,7 @@ class XMLDatFile(DatFile):
                     if value and self.suffixes and key in self.suffixes:
                         self.__dict__.update(value)
 
-    def get_date(self):
+    def get_date(self) -> str:
         """Get the date from the dat file."""
         return self.date
 
@@ -330,7 +332,7 @@ class ClrMameProDatFile(DatFile):
     header: dict = None
     games: list = None
 
-    def get_next_block(self, data):
+    def get_next_block(self, data: str) -> tuple[str, str]:
         """Get the next block of data."""
         parenthesis = 0
         start = 0
@@ -351,7 +353,7 @@ class ClrMameProDatFile(DatFile):
                 break
         return data[start:end], data[end + 1:] if end < len(data) else None
 
-    def read_block(self, data) -> dict:
+    def read_block(self, data: str) -> dict:
         """Read a block of data from a ClrMame dat and parses it."""
         dictionary = {}
         for unstripped_line in iter(data.splitlines()):
@@ -378,7 +380,7 @@ class ClrMameProDatFile(DatFile):
 
         return dictionary
 
-    def load(self, load_games: bool = False) -> None:
+    def load(self, *, load_games: bool = False) -> None:
         """Load the data from a ClrMamePro file."""
         self.games = []
         self.main_key = 'datafile'
@@ -404,12 +406,12 @@ class ClrMameProDatFile(DatFile):
         self.full_name = self.header['description']
 
     def get_rom_shas(self) -> None:
-        """TODO Method"""
+        """TODO Method."""
 
 class DOSCenterDatFile(ClrMameProDatFile):
     """DOSCenter dat file."""
 
-    def read_block(self, data) -> dict:
+    def read_block(self, data: str) -> dict:
         """Read a block of data from a DOSCenter dat and parses it."""
         dictionary = {}
         for unstripped_line in iter(data.splitlines()):
@@ -502,7 +504,8 @@ class HashesIndex:
     crc: dict
     sizes: dict
 
-    def __init__(self):
+    def __init__(self) -> None:
+        """Initialize the index."""
         self.sha256 = {}
         self.sha1 = {}
         self.md5 = {}
@@ -510,7 +513,7 @@ class HashesIndex:
         self.sizes = {}
         self.valid_hashes = ['sha256', 'sha1', 'md5', 'crc']
 
-    def add_rom(self, rom):
+    def add_rom(self, rom: dict) -> None:
         """Add a rom to the index."""
         for rom_hash in self.valid_hashes:
             if rom_hash in rom:
@@ -518,7 +521,7 @@ class HashesIndex:
                     self.__dict__[rom_hash] = {}
                 self.__dict__[rom_hash][rom[rom_hash]] = rom
 
-    def has_rom(self, rom, rom_hash=None):
+    def has_rom(self, rom: dict, rom_hash: str | None=None) -> bool:
         """Check if a rom exists in the index."""
         if rom_hash:
             return rom_hash in rom and rom_hash in self.__dict__ \
@@ -529,18 +532,18 @@ class HashesIndex:
                     and rom['size'] == self.__dict__[rom_hash][rom[rom_hash]]['size']) \
                     for rom_hash in self.valid_hashes)
 
-    def get_sha256s(self):
+    def get_sha256s(self) -> list:
         """Get the sha256s."""
         return self.sha256.keys()
 
-    def get_sha1s(self):
+    def get_sha1s(self) -> list:
         """Get the sha1s."""
         return self.sha1.keys()
 
-    def get_md5s(self):
+    def get_md5s(self) -> list:
         """Get the md5s."""
         return self.md5.keys()
 
-    def get_crcs(self):
+    def get_crcs(self) -> list:
         """Get the crcs."""
         return self.crc.keys()

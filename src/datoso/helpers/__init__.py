@@ -1,8 +1,9 @@
-"""Helpers"""
+"""Helpers."""
 import re
 import shutil
 from contextlib import suppress
 from enum import Enum
+from numbers import Number
 from pathlib import Path
 
 from dateutil import parser
@@ -42,7 +43,7 @@ class Bcolors:
             setattr(Bcolors, color, '')
 
     @staticmethod
-    def remove_color(string) -> str:
+    def remove_color(string: str) -> str:
         """Remove color from string."""
         if not string:
             return ''
@@ -50,7 +51,7 @@ class Bcolors:
             string = string.replace(getattr(Bcolors, color), '')
         return string
 
-def is_date(string, fuzzy=None) -> bool:
+def is_date(string: str, *, fuzzy: bool | None=None) -> bool:
     """Return whether the string can be interpreted as a date.
 
     :param string: str, string to check for date
@@ -64,7 +65,7 @@ def is_date(string, fuzzy=None) -> bool:
 
 KB = 1024
 
-def sizeof_fmt(num, suffix='B') -> str:
+def sizeof_fmt(num: Number, suffix: str='B') -> str:
     """Convert bytes to human readable format."""
     for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
         if abs(num) < KB:
@@ -72,21 +73,22 @@ def sizeof_fmt(num, suffix='B') -> str:
         num /= KB
     return f'{num: .1f}Yi{suffix}'
 
-def is_git_path(path) -> bool:
+def is_git_path(path: str) -> bool:
     """Check if a path is a git repository."""
     pattern = re.compile(r'((git|ssh|http(s)?)|(git@[\w\.]+))(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?')
     return pattern.match(path)
 
-def is_git_repo(path) -> bool:
+def is_git_repo(path: str) -> bool:
     """Check if a path is a git repository."""
-    if Path(Path(path) / '.git').is_dir():
+    if (Path(path) / '.git').is_dir():
         return True
     return False
 
 class FileUtils:
+    """File utils."""
 
     @staticmethod
-    def copy(origin, destination):
+    def copy(origin: str | Path, destination: str | Path) -> None:
         """Copy file to destination."""
         Path(destination).parent.mkdir(parents=True, exist_ok=True)
         try:
@@ -103,15 +105,15 @@ class FileUtils:
             raise FileNotFoundError(msg) from None
 
     @staticmethod
-    def remove_folder(path: str | Path):
+    def remove_folder(path: str | Path) -> None:
         """Remove folder."""
         with suppress(PermissionError):
             shutil.rmtree(path)
 
     @staticmethod
-    def remove(pathstring: str | Path, remove_empty_parent = None) -> None:
-        path = pathstring if isinstance(pathstring, Path) else FileUtils.parse_path(pathstring)
+    def remove(pathstring: str | Path, *, remove_empty_parent: bool = False) -> None:
         """Remove file or folder."""
+        path = pathstring if isinstance(pathstring, Path) else FileUtils.parse_path(pathstring)
         if not path.exists():
             return
         if path.is_dir():
@@ -130,7 +132,7 @@ class FileUtils:
         return Path.cwd() / path
 
     @staticmethod
-    def move(origin, destination):
+    def move(origin: str | Path, destination: str | Path) -> None:
         """Move file to destination."""
         Path(destination).parent.mkdir(parents=True, exist_ok=True)
         try:
@@ -139,28 +141,34 @@ class FileUtils:
             FileUtils.remove(origin)
 
     @staticmethod
-    def get_ext(path: str | Path):
+    def get_ext(path: str | Path) -> str:
         """Get extension of file."""
         return Path(path).suffix
 
 class RequestUtils:
+    """Request utils."""
+
     @staticmethod
-    def urljoin(*args):
+    def urljoin(*args) -> str:  # noqa: ANN002
         """Join url parts."""
         return '/'.join(args).replace('//', '/').replace(':/', '://')
 
 class FileHeaders(Enum):
+    """File headers Enum."""
+
     XML = '<?xml'
     CLRMAMEPRO = 'clrma'
     DOSCENTER = 'DOSCe'
 
-def show_progress(block_num, block_size, total_size):
+def show_progress(block_num: Number, block_size: Number, total_size: Number) -> None:
+    """Show download progress."""
     if total_size != -1:
         print(f' {block_num * block_size / total_size:.1%}', end='\r')
     else:
         print(f' {block_num * block_size / 1024 / 1024:.1f} MB', end='\r')
 
-def compare_dates(date1, date2):
+def compare_dates(date1: str | None, date2: str | None) -> bool:
+    """Compare two dates."""
     if date1 is None or date2 is None:
         return False
     #replace not_allowed characters for space in dates

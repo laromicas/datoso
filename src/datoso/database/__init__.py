@@ -1,4 +1,4 @@
-"""Database module"""
+"""Database module."""
 import os
 from pathlib import Path, PosixPath
 from threading import Lock
@@ -18,6 +18,8 @@ database_path.mkdir(parents=True, exist_ok=True)
 DATABASE_URL = str(database_path / config['PATHS'].get('DatabaseFile', 'datoso.json'))
 
 class Types:
+    """Types class."""
+
     str = str
     int = int
     float = float
@@ -32,11 +34,12 @@ class JSONStorageWithBackup(JSONStorage):
 
     path: str = DATABASE_URL
 
-    def __init__(self, path: str, create_dirs=None, encoding=None, access_mode='r+', **kwargs):
+    def __init__(self, path: str, create_dirs=None, encoding=None, access_mode='r+', **kwargs) -> None:  # noqa: ANN001, ANN003
+        """Initialize the JSONStorageWithBackup."""
         self.path = path
         super().__init__(path, create_dirs or False, encoding, access_mode, **kwargs)
 
-    def sanitize_data(self, data):
+    def sanitize_data(self, data: Any) -> Any:  # noqa: ANN401
         """Sanitize recursively data before writing to the storage."""
         match type(data):
             case Types.str, Types.int, Types.float, Types.bool:
@@ -52,7 +55,7 @@ class JSONStorageWithBackup(JSONStorage):
             case _:
                 return data
 
-    def remove_nulls(self, data):
+    def remove_nulls(self, data: Any) -> Any:  # noqa: ANN401
         """Remove null values from the data."""
         if isinstance(data, dict):
             return {k: self.remove_nulls(v) for k, v in data.items() if v is not None}
@@ -60,23 +63,20 @@ class JSONStorageWithBackup(JSONStorage):
             return [self.remove_nulls(v) for v in data if v is not None]
         return data
 
-    def write(self, data: dict[str, dict[str, Any]]):
+    def write(self, data: dict[str, dict[str, Any]]) -> None:
         """Write data to the storage."""
         self.make_backup()
         data = self.sanitize_data(data)
         # data = self.remove_nulls(data) # noqa: ERA001
         super().write(data)
 
-    def make_backup(self):
+    def make_backup(self) -> None:
         """Make a backup of the database."""
         FileUtils.copy(self.path, f'{self.path}.bak')
 
 
 class DatabaseSingletonMeta(type):
-    """The Singleton class can be implemented in different ways in Python. Some
-    possible methods include: base class, decorator, metaclass. We will use the
-    metaclass because it is best suited for this purpose.
-    """
+    """Singleton Meta class for the database."""
 
     _instances = {} # noqa: RUF012
     _lock: Lock = Lock()
@@ -85,10 +85,9 @@ class DatabaseSingletonMeta(type):
     first access to the Singleton.
     """
 
-    def __call__(cls, *args, **kwargs):
-        """Possible changes to the value of the `__init__` argument do not affect
-        the returned instance.
-        """
+    def __call__(cls, *args, **kwargs) -> Any:  # noqa: ANN002, ANN003, ANN401
+        """Call the Singleton."""
+        # Possible changes to the value of the `__init__` argument do not affect the returned instance.
         with cls._lock:
             # The first thread to acquire the lock, reaches this conditional,
             # goes inside and creates the Singleton instance. Once it leaves the
@@ -102,7 +101,10 @@ class DatabaseSingletonMeta(type):
 
 
 class DatabaseSingleton(metaclass=DatabaseSingletonMeta):
+    """Database Singleton class."""
+
     DB = None
     def __init__(self) -> None:
+        """Initialize the DatabaseSingleton."""
         self.DB = TinyDB(DATABASE_URL, storage=CachingMiddleware(JSONStorageWithBackup), indent=4)
         self.table = None

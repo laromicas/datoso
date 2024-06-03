@@ -1,4 +1,4 @@
-"""__init__.py"""
+"""Initialize datoso main variables."""
 from pathlib import Path
 
 # Version of the datoso package

@@ -1,4 +1,4 @@
-"""Logging configuration for datoso"""
+"""Logging configuration for datoso."""
 import logging
 
 from datoso.helpers import Bcolors, FileUtils
@@ -11,7 +11,7 @@ formatter = logging.Formatter('[%(asctime)s - %(levelname)s] - %(message)s', '%Y
 class TrimmedFileHandler(logging.FileHandler):
     """File handler that removes color codes from the log message."""
 
-    def emit(self, record):
+    def emit(self, record: str) -> None:
         """Emit a record.
 
         If a formatter is specified, it is used to format the record.
@@ -29,7 +29,7 @@ class TrimmedFileHandler(logging.FileHandler):
             try:
                 self.stream.write(Bcolors.remove_color(msg) + self.terminator)
                 self.flush()
-            except Exception:
+            except Exception:  # noqa: BLE001
                 self.handleError(record)
 
 
@@ -37,7 +37,7 @@ class TrimmedFileHandler(logging.FileHandler):
 class TrimmedStreamHandler(logging.StreamHandler):
     """Stream handler that allows to stdout while logging."""
 
-    def emit(self, record):
+    def emit(self, record: str) -> None:
         """Emit a record.
 
         If a formatter is specified, it is used to format the record.
@@ -55,15 +55,15 @@ class TrimmedStreamHandler(logging.StreamHandler):
             self.flush()
         except RecursionError:  # See issue 36272
             raise
-        except Exception:
+        except Exception:  # noqa: BLE001
             self.handleError(record)
 
 # Get root logger
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
-def enable_logging():
-    """Enable logging to file"""
+def enable_logging() -> None:
+    """Enable logging to file."""
     log_path = FileUtils.parse_path(config.get('PATHS','DatosoPath', fallback='~/.config/datoso'))
     log_path.mkdir(parents=True, exist_ok=True)
     log_file = log_path / config['LOG'].get('LogFile', 'datoso.log')
@@ -85,24 +85,24 @@ if config.getboolean('COMMAND', 'Quiet', fallback=False):
     stream_handler.setLevel(logging.WARNING)
 logger.addHandler(stream_handler)
 
-def set_verbosity(verbosity):
-    """Set the log level of the stream handler"""
+def set_verbosity(verbosity: int | str) -> None:
+    """Set the log level of the stream handler."""
     stream_handler.setLevel(verbosity)
 
-def set_quiet():
-    """Set the log level of the stream handler to warning"""
+def set_quiet() -> None:
+    """Set the log level of the stream handler to warning."""
     stream_handler.setLevel(logging.WARNING)
 
-def set_verbose():
-    """Set the log level of the stream handler to debug"""
+def set_verbose() -> None:
+    """Set the log level of the stream handler to debug."""
     stream_handler.setLevel(logging.DEBUG)
 
-def get_verbosity():
-    """Get the log level of the stream handler"""
+def get_verbosity() -> int:
+    """Get the log level of the stream handler."""
     return stream_handler.level
 
-def get_file_level():
-    """Get the log level of the file handler"""
+def get_file_level() -> int:
+    """Get the log level of the file handler."""
     for handler in logger.handlers:
         if isinstance(handler, TrimmedFileHandler):
             return handler.level

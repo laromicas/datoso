@@ -17,7 +17,7 @@ fields = [
 ]
 
 
-def get_mia():
+def get_mia() -> dict:
     """Get MIA from the Google Sheets."""
     if not config['UPDATE_URLS']['GoogleSheetMIAUrl']:
         return []
@@ -35,7 +35,7 @@ def get_mia():
     return mias
 
 
-def import_mias():
+def import_mias() -> None:
     """Seed the database with mia."""
     # pylint: disable=protected-access
     mias = get_mia()
@@ -43,9 +43,8 @@ def import_mias():
         json.dump(mias, file, indent=4)
 
 
-def get_mias():
+def get_mias() -> dict:
     """Seed the database with mia."""
     # pylint: disable=protected-access
     with open(Path(ROOT_FOLDER,'mia.json'), encoding='utf-8') as file:
-        mias = json.load(file)
-    return mias # noqa: RET504
+        return json.load(file)

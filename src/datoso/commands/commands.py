@@ -1,9 +1,11 @@
+"""Commands for datoso after parsing arguments."""
 import configparser
 import json
 import logging
 import os
 import re
 import sys
+from argparse import Namespace
 from pathlib import Path
 from venv import logger
 
@@ -19,8 +21,8 @@ from datoso.seeds.rules import Rules
 from datoso.seeds.unknown_seed import detect_seed
 
 
-def command_deduper(args) -> None:
-    """Deduplicate dats, removes duplicates from input dat existing in parent dat"""
+def command_deduper(args: Namespace) -> None:
+    """Deduplicate dats, removes duplicates from input dat existing in parent dat."""
     if not args.parent and args.input.endswith(('.dat', '.xml')):
         print('Parent dat is required when input is a dat file')
         sys.exit(1)
@@ -39,8 +41,8 @@ def command_deduper(args) -> None:
                  )
 
 
-def command_import(_) -> None:
-    """Make changes in dat config"""
+def command_import(_) -> None:  # noqa: ANN001
+    """Make changes in dat config."""
     dat_root_path = config['PATHS']['DatPath']
 
     if not dat_root_path or not Path(dat_root_path).exists():
@@ -73,14 +75,14 @@ def command_import(_) -> None:
             database.flush()
 
 
-def command_dat(args):
-    """Make changes in dat config"""
+def command_dat(args: Namespace) -> None:
+    """Make changes in dat config."""
     from datoso.commands.helpers.dat import helper_command_dat
     helper_command_dat(args)
 
 
-def command_seed_installed(_) -> None:
-    """List available seeds"""
+def command_seed_installed(_) -> None:  # noqa: ANN001
+    """List available seeds."""
     print('Installed seeds:')
     description_len = 60
     for seed, seed_module in installed_seeds().items():
@@ -90,7 +92,8 @@ def command_seed_installed(_) -> None:
         print(f'* {Bcolors.OKGREEN}{seed_name}{Bcolors.ENDC} - {description}')
 
 
-def command_seed_details(args) -> None:
+def command_seed_details(args: Namespace) -> None:
+    """Show details of a seed."""
     module = None
     for seed, seed_module in installed_seeds().items():
         if seed == f'{__app_name__}_seed_{args.seed}':
@@ -106,8 +109,8 @@ def command_seed_details(args) -> None:
     print(f'  * Description: {module.__description__}')
 
 
-def command_seed(args) -> None:
-    """Commands with the seed (must be installed)"""
+def command_seed(args: Namespace) -> None:
+    """Commands with the seed (must be installed)."""
     from datoso.commands.helpers.seed import command_seed_all, command_seed_parse_actions
     command_seed_parse_actions(args)
     if args.seed == 'all':
@@ -141,8 +144,8 @@ def command_seed(args) -> None:
             print(f'{Bcolors.OKBLUE}Finished processing {Bcolors.OKGREEN}{args.seed}{Bcolors.ENDC}')
 
 
-def command_config_save(args) -> None:
-    """Save config to file"""
+def command_config_save(args: Namespace) -> None:
+    """Save config to file."""
     config_file = Path('~/.config/datoso/datoso.config').expanduser() \
         if args.directory == '~' \
         else Path.cwd() / '.datosorc'
@@ -151,8 +154,8 @@ def command_config_save(args) -> None:
     print(f'Config saved to {Bcolors.OKGREEN}{config_file}{Bcolors.ENDC}')
 
 
-def command_config_set(args) -> None:
-    """Set config value, if global is set, it will be set in datoso.ini file"""
+def command_config_set(args: Namespace) -> None:
+    """Set config value, if global is set, it will be set in datoso.ini file."""
     myconfig = args.set[0].split('.')
     expected_config_array_len = 2
     if len(myconfig) != expected_config_array_len:
@@ -177,15 +180,15 @@ def command_config_set(args) -> None:
     with open(file, 'w', encoding='utf-8') as file:
         newconfig.write(file)
     if getattr(args, 'global', False):
-        print(f'{Bcolors.OKGREEN}Global config {Bcolors.OKCYAN}{myconfig[0]}.{myconfig[1]}{Bcolors.OKGREEN}' \
-            f' set to {Bcolors.OKBLUE}{args.set[1]}{Bcolors.ENDC}')
+        print(f'{Bcolors.OKGREEN}Global config {Bcolors.OKCYAN}{myconfig[0]}.{myconfig[1]}{Bcolors.OKGREEN} '
+            f'set to {Bcolors.OKBLUE}{args.set[1]}{Bcolors.ENDC}')
     else:
-        print(f'{Bcolors.OKGREEN}Local Config {Bcolors.OKCYAN}{myconfig[0]}.{myconfig[1]}{Bcolors.OKGREEN}' \
-            f' set to {Bcolors.OKBLUE}{args.set[1]}{Bcolors.ENDC}')
+        print(f'{Bcolors.OKGREEN}Local Config {Bcolors.OKCYAN}{myconfig[0]}.{myconfig[1]}{Bcolors.OKGREEN} '
+            f'set to {Bcolors.OKBLUE}{args.set[1]}{Bcolors.ENDC}')
 
 
-def command_config_get(args) -> None:
-    """Get active config value"""
+def command_config_get(args: Namespace) -> None:
+    """Get active config value."""
     myconfig = args.get.split('.')
     expected_config_array_len = 2
     if len(myconfig) != expected_config_array_len:
@@ -198,36 +201,36 @@ def command_config_get(args) -> None:
     print(config[myconfig[0]][myconfig[1]])
 
 
-def command_config_rules_update(args) -> None:
-    """Update rules from google sheet"""
+def command_config_rules_update(args: Namespace) -> None:
+    """Update rules from google sheet."""
     from datoso.database.seeds import dat_rules
     print('Updating rules')
     try:
         dat_rules.import_dats()
         print('Rules updated')
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         print(f'{Bcolors.FAIL}Error updating rules{Bcolors.ENDC}')
         print(exc)
         print('Please enable logs for more information or use -v parameter')
         command_doctor(args)
 
 
-def command_config_mia_update(args) -> None:
-    """Update rules from google sheet"""
+def command_config_mia_update(args: Namespace) -> None:
+    """Update rules from google sheet."""
     from datoso.database.seeds import mia
     print('Updating MIA')
     try:
         mia.import_mias()
         print('MIA updated')
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         print(f'{Bcolors.FAIL}Error updating MIA{Bcolors.ENDC}')
         print(exc)
         print('Please enable logs for more information or use -v parameter')
         command_doctor(args)
 
 
-def command_config(args) -> None:
-    """Config commands"""
+def command_config(args: Namespace) -> None:
+    """Config commands."""
     if args.save:
         command_config_save(args)
     elif args.set:
@@ -243,16 +246,16 @@ def command_config(args) -> None:
         print(json.dumps(config_dict, indent=4))
 
 
-def command_list(_):
-    """List installed seeds"""
+def command_list(_) -> None:  # noqa: ANN001
+    """List installed seeds."""
     description_len = 60
     for seed, seed_class in installed_seeds().items():
         description = seed_class.description()
-        print(f'* {Bcolors.OKCYAN}{seed}{Bcolors.ENDC} - ' \
+        print(f'* {Bcolors.OKCYAN}{seed}{Bcolors.ENDC} - '
               f'{description[0:description_len] if len(description) > description_len else description}...')
 
-def command_doctor(args):
-    """Doctor installed seeds"""
+def command_doctor(args: Namespace) -> None:
+    """Doctor installed seeds."""
     if getattr(args, 'seed', False):
         seed = check_seed(args.seed)
         if not seed:
@@ -264,9 +267,10 @@ def command_doctor(args):
         seeds = installed_seeds()
     for seed, module in seeds.items():
         print(f'Checking seed {Bcolors.OKCYAN}{seed}{Bcolors.ENDC}')
-        check_module(seed, module, args.repair)
+        check_module(seed, module, repair=args.repair)
 
-def command_log(_):
+def command_log(_) -> None:  # noqa: ANN001
+    """Display the contents of the log file."""
     log_path = FileUtils.parse_path(config.get('PATHS','DatosoPath', fallback='~/.datoso'))
     logfile = log_path / config['LOG'].get('LogFile', 'datoso.log')
     os.system(f'cat {logfile}') # noqa: S605

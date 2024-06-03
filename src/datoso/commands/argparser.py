@@ -1,4 +1,5 @@
-""" Argument parser for datoso commands """
+"""Argument parser for datoso commands."""
+from argparse import ArgumentParser
 
 from datoso.commands.commands import (
     command_config,
@@ -14,11 +15,13 @@ from datoso.commands.commands import (
 from datoso.commands.seed import Seed
 
 
-def add_log_parser(subparser):
+def add_log_parser(subparser: ArgumentParser) -> None:
+    """Log parser."""
     parser_log = subparser.add_parser('log', help='Show log')
     parser_log.set_defaults(func=command_log)
 
-def add_config_parser(subparser):
+def add_config_parser(subparser: ArgumentParser) -> None:
+    """Config parser."""
     parser_config = subparser.add_parser('config', help='Show configuration')
     parser_config.add_argument('-s', '--save', action='store_true', help='Save configuration to .datosorc')
     parser_config.add_argument('-d', '--directory', default='~', choices=['~', '.'], help='Directory to save .datosorc')
@@ -34,13 +37,15 @@ def add_config_parser(subparser):
     parser_config.add_argument('-g','--global', action='store_true',
                     help='When set, saves to global config, else to `.datosorc`')
 
-def add_doctor_parser(subparser):
+def add_doctor_parser(subparser: ArgumentParser) -> None:
+    """Doctor parser."""
     parser_doctor = subparser.add_parser('doctor', help='Doctor installed seeds')
     parser_doctor.add_argument('seed', nargs='?', help='Seed to doctor')
     parser_doctor.set_defaults(func=command_doctor)
     parser_doctor.add_argument('-r', '--repair', action='store_true', help='Try to repair seed(s)')
 
-def add_dat_parser(subparser):
+def add_dat_parser(subparser: ArgumentParser) -> None:
+    """Dat parser."""
     parser_dat = subparser.add_parser('dat', help='Changes configuration in current dats')
     parser_dat.add_argument('command', nargs='?', help='Command to execute')
 
@@ -67,7 +72,8 @@ def add_dat_parser(subparser):
 
     parser_dat.set_defaults(func=command_dat)
 
-def add_seed_parser(subparser):
+def add_seed_parser(subparser: ArgumentParser) -> None:
+    """Seed parser."""
     parser_seed = subparser.add_parser('seed', help='Seed admin commands')
     subparser_seed = parser_seed.add_subparsers(help='sub-command help')
 
@@ -78,18 +84,20 @@ def add_seed_parser(subparser):
     parser_details.add_argument('seed', help='Seed to show details of')
     parser_details.set_defaults(func=command_seed_details)
 
-def add_import_parser(subparser):
+def add_import_parser(subparser: ArgumentParser) -> None:
+    """Import parser."""
     parser_import = subparser.add_parser('import', help='Import dats from existing romvault')
     parser_import.set_defaults(func=command_import)
 
-def add_deduper_parser(subparser):
+def add_deduper_parser(subparser: ArgumentParser) -> None:
+    """Deduper parser."""
     parser_deduper = subparser.add_parser('deduper',
                         help='Deduplicate dats, removes duplicates from input dat existing in parent dat')
     parser_deduper.add_argument('-i', '--input', required=True,
                         help='Input dat file e.g. "redump:psx_child" or "/mnt/roms/redump_psx_child.dat"')
     parser_deduper.add_argument('-p', '--parent', default=None,
-                help='Parent dat file e.g. "redump:psx" or "/mnt/roms/redump_psx.dat" ' \
-                    'if not set, parent is taken from input dat with prescanned dats')
+                help=('Parent dat file e.g. "redump:psx" or "/mnt/roms/redump_psx.dat" '
+                    'if not set, parent is taken from input dat with prescanned dats'))
     parser_deduper.add_argument('-o', '--output', default=None,
                 help='If different from input.dat, must be a file path e.g. "/mnt/roms/redump_psx_child_deduped.dat"')
     parser_deduper.add_argument('-dr', '--dry-run', action='store_true',
@@ -97,8 +105,9 @@ def add_deduper_parser(subparser):
 
     parser_deduper.set_defaults(func=command_deduper)
 
-def add_all_seed_parser(subparser):
-    def parse_seed(seed_name, description, seed=None):
+def add_all_seed_parser(subparser: ArgumentParser) -> None:
+    """All seed parser."""
+    def parse_seed(seed_name: str, description: str, seed: Seed=None) -> None:
         parser_command = subparser.add_parser(seed_name, help=f'Seed {seed_name}, {description}')
         parser_command.set_defaults(func=command_seed, seed=seed_name)
         parser_command.add_argument('-d', '--details', action='store_true', help='Show details of seed')

@@ -9,7 +9,7 @@ class Rules:
 
     _rules: list | None
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize Rules."""
         self._rules = []
         for seed in installed_seeds():
@@ -18,6 +18,6 @@ class Rules:
         self._rules.sort(key=lambda x: x['priority'], reverse=True)
 
     @property
-    def rules(self):
+    def rules(self) -> list:
         """Return the rules."""
         return self._rules

@@ -1,4 +1,4 @@
-
+"""Helper class to manage the folders of the project."""
 from pathlib import Path
 
 from datoso.configuration import config
@@ -6,13 +6,16 @@ from datoso.helpers import FileUtils
 
 
 class Folders:
+    """Folders class."""
+
     base: Path = None
     download: Path = None
     dats: Path = None
     backup: Path = None
     extras: list = None
 
-    def __init__(self, seed, extras=None) -> None:
+    def __init__(self, seed: str, extras: list | None=None) -> None:
+        """Initialize the folders."""
         self.base = FileUtils.parse_path(config['PATHS'].get('DownloadPath'))
         self.download = Path(self.base) / seed
         self.dats = Path(self.download) / 'dats'
@@ -20,11 +23,13 @@ class Folders:
         extras = extras if extras else []
         self.extras = [] if not extras else [Path(self.dats) / extra for extra in extras]
 
-    def clean_dats(self):
+    def clean_dats(self) -> None:
+        """Clean dats folder."""
         FileUtils.remove(self.dats)
         Path(self.dats).mkdir(parents=True, exist_ok=True)
 
-    def create_all(self):
+    def create_all(self) -> None:
+        """Create all folders."""
         self.download.mkdir(parents=True, exist_ok=True)
         self.dats.mkdir(parents=True, exist_ok=True)
         self.backup.mkdir(parents=True, exist_ok=True)

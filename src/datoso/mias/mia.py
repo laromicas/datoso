@@ -1,8 +1,9 @@
+"""Mark a dat file as MIA."""
 from datoso.database.seeds.mia import get_mias
 from datoso.repositories.dat_file import DatFile
 
 
-def mark_mias(dat_file: str):
+def mark_mias(dat_file: str) -> None:
     """Mark a dat file as MIA."""
     dat = DatFile.from_file(dat_file=dat_file)
     dat.load()

@@ -1,4 +1,4 @@
-"""Check if all dependencies are installed"""
+"""Check if all dependencies are installed."""
 from pydoc import locate
 from shutil import which
 
@@ -9,13 +9,13 @@ from datoso.helpers import Bcolors
 from datoso.helpers.plugins import installed_seeds
 
 
-def check_seed(seed):
-    """Check if seed is installed"""
+def check_seed(seed: str) -> bool:
+    """Check if seed is installed."""
     return f'{__app_name__}_seed_{seed}' in installed_seeds()
 
 
-def check_version(detected, required, expression):
-    """Check if version of required package is correct"""
+def check_version(detected: str, required: str, expression: str) -> bool:
+    """Check if version of required package is correct."""
     detected = pkg_resources.parse_version(detected)
     required = pkg_resources.parse_version(required)
     match expression:
@@ -33,8 +33,8 @@ def check_version(detected, required, expression):
             return detected == required
 
 
-def check_module_attributes(seed, module):
-    """Check if all needed files are present"""
+def check_module_attributes(seed: str, module: object) -> None:
+    """Check if all needed files are present."""
     reqs = {
         '__prefix__': 'Prefix for identification of dats',
         '__description__': 'Description of module',
@@ -49,13 +49,13 @@ def check_module_attributes(seed, module):
                 print(f'{Bcolors.FAIL} - {Bcolors.BOLD}{seed}.{attribute}{Bcolors.ENDC} not found ({desc})')
 
 
-def check_executable(executable):
-    """Check if executable is installed"""
+def check_executable(executable: str) -> bool:
+    """Check if executable is installed."""
     return which(executable) is not None or which(executable + '.exe') is not None
 
 
-def check_module(seed, module, repair=False): # noqa: ARG001
-    """Check if all dependencies are installed"""
+def check_module(seed: str, module: object, *, repair: bool=False) -> None:  # noqa: ARG001
+    """Check if all dependencies are installed."""
     # TODO(laromicas): Add repair functionality
     if not module:
         module = locate(seed)

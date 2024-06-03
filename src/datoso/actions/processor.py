@@ -1,5 +1,6 @@
 """Process actions."""
 from abc import ABC, abstractmethod
+from collections.abc import Iterator
 from pathlib import Path
 
 from datoso.configuration import config, logger
@@ -18,13 +19,14 @@ class Processor:
     seed = None
     file = None
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:  # noqa: ANN003
+        """Initialize the processor."""
         self._file_data = None
         self.__dict__.update(kwargs)
         if not self.actions:
             self.actions = []
 
-    def process(self):
+    def process(self) -> Iterator[str]:
         """Process actions."""
         for action in self.actions:
             action_class = globals()[
@@ -47,11 +49,12 @@ class Process(ABC):
     status = None
     stop = False
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs) -> None:  # noqa: ANN003
+        """Initialize the process."""
         self.__dict__.update(kwargs)
 
     @abstractmethod
-    def process(self):
+    def process(self) -> str:
         """Process."""
 
     def load_file_dat(self) -> dict:
@@ -89,14 +92,14 @@ class Process(ABC):
         return self._database_dat if self._database_dat else self.load_database_dat()
 
     @database_dat.setter
-    def database_dat(self, value):
+    def database_dat(self, value: Dat) -> None:
         self._database_dat = value
 
 
 class LoadDatFile(Process):
     """Load a dat file."""
 
-    def process(self):
+    def process(self) -> str:
         """Load a dat file."""
        # If there is a factory method, use it to create the class
         if getattr(self, '_factory', None) and self._factory:
@@ -105,7 +108,7 @@ class LoadDatFile(Process):
         try:
             self.load_file_dat()
             self.load_database_dat()
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             self.status = 'Error'
             logger.exception(e)
             return 'Error'
@@ -115,7 +118,7 @@ class LoadDatFile(Process):
 class DeleteOld(Process):
     """Delete old dat file."""
 
-    def destination(self):
+    def destination(self) -> Path:
         """Parse path."""
         static_path = self.database_dat.static_path if self.database_dat else None
         path = self.file_dat.path if self.file_dat.path is not None else static_path
@@ -127,9 +130,8 @@ class DeleteOld(Process):
             if FileUtils.get_ext(self.file_dat.file) in ('.dat', '.xml') \
             else Path(self.folder) / path / self.file_dat.name
 
-    def process(self):
+    def process(self) -> str:
         """Delete old dat file."""
-
         try:
             if self.database_data and self.database_data.get('date', None) and self.file_data.get('date', None) \
                 and compare_dates(self.database_dat.date, self.file_dat.date):
@@ -164,7 +166,7 @@ class DeleteOld(Process):
 class Copy(Process):
     """Copy files."""
 
-    def destination(self):
+    def destination(self) -> Path:
         """Parse path."""
         static_path = self.database_dat.static_path if self.database_dat else None
         path = self.file_dat.path if self.file_dat.path is not None else static_path
@@ -174,7 +176,8 @@ class Copy(Process):
             if FileUtils.get_ext(self.file_dat.file) in ('.dat', '.xml') \
             else Path(self.folder) / path / self.file_dat.name
 
-    def process(self):
+    def process(self) -> str:
+        """Copy files."""
         result = None
         origin = self.file if self.file else None
         destination = self.destination()
@@ -221,7 +224,7 @@ class Copy(Process):
 class SaveToDatabase(Process):
     """Save process to database."""
 
-    def process(self):
+    def process(self) -> str:
         """Save process to database."""
         data_to_save = {**self.database_data, **self.file_data}
         self.database_dat = Dat(**data_to_save)
@@ -233,7 +236,7 @@ class SaveToDatabase(Process):
 class MarkMias(Process):
     """Mark missing in action."""
 
-    def process(self):
+    def process(self) -> str:
         """Mark missing in action."""
         if not config.getboolean('PROCESS', 'ProcessMissingInAction', fallback=False):
             return 'Skipped'
@@ -247,7 +250,7 @@ class AutoMerge(Process):
 
     child_db = None
 
-    def process(self):
+    def process(self) -> str:
         """Save process to database."""
         if getattr(self.database_dat, 'automerge', None):
             merged = Dedupe(self.database_dat)
@@ -262,7 +265,7 @@ class AutoMerge(Process):
 class Deduplicate(Process):
     """Save process to database."""
 
-    def process(self):
+    def process(self) -> str:
         """Save process to database."""
         if parent := getattr(self.database_dat, 'parent', None):
             merged = Dedupe(self.database_dat, parent)

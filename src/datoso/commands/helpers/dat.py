@@ -1,14 +1,17 @@
+"""Helper functions for dat command."""
 import re
 import sys
+from argparse import Namespace
 
 from tabulate import tabulate
+from tinydb.table import Document
 
 from datoso.database.models.dat import Dat
 from datoso.helpers import Bcolors
 
 
-def print_dats(args, dats, fields = None):
-    """Print dats"""
+def print_dats(args: Namespace, dats: list, fields: list | None = None) -> None:
+    """Print dats."""
     output = []
     old_fields = fields if fields else ['seed', 'name', 'status']
     fields = ['seed', 'name']
@@ -26,7 +29,8 @@ def print_dats(args, dats, fields = None):
         return
     print(tabulate(output, headers='keys', tablefmt='psql'))
 
-def command_dat_name_search(args):
+def command_dat_name_search(args: Namespace) -> None:
+    """Search for a dat by name."""
     from tinydb import Query
     query = Query()
 
@@ -43,7 +47,8 @@ def command_dat_name_search(args):
     else:
         print_dats(args, result)
 
-def parse_value(value):
+def parse_value(value: str) -> int | bool | str | None:
+    """Parse the value."""
     if value.isdigit():
         value = int(value)
     elif value.lower() == 'true':
@@ -54,7 +59,8 @@ def parse_value(value):
         value = None
     return value
 
-def command_dat_name_set(args, dat, seed, name, result):
+def command_dat_name_set(args: Namespace, dat: Dat, seed: str, name: str, result: Document) -> None:
+    """Set a value in a dat."""
     if '=' not in args.set:
         print(f'{Bcolors.FAIL}Invalid set command, must be in format "variable=value"{Bcolors.ENDC}')
         sys.exit(1)
@@ -62,11 +68,12 @@ def command_dat_name_set(args, dat, seed, name, result):
     value = parse_value(value)
     dat.update({key: value}, doc_ids=[result.doc_id])
     dat.flush()
-    print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} ' \
+    print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} '
             f'{key} set to {Bcolors.OKBLUE}{value}{Bcolors.ENDC}')
     sys.exit(0)
 
-def command_dat_name(args):
+def command_dat_name(args: Namespace) -> None:
+    """Show a dat by name."""
     splitted = args.dat_name.split(':')
     expected_dat_array_len = 2
     if len(splitted) != expected_dat_array_len:
@@ -85,7 +92,7 @@ def command_dat_name(args):
         value = None
         dat.update({key: value}, doc_ids=[result.doc_id])
         dat.flush()
-        print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} ' \
+        print(f'{Bcolors.OKGREEN}Dat {Bcolors.OKCYAN}{seed}:{name}{Bcolors.OKGREEN} '
                 f'{key} set to {Bcolors.OKBLUE}{value}{Bcolors.ENDC}')
         sys.exit(0)
     if args.delete:
@@ -107,9 +114,8 @@ def command_dat_name(args):
     else:
         print_dats(args, [result])
 
-def helper_command_dat(args):
-    """Make changes in dat config"""
-
+def helper_command_dat(args: Namespace) -> None:
+    """Make changes in dat config."""
     if args.dat_name:
         # Show dat by name
         command_dat_name(args)
