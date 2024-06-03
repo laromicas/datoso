@@ -241,7 +241,7 @@ class MarkMias(Process):
         if not config.getboolean('PROCESS', 'ProcessMissingInAction', fallback=False):
             return 'Skipped'
         from datoso.mias.mia import mark_mias
-        mark_mias(dat_file=self.file_dat.new_file)
+        mark_mias(dat_file=self.database_dat.new_file)
         return 'Marked'
 
 
