@@ -15,9 +15,9 @@ from datoso.database import DatabaseSingleton
 class Base:
     """Base class for the database models."""
 
-    _table_name: str = None
-    _table: Table = None
-    _DB: TinyDB = None
+    _table_name = None
+    _table = None
+    _DB = None
 
     def __init__(self, **kwargs: Any) -> None:  # noqa: ANN401
         """Initialize the base."""
