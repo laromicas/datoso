@@ -236,6 +236,24 @@
         "system_type": "Handheld"
     },
     {
+        "company": null,
+        "system": "Bandai Little Jammer",
+        "override": {
+            "company": "Bandai",
+            "system": "Little Jammer"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": null,
+        "system": "Bandai Little Jammer Pro",
+        "override": {
+            "company": "Bandai",
+            "system": "Little Jammer Pro"
+        },
+        "system_type": "Console"
+    },
+    {
         "company": "Benesse",
         "system": "Pocket Challenge V2",
         "system_type": "Console"
@@ -682,6 +700,15 @@
     {
         "company": "Microsoft",
         "system": "Pocket PC",
+        "override": {
+            "company": "Microsoft"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Roms",
+                "redump": "Discs"
+            }
+        },
         "system_type": "Mobile"
     },
     {
@@ -1288,6 +1315,20 @@
         "system_type": "Console"
     },
     {
+        "company": null,
+        "system": "Pocket PC",
+        "override": {
+            "company": "Microsoft"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Roms",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Mobile"
+    },
+    {
         "company": "Pocket PC",
         "system": "Pocket PC",
         "override": {
@@ -1722,6 +1763,11 @@
     {
         "company": "VM Labs",
         "system": "NUON",
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
         "system_type": "Console"
     },
     {
@@ -1900,11 +1946,6 @@
     {
         "company": null,
         "system": "Video Game Documents",
-        "system_type": "Manuals"
-    },
-    {
-        "company": null,
-        "system": "Video Game Magazine Scans",
         "system_type": "Manuals"
     },
     {

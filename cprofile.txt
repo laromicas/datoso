@@ -12,7 +12,7 @@
         "LogLevel": "INFO",
         "LogFile": "datoso.log"
     },
-    "PREFFIXES": {
+    "PREFIXES": {
         "Arcade": "Arcade",
         "Audio": "Other/Audio",
         "Book": "Other/Book",

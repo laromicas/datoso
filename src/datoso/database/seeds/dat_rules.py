@@ -1,13 +1,12 @@
-"""
-    Seed the database with Systems.
-"""
+"""Seed the database with Systems."""
 import json
-import requests
 from pathlib import Path
-from datoso.configuration import config
-from datoso import ROOT_FOLDER
-from datoso.database.models import System
 
+import requests
+
+from datoso import ROOT_FOLDER
+from datoso.configuration import config
+from datoso.database.models import System
 
 fields = [
     'company',
@@ -18,8 +17,8 @@ fields = [
 ]
 
 
-def get_systems():
-    """ Get systems from the Google Sheets. """
+def get_systems() -> list:
+    """Get systems from the Google Sheets."""
     if not config['UPDATE_URLS']['GoogleSheetUrl']:
         return []
     result = requests.get(config['UPDATE_URLS']['GoogleSheetUrl'], timeout=300)
@@ -36,35 +35,35 @@ def get_systems():
             if field in ('override', 'extra_configs') and field in row:
                 try:
                     row[field] = json.loads(system[j])
-                except Exception:  # pylint: disable=broad-except
+                except Exception:  # noqa: BLE001
                     row[field] = system[j]
         systems.append(row)
     return systems
 
 
-def import_dats():
-    """ Seed the database with Systems. """
-    # pylint: disable=protected-access
+def import_dats() -> None:
+    """Seed the database with Systems."""
     systems = get_systems()
     with open(Path(ROOT_FOLDER,'systems.json'), 'w', encoding='utf-8') as file:
         json.dump(systems, file, indent=4)
+    System.truncate()
     for system in systems:
-        row = System(**system)
+        row = System.from_dict(system)
         row.save()
-        row._DB.table.storage.flush()
+        row.flush()
 
-def init():
-    """ Seed the database with Systems. """
-    # pylint: disable=protected-access
-    with open(Path(ROOT_FOLDER,'systems.json'), 'r', encoding='utf-8') as file:
-        systems = json.loads(file.read())
+
+def init() -> None:
+    """Seed the database with Systems."""
+    with open(Path(ROOT_FOLDER,'systems.json'), encoding='utf-8') as file:
+        systems = json.load(file)
     for system in systems:
-        row = System(**system)
+        row = System.from_dict(system)
         row.save()
-        row._DB.table.storage.flush()
+        row.flush()
 
-def detect_first_run():
-    """ Detect if this is the first run. """
-    # pylint: disable=protected-access
-    if not len(System.all()):
+
+def detect_first_run() -> None:
+    """Detect if this is the first run."""
+    if not System.all():
         init()

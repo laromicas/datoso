@@ -1,131 +1,208 @@
-""" Fetch and Process Commands for Seeds """
-import os
+"""Fetch and Process Commands for Seeds."""
+# ruff: noqa: ERA001
 import re
-from datoso.helpers.plugins import get_seed
-from datoso.helpers import Bcolors, FileUtils
-from datoso.configuration import config
-from datoso.helpers.executor import Command
+from argparse import ArgumentParser
+from collections.abc import Iterator
+from pathlib import Path
+
+from datoso import __app_name__
 from datoso.actions.processor import Processor
+from datoso.configuration import config
+from datoso.helpers import Bcolors, FileUtils
+from datoso.helpers.plugins import PluginType, installed_seeds
+
+STATUS_TO_SHOW = ['Updated', 'Created', 'Error', 'Disabled', 'Deduped', 'Automerged', 'No Action Taken, Newer Found']
 
 class Seed:
-    """ Seed class """
-    name = None
-    path = None
-    actions = {}
-    # working_path = os.path.abspath(os.path.join(os.getcwd(), config.get('PATHS', 'WorkingPath')))
-    status_to_show = ['Updated', 'Created', 'Error', 'Disabled', 'Deduped', 'No Action Taken, Newer Found']
+    """Seed class."""
+
+    name: str = None
+    path: str = None
+    module = None
+    actions: dict = None
     config = None
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs) -> None:  # noqa: ANN003
+        """Initialize the seed."""
         self.__dict__.update(kwargs)
+        if not self.name and self.module:
+            self.name = self.module.__name__.split('_')[-1]
+        self.full_name = f'{__app_name__}_{PluginType.SEED.value}_{self.name}'
+        if not config.has_section(self.name.upper()):
+            self.init_config()
+
+    def get_actions(self) -> None:
+        """Get actions."""
+        actions = self.get_module('actions')
         self.config = config[self.name.upper()] if config.has_section(self.name.upper()) else None
-        configs = []
-        seed = get_seed(self.name, 'actions')
-        if seed:
-            self.actions = seed.get_actions()
-        for path, actions in self.actions.items():
-            config_path = path.replace('{dat_origin}', self.name.upper()).replace('/', '.')
-            if config.has_section(config_path):
-                configs.append(config[config_path])
-                # print(self.actions)
-                # exit()
-                for path, actions in self.actions.items():
-                    new_steps = {action['action']: action for action in actions}
-                    new_actions = []
-                    if override_actions := config[config_path].get('OverrideActions'):
-                        override_actions = override_actions.split(',')
-                        for override_action in override_actions:
-                            if override_action in new_steps:
-                                new_actions.append(new_steps[override_action])
-                            else:
-                                new_actions.append({'action': override_action})
+        if actions:
+            self.actions = actions.get_actions()
+
+        # TODO(laromicas): This is a work in progress, it should be able to override actions
+        # configs = []
+        # for path, actions in self.actions.items():
+        #     config_path = path.replace('{dat_origin}', self.name.upper()).replace('/', '.')
+        #     if not config.has_section(config_path):
+        #         continue
+        #     configs.append(config[config_path])
+
+        # # for actions in self.actions.values():
+        #     new_steps = {action['action']: action for action in actions}
+        #     new_actions = []
+        #     if not (override_actions := config[config_path].get('OverrideActions')):
+        #         continue
+        #     override_actions = override_actions.split(',')
+        #     for override_action in override_actions:
+        #         if override_action in new_steps:
+        #             new_actions.append(new_steps[override_action])
+        #         else:
+        #             new_actions.append({'action': override_action})
 
 
         # if configs:
-        #     for path, actions in self.actions.items():
-        #         config_path = path.replace('{dat_origin}', self.name.upper()).replace('/', '.')
-        #         if config.has_section(config_path):
+            #     for path, actions in self.actions.items():
+            #         config_path = path.replace('{dat_origin}', self.name.upper()).replace('/', '.')
+            #         if config.has_section(config_path):
 
-                # action_name =
-                # for action_name, action_value in action.items():
-                #     if isinstance(action_value, str):
-                #         action[action_name] = action_value.format(**config)
+                    # action_name =
+                    # for action_name, action_value in action.items():
+                    #     if isinstance(action_value, str):
+                    #         action[action_name] = action_value.format(**config)
 
-        # if self.config and self.config.get('OverrideActions'):
-        #     for path, actions in self.actions.items():
-        #         for action in actions:
-        #             if action.get('action') == 'Copy':
-        #                 action['folder'] = action.get('folder', 'ToSort')
-        #                 action['destination'] = action.get('destination', 'tmp')
-        #             if action.get('action') == 'LoadDatFile':
-        #                 action['_class'] = action.get('_class', None)
-        # if self.config and self.config.get('Actions'):
-        #     self.actions = self.config.get('Actions')
+            # if self.config and self.config.get('OverrideActions'):
+            #     for path, actions in self.actions.items():
+            #         for action in actions:
+            #             if action.get('action') == 'Copy':
+            #                 action['folder'] = action.get('folder', 'ToSort')
+            #                 action['destination'] = action.get('destination', 'tmp')
+            #             if action.get('action') == 'LoadDatFile':
+            #                 action['_class'] = action.get('_class', None)
+            # if self.config and self.config.get('Actions'):
+            #     self.actions = self.config.get('Actions')
 
+    def get_module(self, submodule: str | None=None) -> None:
+        """Get module."""
+        try:
+            self.module = __import__(self.full_name) if not self.module else self.module
+            if submodule:
+                return __import__(f'{self.full_name}.{submodule}', fromlist=[submodule])
+        except ModuleNotFoundError:
+            return None
+        return self.module
 
-    def fetch(self):
-        """ Fetch seed """
-        fetch = get_seed(self.name, 'fetch')
+    def description(self) -> str:
+        """Return the description of the seed."""
+        return self.get_module().__description__
+
+    def fetch(self) -> None:
+        """Fetch seed."""
+        fetch = self.get_module('fetch')
         fetch.fetch()
 
+    def args(self, parser: ArgumentParser) -> ArgumentParser:
+        """Seed args."""
+        try:
+            get_args = self.get_module('args')
+        except AttributeError:
+            return None
+        return get_args.seed_args(parser) if get_args else None
 
-    def format_actions(self, actions, data: dict = {}):
-        """ Format actions. """
+    def parse_args(self, parser: ArgumentParser) -> None:
+        """Parse args."""
+        try:
+            get_args = self.get_module('args')
+        except AttributeError:
+            return
+        get_args.post_parser(parser) if get_args else None
+
+    def init_config(self) -> None:
+        """Initialize configuration."""
+        try:
+            get_args = self.get_module('args')
+        except AttributeError:
+            return
+        if get_args:
+            get_args.init_config()
+
+    def format_actions(self, actions: dict, data: dict | None = None) -> dict:
+        """Format actions."""
+        data = data if data else {}
         for action in actions:
             for action_name, action_value in action.items():
                 if isinstance(action_value, str):
                     action[action_name] = action_value.format(**data)
         return actions
 
+    def delete_line(self, line: str) -> None:
+        """Delete line."""
+        # pylint: disable=expression-not-assigned
+        [print('\b \b', end='') for x in range(len(line))]
+        print(' ' * (len(line)), end='')
+        print('\r', end='')
 
-    def process_dats(self, fltr=None, actions_to_execute=None):
-        """ Process dats."""
-        def delete_line(line):
-            # pylint: disable=expression-not-assigned
-            [print('\b \b', end='') for x in range(0, len(line))]
-            print(' ' * (len(line)), end='')
-            print('\r', end='')
-        def get_preffix(name) -> str:
-            seed = get_seed(name)
-            return seed.__preffix__ if seed else name
+    def get_prefix(self, name: str) -> str:
+        """Get prefix."""
+        seed = self.get_module()
+        return seed.__prefix__ if seed else name
+
+    def should_ignore_file(self, fltr: str | None, file: str) -> bool:
+        """Ignore file if necessary."""
+        if config['PROCESS'].get('DatIgnoreRegEx'):
+            ignore_regex = re.compile(config['PROCESS']['DatIgnoreRegEx'])
+            if ignore_regex.match(str(file)):
+                return True
+        if (file.suffix not in ('.dat', '.xml') and not file.is_dir()) or (fltr and fltr not in str(file)):
+            return True
+        return False
+
+    def process_action(self, procesor: Processor) -> list:
+        """Process action."""
+        output = []
+        for process in procesor.process():
+            if process in STATUS_TO_SHOW or config.getboolean('COMMAND', 'Verbose', fallback=False):
+                output.append(process)
+            if process == 'Error':
+                break
+        if 'Deleted' in output or 'Ignored' in output:
+            output.append('Disabled')
+        return output
+
+    def add_default_actions(self) -> None:
+        """Add default actions."""
+        for seed_actions in self.actions.values():
+            if config.getboolean('PROCESS', 'AutoMergeEnabled', fallback=False):
+                seed_actions.append({ 'action': 'AutoMerge' })
+            if config.getboolean('PROCESS', 'ParentMergeEnabled', fallback=False):
+                seed_actions.append({ 'action': 'Deduplicate' })
+
+    def process_dats(self, fltr: str | None=None, actions_to_execute: list | None=None) -> None:
+        """Process dats."""
         tmp_path = config['PATHS'].get('DownloadPath', 'tmp')
-        dat_origin = os.path.join(FileUtils.parse_folder(tmp_path), get_preffix(self.name), 'dats')
+        dat_origin = FileUtils.parse_path(tmp_path) / self.get_prefix(self.name) / 'dats'
         line = ''
-        for path, actions in self.actions.items():
-            new_path = path.format(dat_origin=dat_origin)
-            actions = self.format_actions(actions, data={'dat_destination': config['PATHS'].get('DatPath', 'DatRoot')})
-            # TODO: override actions to process from config
+        self.get_actions()
+        self.add_default_actions()
+
+        for path, seed_actions in self.actions.items():
+            new_path = Path(path.format(dat_origin=dat_origin))
+            actions = self.format_actions(seed_actions, data={
+                'dat_destination': config['PATHS'].get('DatPath', 'DatRoot'),
+                })
+            # TODO(laromicas): override actions to process from config
             if actions_to_execute:
                 actions = [x for x in actions if x['action'] in actions_to_execute]
-            for file in os.listdir(new_path) if os.path.isdir(new_path) else []:
-                if config['PROCESS'].get('DatIgnoreRegEx'):
-                    ignore_regex = re.compile(config['PROCESS']['DatIgnoreRegEx'])
-                    if ignore_regex.match(file):
-                        continue
-
-                if (not file.endswith(('.dat', '.xml')) \
-                    and not os.path.isdir(os.path.join(new_path,file))) \
-                    or (fltr and fltr not in file):
+            for file in new_path.iterdir() if new_path.is_dir() else []:
+                if self.should_ignore_file(fltr, file):
                     continue
-
                 if not config.getboolean('COMMAND', 'Quiet', fallback=False):
-                    delete_line(line)
-                    line = f'Processing {Bcolors.OKCYAN}{file}{Bcolors.ENDC}'
+                    self.delete_line(line)
+                    line = f'Processing {Bcolors.OKCYAN}{file.name}{Bcolors.ENDC}'
                     print(line, end=' ', flush=True)
-                procesor = Processor(seed=self.name, file=f'{new_path}/{file}', actions=actions)
-                # output = [x for x in procesor.process() if (x in self.status_to_show or Command.verbose)]
-                output = []
-                for process in procesor.process():
-                    if process in self.status_to_show or Command.verbose:
-                        output.append(process)
-                    if process == 'Error':
-                        break
-                if 'Deleted' in output and 'Ignored' in output:
-                    output.append('Disabled')
+                procesor = Processor(seed=self.name, file=file, actions=actions)
+                output = self.process_action(procesor)
                 if not config.getboolean('COMMAND', 'Quiet', fallback=False):
-                    # [print('\b \b', end='') for x in range(0, len(line))]
-                    delete_line(line)
-                    line = f'Processed {Bcolors.OKCYAN}{file}{Bcolors.ENDC}'
+                    self.delete_line(line)
+                    line = f'Processed {Bcolors.OKCYAN}{file.name}{Bcolors.ENDC}'
                     print(line, end=' ', flush=True)
 
                 if output and not config.getboolean('COMMAND', 'Quiet', fallback=False):
@@ -134,4 +211,21 @@ class Seed:
                 if output or config.getboolean('COMMAND', 'Verbose', fallback=False):
                     line = ''
                     print(line)
-        delete_line(line)
+        self.delete_line(line)
+
+    @staticmethod
+    def list_installed() -> Iterator['Seed']:
+        """Installed seeds."""
+        for unformatted_seed in installed_seeds():
+            seed = unformatted_seed.replace(f'{__app_name__}_seed_', '')
+            yield Seed(name=seed, module=__import__(f'{__app_name__}_{PluginType.SEED.value}_{seed}'))
+
+    @staticmethod
+    def from_name(name: str) -> 'Seed':
+        """From name."""
+        return Seed(name=name)
+
+    @staticmethod
+    def from_module(module: object) -> 'Seed':
+        """From module."""
+        return Seed(module=module)

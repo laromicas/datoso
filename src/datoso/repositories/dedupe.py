@@ -1,60 +1,107 @@
+"""Dedupe module."""
 import logging
-from datoso.database.models.datfile import Dat
-from datoso.repositories.dat import DatFile
+from pathlib import Path
+
+from datoso.database.models.dat import Dat
+from datoso.repositories.dat_file import DatFile
+
+
+class DatDedupe:
+    """Dat Dedupe class."""
+
+    _datdb: Dat
+    _datfile: DatFile
+    _file: str | Path
+
+    @property
+    def datdb(self) -> Dat:
+        """Return the dat database."""
+        return self._db
+
+    @datdb.setter
+    def datdb(self, value: Dat) -> None:
+        """Set the dat database."""
+        self._db = value
+
+    @property
+    def datfile(self) -> DatFile:
+        """Return the dat file."""
+        return self._datfile
+
+    @datfile.setter
+    def datfile(self, value: DatFile) -> None:
+        """Set the dat file."""
+        self._datfile = value
+
+    @property
+    def file(self) -> str | Path:
+        """Return the file."""
+        return self._file
+
+    @file.setter
+    def file(self, value: str | Path) -> None:
+        """Set the file."""
+        self._file = value
+
 
 class Dedupe:
-    """ Merge two dat files. """
+    """Merge two dat files."""
 
-    child = {}
-    parent = {}
+    child: DatDedupe
+    parent: DatDedupe | None
 
-    def __init__(self, child, parent=None):
-        self.child = {}
-        self.parent = {}
+    def __init__(self, child: str | Dat | DatFile, parent: str | Dat | DatFile=None) -> None:
+        """Initialize Dedupe."""
+        self.child = DatDedupe()
+        self.parent = DatDedupe() if parent else None
 
-        def load_metadata(var, obj):
+        def load_metadata(var: str | Dat | DatFile, obj: DatDedupe) -> None:
             if isinstance(var, str):
                 if ':' in var:
                     splitted = var.split(':')
                     seed = splitted[0]
                     name = splitted[1]
-                    obj['db'] = Dat(name=name, seed=seed)
-                    obj['db'].load()
-                    var = obj['db']
+                    obj.datdb = Dat(name=name, seed=seed)
+                    obj.datdb.load()
+                    var = obj.datdb
                 elif var.endswith(('.dat', '.xml')):
-                    obj['file'] = var
+                    obj.file = var
                 else:
-                    raise Exception("Invalid dat file")
+                    msg = 'Invalid dat file'
+                    raise LookupError(msg)
             if isinstance(var, Dat):
-                obj['db'] = var
-                obj['file'] = getattr(var, 'new_file', None) or var.file
+                obj.datdb = var
+                obj.file = getattr(var, 'new_file', None) or var.file
             if isinstance(var, DatFile):
-                obj['dat'] = var
+                obj.datfile = var
             else:
-                obj['dat'] = self.get_dat_file(obj['file'])
+                obj.datfile = self.get_dat_file(obj.file)
 
         load_metadata(child, self.child)
-        if not parent:
-            parent = self.child['db'].parent
+        if parent:
             load_metadata(parent, self.parent)
 
-    def get_dat_file(self, file):
+    def get_dat_file(self, file: str | Path) -> DatFile:
+        """Return a DatFile from a file."""
         try:
             dat = DatFile.from_file(file)
             dat.load()
-            return dat
-        except Exception:
-            raise Exception("Invalid dat file")
+        except Exception:  # noqa: BLE001
+            msg = 'Invalid dat file'
+            raise ValueError(msg) from None
+        return dat
 
-    def dedupe(self):
+    def dedupe(self) -> int:
+        """Dedupe the dat files."""
         if self.parent:
-            self.child['dat'].merge_with(self.parent['dat'])
+            self.child.datfile.merge_with(self.parent.datfile)
         else:
-            self.child['dat'].dedupe()
-        logging.info("Deduped %i roms", len(self.child['dat'].merged_roms))
-        return self.child['dat']
+            self.child.datfile.dedupe()
+        logging.info('Deduped %i roms', len(self.child.datfile.merged_roms))
+        return len(self.child.datfile.merged_roms)
 
-    def save(self, file=None):
+    def save(self, file: str | Path | None = None) -> None:
+        """Save the dat file."""
         if file:
-            self.child['dat'].file = file
-        self.child['dat'].save()
+            self.child.datfile.file = file
+        self.child.datfile.save()

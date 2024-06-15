@@ -1,4 +1,4 @@
-![Datoso](/bearlogo.png)
+![Datoso](/bearlogo.svg)
 
 # Datoso
 
@@ -18,7 +18,7 @@ The dat file format must be compatible with [ROMVault](https://www.romvault.com/
 
 ## Installation
 
-Datoso requires python 3.10+.
+Datoso requires python 3.11+.
 
 Use pip (recommended to use a virtual environment):
 
@@ -34,20 +34,31 @@ pip install datoso
 pip install datoso[all]
 
 # Install datoso with only one of the plugins
+pip install datoso[SEED_NAME]
+# e.g.
 pip install datoso[fbneo]
-pip install datoso[nointro]
-pip install datoso[pleasuredome]
-pip install datoso[redump]
-pip install datoso[translatedenglish]
 
+# or install the plugins separately
 # Install datoso plugins after installing datoso
-pip install datoso_seed_fbneo
+pip install datoso_seed_SEED_NAME
+# e.g.
 pip install datoso_seed_nointro
-pip install datoso_seed_pleasuredome
-pip install datoso_seed_redump
-pip install datoso_seed_translatedenglish
 
 ```
+### Seeds available:
+- fbneo (Final Burn Neo)
+- md_enhanced (Mega Drive Enhanced)
+- nointro (No-Intro)
+- pleasuredome (Pleasuredome)
+- redump (Redump)
+- sfc_enhancedcolors (Super Famicom Enhanced Colors)
+- sfc_msu1 (Super Famicom MSU1)
+- sfc_speedhacks (Super Famicom Speed Hacks)
+- tdc (Total DOS Collection)
+- translatedenglish (Translated English)
+- vpinmame (Visual Pinball)
+- whdload (WHDLoad)
+
 
 ## Usage
 
@@ -109,46 +120,27 @@ OTW.
 
 ## TODO (without priority)
 
--   Change logo
--   Change pydantic to dataclasses
+-   Enhance logo
 -   Better rules update process
-    -   Make update rules write to database only when finished
 -   Tests
 -   More dat repositories
 -   Mega.nz download support (<https://pypi.org/project/mega.py/>)
 -   Zippyshare download support (<https://pypi.org/project/zippyshare-downloader/>)
 -   Zippyshare download support (<https://pypi.org/project/pyOneFichierClient/>)
--   Configurable folder structure (instead of emulator-focused structure use dat-repositories or viceversa)
-    -   Maybe with a builder, to avoid the need to change the code anytime
+-   Templating for folder structure (opinionated, per seed, custom)
+    - currently is opinionated and can be customized with static paths
 
-
-## USEFUL DEVELOPMENT COMMANDS
-
-```bash
-# Find folders with more than one dat file:
-$ find . -type f -iname '*.dat' -printf '%h\n'|sort|uniq -cd
-
-# Find and delete empty folders:
-$ find . -type d -empty -print -delete
-
-# Pylint
-$ pylint src --errors-only
-$ pylint src --disable=all --enable=missing-function-docstring
-
-# Find duplicate names different case
-$ find . | sort -f | uniq -i -d
-```
 
 ## WISHLIST (without priority)
 
--   Dat structure for ClrMamePro or another dat manager.
+-   Dat structure for ClrMamePro or another dat manager. **(DONE)**
+    - Added DOSCenter dat structure **(DONE)**
 -   Web interface
 -   Download from central repositories (an S3 or something like that to prevent overload main sites)
     -   Lambda to download dats and upload to S3
     -   Downloading from S3
 -   Auto-Import MIA Lists (for redump)
     -   Add \[MIA\] to dat roms **(DONE)**
--   Remove MIA from dats **(probably not needed as it already can mark them)**
 -   .cue Generator
 
 ## Contributing

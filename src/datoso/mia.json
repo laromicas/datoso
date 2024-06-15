@@ -32,21 +32,6 @@
         "game": "Code of Joker (No. 2) (Japan) (Rev F)",
         "sha1": "a34c3b5f736685ebab3fd110426309b1846725d0"
     },
-    "abb61dd16f2d951e09233435d8ef4fd92ff90cd5": {
-        "system": "Sega - Naomi",
-        "game": "Senko no Ronde (Japan)",
-        "sha1": "abb61dd16f2d951e09233435d8ef4fd92ff90cd5"
-    },
-    "c9148e24e4254818b5b193c00777a706458dad1d": {
-        "system": "Sega - Naomi",
-        "game": "Senko no Ronde (Japan)",
-        "sha1": "c9148e24e4254818b5b193c00777a706458dad1d"
-    },
-    "f81987adb2b49190bd3caf29814d1e18df47d801": {
-        "system": "Sega - Naomi",
-        "game": "Senko no Ronde (Japan)",
-        "sha1": "f81987adb2b49190bd3caf29814d1e18df47d801"
-    },
     "012a1e13179648315163cb9bdb107fcd8ba902aa": {
         "system": "Sega - Lindbergh",
         "game": "Let's Go Jungle (Export)",
@@ -68,16 +53,6 @@
         "size": " ",
         "md5": " ",
         "sha1": "b5a93421c4e42adeeda3b8ae5d7eb712c022ef6b"
-    },
-    "d5711b11f459adfd6f8287a907f098a3a0ace9c6": {
-        "system": "Sega - Chihiro",
-        "game": "Sega Network Taisen Mahjong MJ2 (Japan) (Rev D)",
-        "sha1": "d5711b11f459adfd6f8287a907f098a3a0ace9c6"
-    },
-    "de395defd3dd74753c40e35b9fea00f5b5252b7f": {
-        "system": "Sega - Chihiro",
-        "game": "Sega Network Taisen Mahjong MJ2 (Japan) (Rev D)",
-        "sha1": "de395defd3dd74753c40e35b9fea00f5b5252b7f"
     },
     "fa356db9b107fe93f1729689d7ecd457966ba492": {
         "system": "Konami - e-Amusement",
@@ -213,11 +188,6 @@
         "system": "funworld - Photo Play",
         "game": "Update 2001 (Europe) (Disc 2)",
         "sha1": "5248881684b861b87ad66c3ec4bdeaf2bfe88b61"
-    },
-    "196d670e9fe04d407846a688c90f541b20d13b7a": {
-        "system": "Palm",
-        "game": "PDA Essentials - Issue 15 (UK)",
-        "sha1": "196d670e9fe04d407846a688c90f541b20d13b7a"
     },
     "4babed3535bfeea4ea33eb37bc908f12859998ab": {
         "system": "Pocket PC",
