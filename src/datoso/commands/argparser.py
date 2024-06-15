@@ -119,7 +119,7 @@ def add_all_seed_parser(subparser: ArgumentParser) -> None:
         if seed_name == 'all':
             parser_command.add_argument('-e', '--exclude', action='append',
                                         help='Exclude seed or seeds (only work with all)')
-            parser_command.add_argument('-o', '--only', action='append', help='Only seed or seeds (only work with all)')
+            parser_command.add_argument('-o', '--only', action='append', help='Only seed or seeds')
         else:
             parser_command_process.add_argument('-o', '--overwrite', action='store_true', help='Force overwrite dats')
             seed.args(parser_command)
