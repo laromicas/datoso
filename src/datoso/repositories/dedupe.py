@@ -86,7 +86,7 @@ class Dedupe:
         try:
             dat = DatFile.from_file(file)
             dat.load()
-        except Exception:
+        except Exception:  # noqa: BLE001
             msg = 'Invalid dat file'
             raise ValueError(msg) from None
         return dat
