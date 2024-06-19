@@ -87,7 +87,8 @@ class Seed:
             if submodule:
                 return __import__(f'{self.full_name}.{submodule}', fromlist=[submodule])
         except ModuleNotFoundError:
-            return None
+            err_msg = f'Module {self.full_name} not found'
+            raise AttributeError(err_msg) from None
         return self.module
 
     def description(self) -> str:
