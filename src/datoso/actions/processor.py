@@ -150,7 +150,8 @@ class DeleteOld(Process):
             new_file = self.destination()
             if old_file == new_file and self.database_data.get('date', None) \
                 and self.database_data.get('date', None) == self.file_data.get('date', None) \
-                and not config.getboolean('PROCESS', 'Overwrite', fallback=False):
+                and not config.getboolean('PROCESS', 'Overwrite', fallback=False) \
+                and self.database_dat.is_enabled():
                 return 'Exists'
 
         FileUtils.remove(self.database_dat.new_file, remove_empty_parent=True)
