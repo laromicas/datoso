@@ -135,7 +135,7 @@ def command_seed(args: Namespace) -> None:
             message = f'{Bcolors.OKCYAN}Processing seed {Bcolors.OKGREEN}{args.seed}{Bcolors.ENDC}'
             print('='*(len(message)-14))
             print(message)
-            print('='*(len(message)-14))
+            print('-'*(len(message)-14))
             if seed.process_dats(fltr=getattr(args, 'filter', None), actions_to_execute=args.actions):
                 print(f'Errors processing {Bcolors.FAIL}{args.seed}{Bcolors.ENDC}')
                 print('Please enable logs for more information or use -v parameter')
