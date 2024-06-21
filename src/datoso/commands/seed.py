@@ -179,9 +179,11 @@ class Seed:
     def add_default_actions(self) -> None:
         """Add default actions."""
         for seed_actions in self.actions.values():
-            if config.getboolean('PROCESS', 'AutoMergeEnabled', fallback=False) and not self.get_action('AutoMerge'):
+            if config.getboolean('PROCESS', 'AutoMergeEnabled', fallback=False) \
+                and not self.get_action('AutoMerge'):
                 seed_actions.append({ 'action': 'AutoMerge' })
-            if config.getboolean('PROCESS', 'ParentMergeEnabled', fallback=False) and not self.get_action('Deduplicate'):
+            if config.getboolean('PROCESS', 'ParentMergeEnabled', fallback=False) \
+                and not self.get_action('Deduplicate'):
                 seed_actions.append({ 'action': 'Deduplicate' })
 
     def process_dats(self, fltr: str | None=None, actions_to_execute: list | None=None) -> None:
