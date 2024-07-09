@@ -33,8 +33,8 @@ def parse_args() -> Namespace:
     parser = ArgumentParser(description='Update dats from different sources.')
     subparser = parser.add_subparsers(help='sub-command help')
 
-    parser.add_argument('-v', '--version', action='store_true', help='show version')
-    parser.add_argument('-V', '--verbose', action='store_true', help='verbose output')
+    parser.add_argument('--version', action='store_true', help='show version')
+    parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
 
     add_log_parser(subparser)
     add_config_parser(subparser)

@@ -145,10 +145,10 @@ class DeleteOld(Process):
         if not self.database_data.get('new_file', None):
             return 'New'
 
-        if getattr(self, 'folder', None):
+        if getattr(self, 'folder', None) and self.database_data.get('date', None):
             old_file = Path(self.database_data.get('new_file', '') or '')
             new_file = self.destination()
-            if old_file == new_file and self.database_data.get('date', None) \
+            if old_file == new_file \
                 and self.database_data.get('date', None) == self.file_data.get('date', None) \
                 and not config.getboolean('PROCESS', 'Overwrite', fallback=False) \
                 and self.database_dat.is_enabled():

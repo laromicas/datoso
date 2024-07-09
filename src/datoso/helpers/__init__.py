@@ -173,13 +173,19 @@ def compare_dates(date1: str | None, date2: str | None) -> bool:
         return False
     #replace not_allowed characters for space in dates
     date1 = re.sub(r'[^\w\s\,\-\:]', ' ', date1)
-    date2 = re.sub(r'[^\w\s\,\-\:]', ' ', date1)
+    date2 = re.sub(r'[^\w\s\,\-\:]', ' ', date2)
     dayfirst = date1[2] in ['/', '-']
     try:
         if isinstance(date1, str):
             date1 = parser.parse(date1, fuzzy=True, dayfirst=dayfirst)
+            # Prevents bug
+            # ValueError: offset must be a timedelta strictly between -timedelta(hours=24) and timedelta(hours=24)
+            str(date1)
         if isinstance(date2, str):
             date2 = parser.parse(date2, fuzzy=True, dayfirst=dayfirst)
+            # Prevents bug
+            # ValueError: offset must be a timedelta strictly between -timedelta(hours=24) and timedelta(hours=24)
+            str(date2)
     except ValueError:
         return False
     return date1 > date2

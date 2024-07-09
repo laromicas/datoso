@@ -1482,6 +1482,15 @@
         "system_type": "Arcade"
     },
     {
+        "company": null,
+        "system": "Sega NAOMI Satellite Terminal PC",
+        "override": {
+            "company": "Sega",
+            "system": "Naomi Satellite Terminal PC"
+        },
+        "system_type": "Arcade"
+    },
+    {
         "company": "Sega",
         "system": "Nu 2",
         "system_type": "Arcade"
