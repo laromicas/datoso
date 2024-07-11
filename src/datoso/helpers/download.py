@@ -12,10 +12,11 @@ from typing import TextIO
 from datoso.configuration import config
 
 
-def downloader(url: str, destination: str,
-               reporthook: Callable | None=None, *, filename_from_headers: bool=False) -> Path:
+def downloader(url: str, destination: str, reporthook: Callable | None=None,
+               *, filename_from_headers: bool=False, downloader: str | None=None) -> Path:
     """Download a file from a URL."""
-    match config.get('DOWNLOAD', 'PrefferDownloadUtility', fallback='urllib'):
+    downloader = downloader or config.get('DOWNLOAD', 'PrefferDownloadUtility', fallback='urllib')
+    match downloader:
         case 'wget':
             download = WgetDownload()
             return download.download(url, destination,
@@ -67,8 +68,13 @@ class UrllibDownload(Download):
             tmp_filename, headers = urllib.request.urlretrieve(url)  # noqa: S310
             local_filename = Path(destination) / headers.get_filename()
             shutil.move(tmp_filename, local_filename)
+        except TypeError:
+            logging.exception('Error downloading %s', url)
+            logging.exception('Headers: %s', headers)
+            return None
         except Exception:
             logging.exception('Error downloading %s', url)
+            logging.exception('Headers: %s', headers)
             return None
         return local_filename
 
@@ -104,6 +110,9 @@ class CurlDownload(Download):
         if filename_from_headers:
             args = ['curl', '-JLOk', url]
             std_out, _ = self.popen(args, cwd=destination)
+            if not std_out:
+                msg = f'Error downloading file from {url} {std_out}'
+                raise ValueError(msg)
             return Path(destination) / self.parse_filename(std_out)
         args = ['curl', '-L', url, '-o', destination, '-J', '-L', '-k', '-s']
         std_out, _ = self.popen(args)

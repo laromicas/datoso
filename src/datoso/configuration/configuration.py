@@ -40,8 +40,8 @@ class Config(configparser.ConfigParser):
 
 config_paths = [
     ROOT_FOLDER / 'datoso.ini',
-    XDG_CONFIG_HOME / 'datoso/datoso.config',
     HOME / '.datosorc',
+    XDG_CONFIG_HOME / 'datoso/datoso.config',
     Path.cwd() / '.datosorc',
 ]
 

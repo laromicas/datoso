@@ -168,11 +168,9 @@ def command_config_set(args: Namespace) -> None:
     newconfig = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
     newconfig.optionxform = lambda option: option
     if getattr(args, 'global', False):
-        file = Path(ROOT_FOLDER) / 'datoso.ini'
+        file = Path('~/.config/datoso/datoso.config').expanduser()
     else:
         file = Path.cwd() / '.datosorc'
-        if not Path.is_file(file):
-            file = Path('~/datosorc').expanduser()
     newconfig.read(file)
     if not newconfig.has_section(myconfig[0]):
         newconfig.add_section(myconfig[0])
