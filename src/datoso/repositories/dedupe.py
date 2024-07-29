@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 
 from datoso.database.models.dat import Dat
-from datoso.repositories.dat_file import DatFile
+from datoso.repositories.dat_file import ClrMameProDatFile, DatFile
 
 
 class DatDedupe:
@@ -85,10 +85,13 @@ class Dedupe:
         """Return a DatFile from a file."""
         try:
             dat = DatFile.from_file(file)
-            dat.load()
-        except Exception:  # noqa: BLE001
+            if isinstance(dat, ClrMameProDatFile):
+                dat.load(load_games=True)
+            else:
+                dat.load()
+        except Exception as e:  # noqa: BLE001
             msg = 'Invalid dat file'
-            raise ValueError(msg) from None
+            raise ValueError(msg, e) from None
         return dat
 
     def dedupe(self) -> int:

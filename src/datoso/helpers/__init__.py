@@ -9,8 +9,20 @@ from pathlib import Path
 from dateutil import parser
 
 
-class Bcolors:
-    # pylint: disable=anomalous-backslash-in-string
+class BcolorsMeta(type):
+    """Metaclass for Bcolors."""
+
+    @classmethod
+    def __getattr__(cls, name: str) -> str:
+        """Get attribute."""
+        if name.upper() in Bcolors.color_list():
+            def method(text: str) -> str:
+                return f'{getattr(Bcolors, name.upper())}{text}{Bcolors.ENDC}'
+            return method
+        msg = f'module {__name__} has no attribute {name}'
+        raise AttributeError(msg)
+
+class Bcolors(metaclass=BcolorsMeta):
     """Color class."""
 
     HEADER = '\033[95m'
@@ -23,13 +35,14 @@ class Bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
-    BOLDBLUE = r'\e[1;34m'
-    BOLDCYAN = r'\e[1;36m'
-    BOLDGREEN = r'\e[1;32m'
-    BOLDRED = r'\e[1;31m'
-    BOLDYELLOW = r'\e[1;33m'
-    BOLDWHITE = r'\e[1;37m'
-    BOLDMAGENTA = r'\e[1;35m'
+    # TODO(laromicas): Find replacement for colors below
+    # BOLDBLUE = '\e[1;34m'  # noqa: ERA001
+    # BOLDCYAN = '\e[1;36m'  # noqa: ERA001
+    # BOLDGREEN = '\e[1;32m'  # noqa: ERA001
+    # BOLDRED = '\e[1;31m'  # noqa: ERA001
+    # BOLDYELLOW = '\e[1;33m'  # noqa: ERA001
+    # BOLDWHITE = '\e[1;37m'  # noqa: ERA001
+    # BOLDMAGENTA = '\e[1;35m'  # noqa: ERA001
 
     @staticmethod
     def color_list() -> list:
@@ -50,6 +63,7 @@ class Bcolors:
         for color in Bcolors.color_list():
             string = string.replace(getattr(Bcolors, color), '')
         return string
+
 
 def is_date(string: str, *, fuzzy: bool | None=None) -> bool:
     """Return whether the string can be interpreted as a date.

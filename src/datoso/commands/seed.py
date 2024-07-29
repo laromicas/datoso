@@ -28,8 +28,7 @@ class Seed:
         if not self.name and self.module:
             self.name = self.module.__name__.split('_')[-1]
         self.full_name = f'{__app_name__}_{PluginType.SEED.value}_{self.name}'
-        if not config.has_section(self.name.upper()):
-            self.init_config()
+        self.init_config()
 
     def get_actions(self) -> None:
         """Get actions."""

@@ -9,7 +9,7 @@ from argparse import Namespace
 from pathlib import Path
 from venv import logger
 
-from datoso import ROOT_FOLDER, __app_name__
+from datoso import __app_name__
 from datoso.commands.doctor import check_module, check_seed
 from datoso.commands.seed import Seed
 from datoso.configuration import config
@@ -162,15 +162,17 @@ def command_config_set(args: Namespace) -> None:
         print(f'{Bcolors.FAIL}Invalid config key, must be in <SECTION>.<Option> format. {Bcolors.ENDC}')
         sys.exit(1)
     if myconfig[1] not in config[myconfig[0]]:
-        print(f'{Bcolors.FAIL}Invalid config option. {Bcolors.ENDC}')
-        sys.exit(1)
+        print(f'{Bcolors.WARNING}Config option not found in curent config file. {Bcolors.ENDC}')
+        print(f'{Bcolors.WARNING}Do you want to continue? {Bcolors.ENDC}')
+        if input('y/n: ').lower() != 'y':
+            sys.exit(1)
 
     newconfig = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
     newconfig.optionxform = lambda option: option
-    if getattr(args, 'global', False):
-        file = Path('~/.config/datoso/datoso.config').expanduser()
-    else:
+    if getattr(args, 'local', False):
         file = Path.cwd() / '.datosorc'
+    else:
+        file = Path('~/.config/datoso/datoso.config').expanduser()
     newconfig.read(file)
     if not newconfig.has_section(myconfig[0]):
         newconfig.add_section(myconfig[0])
@@ -193,9 +195,31 @@ def command_config_get(args: Namespace) -> None:
         print(myconfig)
         print(f'{Bcolors.FAIL}Invalid config key, must be in <SECTION>.<Option> format. {Bcolors.ENDC}')
         sys.exit(1)
+
+    newconfig = None
+    if getattr(args, 'local', False) or getattr(args, 'global', False):
+        newconfig = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
+        newconfig.optionxform = lambda option: option
+        if getattr(args, 'local', False):
+            file = Path.cwd() / '.datosorc'
+        else:
+            file = Path('~/.config/datoso/datoso.config').expanduser()
+        newconfig.read(file)
+
+        if newconfig and myconfig[0] in newconfig and myconfig[1] in newconfig[myconfig[0]]:
+            print(f'{Bcolors.WARNING}Configuration found in {file}{Bcolors.ENDC}')
+            print(f'{Bcolors.OKGREEN}{myconfig[0]}.{myconfig[1]}{Bcolors.ENDC} = ', end='')
+            print(newconfig[myconfig[0]][myconfig[1]])
+            return
+
     if myconfig[1] not in config[myconfig[0]]:
         print(f'{Bcolors.FAIL}Invalid config option. {Bcolors.ENDC}')
         sys.exit(1)
+
+    if getattr(args, 'local', False) or getattr(args, 'global', False):
+        print(f'{Bcolors.WARNING}Configuration not found in {file}{Bcolors.ENDC}')
+        print('Showing current configuration')
+    print(f'{Bcolors.OKGREEN}{myconfig[0]}.{myconfig[1]}{Bcolors.ENDC} = ', end='')
     print(config[myconfig[0]][myconfig[1]])
 
 

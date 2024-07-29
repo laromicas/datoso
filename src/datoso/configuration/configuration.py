@@ -8,7 +8,7 @@ from datoso import ROOT_FOLDER, __app_name__
 HOME = Path.home()
 XDG_CONFIG_HOME = Path(os.environ.get('XDG_CONFIG_HOME', '~/.config')).expanduser()
 
-(XDG_CONFIG_HOME / 'datoso/datoso.config').mkdir(parents=True, exist_ok=True)
+(XDG_CONFIG_HOME / 'datoso').mkdir(parents=True, exist_ok=True)
 
 def get_seed_name(seed: str) -> str:
     """Get seed name."""
@@ -35,8 +35,16 @@ class Config(configparser.ConfigParser):
             return os.environ[envvar].lower() in ['true', 'yes', '1']
         try:
             return super().getboolean(section, option, **kwargs)
+        except AttributeError:
+            return self.boolean(super().get(section, option, **kwargs))
         except configparser.NoOptionError:
             return None
+
+    def boolean(self, value: str | bool | int | None) -> bool:
+        """Return a boolean value."""
+        if value is None:
+            return False
+        return str(value).lower() in ['true', 'yes', '1']
 
 config_paths = [
     ROOT_FOLDER / 'datoso.ini',

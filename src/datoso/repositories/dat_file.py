@@ -331,6 +331,8 @@ class ClrMameProDatFile(DatFile):
 
     header: dict = None
     games: list = None
+    main_key = 'clrmamepro'
+    game_key = 'game'
 
     def get_next_block(self, data: str) -> tuple[str, str]:
         """Get the next block of data."""
@@ -406,7 +408,31 @@ class ClrMameProDatFile(DatFile):
         self.full_name = self.header['description']
 
     def get_rom_shas(self) -> None:
-        """TODO Method."""
+        """Get the shas for the roms and creates an index."""
+        self.shas = HashesIndex()
+
+        for game in self.games:
+            if 'rom' not in game:
+                continue
+            if not isinstance(game['rom'], list):
+                self.add_rom(game['rom'])
+            else:
+                for rom in game['rom']:
+                    self.add_rom(rom)
+
+    def add_rom(self, rom: dict) -> None:
+        """Add a rom to the dat file."""
+        self.shas.add_rom(self.parse_rom(rom))
+
+    def parse_rom(self, rom: dict) -> dict:
+        """Standarize the rom."""
+        parsed_rom = {}
+        for key in rom:
+            if key.startswith('@'):
+                parsed_rom[key[1:]] = rom[key]
+            else:
+                parsed_rom[key] = rom[key]
+        return parsed_rom
 
 class DOSCenterDatFile(ClrMameProDatFile):
     """DOSCenter dat file."""

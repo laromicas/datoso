@@ -34,8 +34,11 @@ def add_config_parser(subparser: ArgumentParser) -> None:
     group_save.add_argument('--set', nargs=2, metavar=('configuration', 'value'),
                     help='Set Configuration Option separated by point with new value e.g. <PROCESS.Overwrite> <false>')
     group_save.add_argument('--get', metavar=('configuration'), help='Get value of Configuration Option.')
-    parser_config.add_argument('-g','--global', action='store_true',
-                    help='When set, saves to global config, else to `.datosorc`')
+    where_group = parser_config.add_mutually_exclusive_group()
+    where_group.add_argument('-g','--global', action='store_true',
+                               help='When set, saves to global config, enabled by default')
+    where_group.add_argument('-l','--local', action='store_true',
+                    help='When set, saves to `.datosorc` in current directory, disabled by default')
 
 def add_doctor_parser(subparser: ArgumentParser) -> None:
     """Doctor parser."""
