@@ -48,7 +48,7 @@ pip install datoso_seed_nointro
 ### Seeds available:
 - fbneo (Final Burn Neo)
 - md_enhanced (Mega Drive Enhanced)
-- nointro (No-Intro)
+- nointro (No-Intro Datomatic)
 - pleasuredome (Pleasuredome)
 - redump (Redump)
 - sfc_enhancedcolors (Super Famicom Enhanced Colors)
@@ -96,6 +96,16 @@ $ datoso {<seed> | all} {--fetch | --process} [--filter FILTER]
 $ datoso redump --fetch                    # Downloads all dats from redump
 $ datoso redump --process --filter IBM     # Process all dats downloaded in the step before that has IBM in its name
 
+# Dat management
+$ datoso dat -d <dat_name>                 # Finds a dat by partial name (cannot set/modify properties)
+$ datoso dat -d <seed>:<dat_name>          # Finds a dat by partial name in a seed (can set/modify properties)
+$ datoso dat -d <dat_name> --fields <field1> <field2> ...  # Shows only the fields specified
+$ datoso dat -d <seed>:<dat_name> --fields <field1> <field2> ...  # Shows only the fields specified
+$ datoso dat -d <dat_name> -on             # Finds a dat by partial name in a seed and shows the full name (for setting properties)
+$ datoso dat -d <seed>:<dat_name> --set <property>=<value>   # Sets a property of a dat
+$ datoso dat -d <seed>:<dat_name> --unset <property>         # Unsets a property of a dat
+
+
 # Doctor
 $ datoso doctor [seed]        # Validates if all requirements for all seeds are OK
 
@@ -115,33 +125,29 @@ Check [datoso_seed_base](https://github.com/laromicas/datoso_seed_base)
 ## Posible Issues
 
 Be careful when updating dats from datomatic, sometimes they put a
-captcha, and you may be banned if the captcha fails, captcha support is
-OTW.
+captcha, and you may be banned if the captcha fails.
 
 ## TODO (without priority)
 
--   Enhance logo
 -   Better rules update process
 -   Tests
 -   More dat repositories
 -   Mega.nz download support (<https://pypi.org/project/mega.py/>)
 -   Zippyshare download support (<https://pypi.org/project/zippyshare-downloader/>)
--   Zippyshare download support (<https://pypi.org/project/pyOneFichierClient/>)
+-   OneFichier download support (<https://pypi.org/project/pyOneFichierClient/>)
 -   Templating for folder structure (opinionated, per seed, custom)
     - currently is opinionated and can be customized with static paths
 
 
 ## WISHLIST (without priority)
 
--   Dat structure for ClrMamePro or another dat manager. **(DONE)**
-    - Added DOSCenter dat structure **(DONE)**
+-   Support for deduplication on ClrMamePro dat structure
 -   Web interface
 -   Download from central repositories (an S3 or something like that to prevent overload main sites)
     -   Lambda to download dats and upload to S3
     -   Downloading from S3
 -   Auto-Import MIA Lists (for redump)
-    -   Add \[MIA\] to dat roms **(DONE)**
--   .cue Generator
+-   .cue Generator for Non-Redump Dats
 
 ## Contributing
 
