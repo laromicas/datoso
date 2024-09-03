@@ -151,9 +151,7 @@ class Seed:
             ignore_regex = re.compile(config['PROCESS']['DatIgnoreRegEx'])
             if ignore_regex.match(str(file)):
                 return True
-        if (file.suffix not in ('.dat', '.xml') and not file.is_dir()) or (fltr and fltr not in str(file)):
-            return True
-        return False
+        return (file.suffix not in ('.dat', '.xml') and not file.is_dir()) or (fltr and fltr not in str(file))
 
     def process_action(self, procesor: Processor) -> list:
         """Process action."""

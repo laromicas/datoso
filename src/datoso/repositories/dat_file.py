@@ -192,9 +192,7 @@ class XMLDatFile(DatFile):
     def mark_mia(self, rom: dict, mias: dict) -> None:
         """Mark the mias in the dat file."""
         key = rom.get('@sha1') or rom.get('@md5') or rom.get('@crc32') or f"{self.get_system()} - {rom.get('name')}"
-        if key in mias:
-            return True
-        return False
+        return key in mias
 
     def mark_mias(self, mias: dict) -> None:
         """Mark the mias in the dat file."""

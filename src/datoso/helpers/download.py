@@ -43,7 +43,7 @@ class Download:
                  reporthook: Callable | None=None, filename_from_headers: bool=False) -> Path:
         """Download a file."""
 
-    def popen(self, args: str | list, cwd: str | None=None, *, text: bool=True,  # noqa: PLR0913
+    def popen(self, args: str | list, cwd: str | None=None, *, text: bool=True,
               stdout: Path | TextIO = subprocess.PIPE, stderr: Path | TextIO=subprocess.PIPE) -> tuple:
         """Execute a command."""
         pipes = subprocess.Popen(args, cwd=cwd, text=text, stdout=stdout, stderr=stderr)  # noqa: S603

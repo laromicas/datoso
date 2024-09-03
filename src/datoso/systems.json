@@ -441,24 +441,34 @@
     {
         "company": "Hasbro",
         "system": "VideoNow",
+        "override": {
+            "modifier": "Video"
+        },
         "system_type": "Video"
     },
     {
         "company": "Hasbro",
         "system": "VideoNow Color",
+        "override": {
+            "modifier": "Video"
+        },
         "system_type": "Video"
     },
     {
         "company": "Hasbro",
         "system": "VideoNow Jr.",
         "override": {
-            "system": "VideoNow Jr"
+            "system": "VideoNow Jr",
+            "modifier": "Video"
         },
         "system_type": "Video"
     },
     {
         "company": "Hasbro",
         "system": "VideoNow XP",
+        "override": {
+            "modifier": "Video"
+        },
         "system_type": "Video"
     },
     {

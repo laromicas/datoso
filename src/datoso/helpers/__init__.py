@@ -94,9 +94,7 @@ def is_git_path(path: str) -> bool:
 
 def is_git_repo(path: str) -> bool:
     """Check if a path is a git repository."""
-    if (Path(path) / '.git').is_dir():
-        return True
-    return False
+    return (Path(path) / '.git').is_dir()
 
 class FileUtils:
     """File utils."""
