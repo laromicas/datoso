@@ -1,4 +1,5 @@
 """Helpers."""
+import os
 import re
 import shutil
 from contextlib import suppress
@@ -134,6 +135,14 @@ class FileUtils:
             path.unlink()
         if remove_empty_parent and not list(path.parent.iterdir()):
             FileUtils.remove(path.parent, remove_empty_parent=True)
+
+    @staticmethod
+    def remove_empty_folders(path_abs: str | Path) -> None:
+        """Remove empty folders."""
+        walk = list(os.walk(str(path_abs)))
+        for path, _, _ in walk[::-1]:
+            if len(os.listdir(path)) == 0:
+                FileUtils.remove(path)
 
     @staticmethod
     def parse_path(path: str) -> Path:
