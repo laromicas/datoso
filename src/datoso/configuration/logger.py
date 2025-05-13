@@ -1,7 +1,8 @@
 """Logging configuration for datoso."""
 import logging
 
-from datoso.helpers import Bcolors, FileUtils
+from datoso.helpers import Bcolors
+from datoso.helpers.file_utils import parse_path
 
 from .configuration import config
 
@@ -64,7 +65,7 @@ logger.setLevel(logging.DEBUG)
 
 def enable_logging() -> None:
     """Enable logging to file."""
-    log_path = FileUtils.parse_path(config.get('PATHS','DatosoPath', fallback='~/.config/datoso'))
+    log_path = parse_path(config.get('PATHS','DatosoPath', fallback='~/.config/datoso'))
     log_path.mkdir(parents=True, exist_ok=True)
     log_file = log_path / config['LOG'].get('LogFile', 'datoso.log')
     file_handler = TrimmedFileHandler(log_file)

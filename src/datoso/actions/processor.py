@@ -5,7 +5,8 @@ from pathlib import Path
 
 from datoso.configuration import config, logger
 from datoso.database.models.dat import Dat
-from datoso.helpers import FileUtils, compare_dates
+from datoso.helpers import compare_dates
+from datoso.helpers.file_utils import copy_path, get_ext, remove_path
 from datoso.repositories.dat_file import DatFile
 from datoso.repositories.dedupe import Dedupe
 
@@ -101,7 +102,7 @@ class LoadDatFile(Process):
 
     def process(self) -> str:
         """Load a dat file."""
-       # If there is a factory method, use it to create the class
+        # If there is a factory method, use it to create the class
         if getattr(self, '_factory', None) and self._factory:
             self._class = self._factory(self.file)
 
@@ -127,7 +128,7 @@ class DeleteOld(Process):
         if not getattr(self, 'folder', None):
             return None
         return Path(self.folder) / path / self.file_dat.file.name \
-            if FileUtils.get_ext(self.file_dat.file) in ('.dat', '.xml') \
+            if get_ext(self.file_dat.file) in ('.dat', '.xml') \
             else Path(self.folder) / path / self.file_dat.name
 
     def process(self) -> str:
@@ -154,7 +155,7 @@ class DeleteOld(Process):
                 and self.database_dat.is_enabled():
                 return 'Exists'
 
-        FileUtils.remove(self.database_dat.new_file, remove_empty_parent=True)
+        remove_path(self.database_dat.new_file, remove_empty_parent=True)
         if not self.database_dat.is_enabled():
             self.stop = True
             self.database_dat.new_file = None
@@ -174,7 +175,7 @@ class Copy(Process):
         if path.startswith(('/', '~')):
             return Path(path).expanduser()
         return Path(self.folder) / path / self.file_dat.file.name \
-            if FileUtils.get_ext(self.file_dat.file) in ('.dat', '.xml') \
+            if get_ext(self.file_dat.file) in ('.dat', '.xml') \
             else Path(self.folder) / path / self.file_dat.name
 
     def process(self) -> str:
@@ -183,7 +184,7 @@ class Copy(Process):
         origin = self.file if self.file else None
         destination = self.destination()
         if not self.database_dat:
-            FileUtils.copy(origin, destination)
+            copy_path(origin, destination)
             return 'Copied'
         if not self.database_dat.is_enabled():
             self.file_dat.new_file = None
@@ -216,7 +217,7 @@ class Copy(Process):
                 return 'No Action Taken, Newer Found'
 
             self.database_dat.new_file = destination
-            FileUtils.copy(origin, destination)
+            copy_path(origin, destination)
         except ValueError:
             pass
         return result

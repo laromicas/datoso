@@ -84,7 +84,7 @@ class Dedupe:
     def get_dat_file(self, file: str | Path) -> DatFile:
         """Return a DatFile from a file."""
         try:
-            dat = DatFile.from_file(file)
+            dat = DatFile.from_file(file=file)
             if isinstance(dat, ClrMameProDatFile):
                 dat.load(load_games=True)
             else:
@@ -105,6 +105,6 @@ class Dedupe:
 
     def save(self, file: str | Path | None = None) -> None:
         """Save the dat file."""
-        if file:
+        if file and len(self.child.datfile.merged_roms) > 0:
             self.child.datfile.file = file
         self.child.datfile.save()

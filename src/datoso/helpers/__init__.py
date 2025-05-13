@@ -1,9 +1,5 @@
 """Helpers."""
-import os
 import re
-import shutil
-from contextlib import suppress
-from enum import Enum
 from numbers import Number
 from pathlib import Path
 
@@ -96,90 +92,6 @@ def is_git_path(path: str) -> bool:
 def is_git_repo(path: str) -> bool:
     """Check if a path is a git repository."""
     return (Path(path) / '.git').is_dir()
-
-class FileUtils:
-    """File utils."""
-
-    @staticmethod
-    def copy(origin: str | Path, destination: str | Path) -> None:
-        """Copy file to destination."""
-        Path(destination).parent.mkdir(parents=True, exist_ok=True)
-        try:
-            if Path(origin).is_dir():
-                with suppress(FileNotFoundError):
-                    shutil.rmtree(destination)
-                shutil.copytree(origin, destination)
-            else:
-                shutil.copy(origin, destination)
-        except shutil.SameFileError:
-            pass
-        except FileNotFoundError:
-            msg = f'File {origin} not found.'
-            raise FileNotFoundError(msg) from None
-
-    @staticmethod
-    def remove_folder(path: str | Path) -> None:
-        """Remove folder."""
-        with suppress(PermissionError):
-            shutil.rmtree(path)
-
-    @staticmethod
-    def remove(pathstring: str | Path, *, remove_empty_parent: bool = False) -> None:
-        """Remove file or folder."""
-        path = pathstring if isinstance(pathstring, Path) else FileUtils.parse_path(pathstring)
-        if not path.exists():
-            return
-        if path.is_dir():
-            FileUtils.remove_folder(path)
-        else:
-            path.unlink()
-        if remove_empty_parent and not list(path.parent.iterdir()):
-            FileUtils.remove(path.parent, remove_empty_parent=True)
-
-    @staticmethod
-    def remove_empty_folders(path_abs: str | Path) -> None:
-        """Remove empty folders."""
-        walk = list(os.walk(str(path_abs)))
-        for path, _, _ in walk[::-1]:
-            if len(os.listdir(path)) == 0:
-                FileUtils.remove(path)
-
-    @staticmethod
-    def parse_path(path: str) -> Path:
-        """Get folder from config."""
-        path = path if path is not None else ''
-        if path.startswith(('/', '~')):
-            return Path(path).expanduser()
-        return Path.cwd() / path
-
-    @staticmethod
-    def move(origin: str | Path, destination: str | Path) -> None:
-        """Move file to destination."""
-        Path(destination).parent.mkdir(parents=True, exist_ok=True)
-        try:
-            shutil.move(origin, destination)
-        except shutil.Error:
-            FileUtils.remove(origin)
-
-    @staticmethod
-    def get_ext(path: str | Path) -> str:
-        """Get extension of file."""
-        return Path(path).suffix
-
-class RequestUtils:
-    """Request utils."""
-
-    @staticmethod
-    def urljoin(*args) -> str:  # noqa: ANN002
-        """Join url parts."""
-        return '/'.join(args).replace('//', '/').replace(':/', '://')
-
-class FileHeaders(Enum):
-    """File headers Enum."""
-
-    XML = '<?xml'
-    CLRMAMEPRO = 'clrma'
-    DOSCENTER = 'DOSCe'
 
 def show_progress(block_num: Number, block_size: Number, total_size: Number) -> None:
     """Show download progress."""

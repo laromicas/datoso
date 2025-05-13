@@ -8,7 +8,8 @@ from pathlib import Path
 from datoso import __app_name__
 from datoso.actions.processor import Processor
 from datoso.configuration import config
-from datoso.helpers import Bcolors, FileUtils
+from datoso.helpers import Bcolors
+from datoso.helpers.file_utils import parse_path
 from datoso.helpers.plugins import PluginType, installed_seeds
 
 STATUS_TO_SHOW = ['Updated', 'Created', 'Error', 'Disabled', 'Deduped', 'Automerged', 'No Action Taken, Newer Found']
@@ -186,7 +187,7 @@ class Seed:
     def process_dats(self, fltr: str | None=None, actions_to_execute: list | None=None) -> None:
         """Process dats."""
         tmp_path = config['PATHS'].get('DownloadPath', 'tmp')
-        dat_origin = FileUtils.parse_path(tmp_path) / self.get_prefix(self.name) / 'dats'
+        dat_origin = parse_path(tmp_path) / self.get_prefix(self.name) / 'dats'
         line = ''
         self.get_actions()
         self.add_default_actions()

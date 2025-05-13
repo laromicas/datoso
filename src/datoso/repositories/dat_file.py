@@ -1,6 +1,8 @@
 """Dat classes to parse different types of dat files."""
+import logging
 import os
 import shlex
+from enum import Enum
 from pathlib import Path
 from typing import Any
 
@@ -8,11 +10,18 @@ import xmltodict
 
 from datoso.configuration import config
 from datoso.database.models.dat import System
-from datoso.helpers import FileHeaders
+from datoso.repositories.hashes_index import HashesIndex
 
+
+class FileHeaders(Enum):
+    """File headers Enum."""
+
+    XML = '<?xml'
+    CLRMAMEPRO = 'clrma'
+    DOSCENTER = 'DOSCe'
 
 class DatFile:
-    """Base class for dat files."""
+    """Base class for dat files. Abstract class."""
 
     name: str = None
     file: str = None
@@ -95,6 +104,15 @@ class DatFile:
                                                *suffixes] if x])
         return self.path
 
+    def get_rom_shas(self) -> None:
+        """Get the shas for the roms and creates an index."""
+
+    def dedupe(self) -> None:
+        """Dedupe the dat file."""
+
+    def merge_with(self, parent: 'DatFile') -> None:
+        """Merge the dat file with the parent."""
+
     def dict(self) -> dict:
         """Return a dictionary with the dat file information."""
         self.initial_parse()
@@ -113,18 +131,27 @@ class DatFile:
         }
 
     @staticmethod
-    def from_file(dat_file: str | Path) -> 'DatFile':
+    def from_file(file: str | Path | None) -> 'DatFile':
         """Create a class dynamically."""
-        with open(dat_file, encoding='utf-8') as file:
-            file_header = file.read(5)
-        if file_header == FileHeaders.XML.value:
-            return XMLDatFile(file=dat_file)
-        if file_header == FileHeaders.CLRMAMEPRO.value:
-            return ClrMameProDatFile(file=dat_file)
-        if file_header == FileHeaders.DOSCENTER.value:
-            return DOSCenterDatFile(file=dat_file)
-        return None
+        try:
+            dat_file = DatFile.class_from_file(dat_file=file)
+            return dat_file(file=file) if dat_file else None
+        except Exception:
+            logging.exception('Error detecting seed type')
+            raise
 
+    @staticmethod
+    def class_from_file(dat_file: str | Path | None) -> 'DatFile':
+        """Create a class dynamically."""
+        with open(dat_file, encoding='utf-8', errors='ignore') as file:
+            file_header = file.read(10).encode('ascii', errors='ignore')[:5].decode()
+        if file_header == FileHeaders.XML.value:
+            return XMLDatFile
+        if file_header == FileHeaders.CLRMAMEPRO.value:
+            return ClrMameProDatFile
+        if file_header == FileHeaders.DOSCENTER.value:
+            return DOSCenterDatFile
+        return None
 
 class XMLDatFile(DatFile):
     """XML dat file."""
@@ -265,7 +292,6 @@ class XMLDatFile(DatFile):
         self.shas = HashesIndex()
         if not self.merged_roms:
             self.merged_roms = []
-
         for game in self.data[self.main_key][self.game_key]:
             if 'rom' not in game:
                 continue
@@ -282,11 +308,11 @@ class XMLDatFile(DatFile):
             else:
                 new_roms = []
                 for rom in game['rom']:
-                    if not self.shas.has_rom(self.parse_rom(rom)):
-                        new_roms.append(rom)
-                    else:
-                        self.add_rom(game['rom'])
+                    if self.shas.has_rom(self.parse_rom(rom)):
                         self.merged_roms.append(self.parse_rom(rom))
+                    else:
+                        self.add_rom(rom)
+                        new_roms.append(rom)
                 new_game['rom'] = new_roms
             new_games.append(new_game)
         self.data[self.main_key][self.game_key] = new_games
@@ -418,6 +444,37 @@ class ClrMameProDatFile(DatFile):
                 for rom in game['rom']:
                     self.add_rom(rom)
 
+    def merge_with(self, parent: DatFile) -> None:
+        """Merge the dat file with the parent."""
+        print("Not yet implemented")
+        return
+        if not self.merged_roms:
+            self.merged_roms = []
+        parent.get_rom_shas()
+        new_games = []
+        for game in self.data[self.main_key][self.game_key]:
+            if 'rom' not in game:
+                continue
+            new_game = {}
+            for key in game:
+                if key != 'rom':
+                    new_game[key] = game[key]
+            if not isinstance(game['rom'], list):
+                if parent.shas.has_rom(self.parse_rom(game['rom'])):
+                    self.merged_roms.append(self.parse_rom(game['rom']))
+                else:
+                    new_game['rom'] = game['rom']
+            else:
+                new_roms = []
+                for rom in game['rom']:
+                    if not parent.shas.has_rom(self.parse_rom(rom)):
+                        new_roms.append(rom)
+                    else:
+                        self.merged_roms.append(self.parse_rom(rom))
+                new_game['rom'] = new_roms
+            new_games.append(new_game)
+        self.data[self.main_key][self.game_key] = new_games
+
     def add_rom(self, rom: dict) -> None:
         """Add a rom to the dat file."""
         self.shas.add_rom(self.parse_rom(rom))
@@ -516,58 +573,3 @@ class DirMultiDatFile(DatFile):
         }
         self.name = self.header['name']
         self.full_name = self.header['description']
-
-
-class HashesIndex:
-    """Index of hashes."""
-
-    valid_hashes: list
-    sha256: dict
-    sha1: dict
-    md5: dict
-    crc: dict
-    sizes: dict
-
-    def __init__(self) -> None:
-        """Initialize the index."""
-        self.sha256 = {}
-        self.sha1 = {}
-        self.md5 = {}
-        self.crc = {}
-        self.sizes = {}
-        self.valid_hashes = ['sha256', 'sha1', 'md5', 'crc']
-
-    def add_rom(self, rom: dict) -> None:
-        """Add a rom to the index."""
-        for rom_hash in self.valid_hashes:
-            if rom_hash in rom:
-                if rom_hash not in self.__dict__:
-                    self.__dict__[rom_hash] = {}
-                self.__dict__[rom_hash][rom[rom_hash]] = rom
-
-    def has_rom(self, rom: dict, rom_hash: str | None=None) -> bool:
-        """Check if a rom exists in the index."""
-        if rom_hash:
-            return rom_hash in rom and rom_hash in self.__dict__ \
-                and rom[rom_hash] in self.__dict__[rom_hash] \
-                and rom['size'] == self.__dict__[rom_hash][rom[rom_hash]]['size']
-        return any((rom_hash in rom and rom_hash in self.__dict__ \
-                    and rom[rom_hash] in self.__dict__[rom_hash] \
-                    and rom['size'] == self.__dict__[rom_hash][rom[rom_hash]]['size']) \
-                    for rom_hash in self.valid_hashes)
-
-    def get_sha256s(self) -> list:
-        """Get the sha256s."""
-        return self.sha256.keys()
-
-    def get_sha1s(self) -> list:
-        """Get the sha1s."""
-        return self.sha1.keys()
-
-    def get_md5s(self) -> list:
-        """Get the md5s."""
-        return self.md5.keys()
-
-    def get_crcs(self) -> list:
-        """Get the crcs."""
-        return self.crc.keys()
