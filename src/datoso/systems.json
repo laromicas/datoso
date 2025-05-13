@@ -137,6 +137,19 @@
     },
     {
         "company": "Atari",
+        "system": "Atari ST",
+        "override": {
+            "system": "ST"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies"
+            }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Atari",
         "system": "Atari Jaguar CD",
         "override": {
             "system": "Jaguar CD"
@@ -158,6 +171,46 @@
             "empty_suffix": {
                 "redump": "Discs"
             }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Atari",
+        "system": "Atari 2600",
+        "override": {
+            "system": "2600"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Atari",
+        "system": "Atari 5200",
+        "override": {
+            "system": "5200"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Atari",
+        "system": "Atari 7800",
+        "override": {
+            "system": "7800"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Atari",
+        "system": "Atari Jaguar",
+        "override": {
+            "system": "Jaguar"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Atari",
+        "system": "Atari Lynx",
+        "override": {
+            "system": "Lynx"
         },
         "system_type": "Console"
     },
@@ -267,6 +320,11 @@
         "company": "Bit Corporation",
         "system": "Gamate",
         "system_type": "Console"
+    },
+    {
+        "company": "Capcom",
+        "system": "Play System III",
+        "system_type": "Arcade"
     },
     {
         "company": "Casio",
@@ -506,6 +564,11 @@
             "system": "PC and Compatibles"
         },
         "system_type": "Computer"
+    },
+    {
+        "company": "FuRyu & Omron",
+        "system": "Purikura",
+        "system_type": "Arcade"
     },
     {
         "company": "Web",
@@ -774,6 +837,29 @@
         "company": "Mobile",
         "system": "Symbian",
         "system_type": "Mobile"
+    },
+    {
+        "company": "Namco",
+        "system": "System N2",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Namco",
+        "system": "Namco",
+        "override": {
+            "company": "Namco",
+            "system": "System N2"
+        },
+        "system_type": "Arcade"
+    },
+    {
+        "company": null,
+        "system": "Namco",
+        "override": {
+            "company": "Namco",
+            "system": "System N2"
+        },
+        "system_type": "Arcade"
     },
     {
         "company": "Namco",
@@ -1276,6 +1362,11 @@
         "system_type": "Handheld"
     },
     {
+        "company": null,
+        "system": "Obscure Gamers",
+        "system_type": "Source Code"
+    },
+    {
         "company": "Panic",
         "system": "Playdate",
         "system_type": "Console"
@@ -1460,9 +1551,44 @@
     },
     {
         "company": "Sega",
+        "system": "Alls",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Sega",
         "system": "ALLS",
         "override": {
             "system": "Alls"
+        },
+        "system_type": "Arcade"
+    },
+    {
+        "company": null,
+        "system": "Sega ALLS",
+        "override": {
+            "company": "Sega",
+            "system": "Alls",
+            "suffix": "DataCollective"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "teknoparrot": "DataCollective"
+            }
+        },
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Sega",
+        "system": "Sega ALLS",
+        "override": {
+            "company": "Sega",
+            "system": "Alls",
+            "suffix": "DataCollective"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "teknoparrot": "DataCollective"
+            }
         },
         "system_type": "Arcade"
     },
@@ -1489,6 +1615,31 @@
     {
         "company": "Sega",
         "system": "Lindbergh",
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Arcade"
+    },
+    {
+        "company": null,
+        "system": "Sega Lindbergh",
+        "override": {
+            "company": "Sega",
+            "system": "Lindbergh",
+            "suffix": "DataCollective"
+        },
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Sega",
+        "system": "Sega Lindbergh",
+        "override": {
+            "company": "Sega",
+            "system": "Lindbergh",
+            "suffix": "DataCollective"
+        },
         "system_type": "Arcade"
     },
     {
@@ -1518,6 +1669,49 @@
     {
         "company": "Sega",
         "system": "Nu",
+        "system_type": "Arcade"
+    },
+    {
+        "company": null,
+        "system": "Sega Nu",
+        "override": {
+            "company": "Sega",
+            "system": "Nu",
+            "suffix": "DataCollective"
+        },
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Sega",
+        "system": "Sega Nu",
+        "override": {
+            "company": "Sega",
+            "system": "Nu",
+            "suffix": "DataCollective"
+        },
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Sega",
+        "system": "Elefun",
+        "system_type": "Arcade"
+    },
+    {
+        "company": null,
+        "system": "Sega Elefun",
+        "override": {
+            "company": "Sega",
+            "system": "Elefun"
+        },
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Sega",
+        "system": "Sega Elefun",
+        "override": {
+            "company": "Sega",
+            "system": "Elefun"
+        },
         "system_type": "Arcade"
     },
     {
@@ -1574,6 +1768,29 @@
     {
         "company": "Sega",
         "system": "RingEdge 2",
+        "system_type": "Arcade"
+    },
+    {
+        "company": null,
+        "system": "Sega RingEdge-Wide",
+        "override": {
+            "company": "Sega",
+            "system": "RingEdge-Wide"
+        },
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Sega",
+        "system": "Sega RingEdge-Wide",
+        "override": {
+            "company": "Sega",
+            "system": "RingEdge-Wide"
+        },
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Sega",
+        "system": "RingEdge-Wide",
         "system_type": "Arcade"
     },
     {
@@ -1742,6 +1959,19 @@
         "system_type": "Arcade"
     },
     {
+        "company": null,
+        "system": "TeknoParrot",
+        "system_type": "Arcade"
+    },
+    {
+        "company": null,
+        "system": "TeknoParrot Collection",
+        "override": {
+            "system": "TeknoParrot"
+        },
+        "system_type": "Arcade"
+    },
+    {
         "company": "Tangerine Computer Systems",
         "system": "Oric",
         "system_type": "Computer"
@@ -1791,6 +2021,16 @@
             "empty_suffix": {
                 "redump": "Discs"
             }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Non-Redump",
+        "system": "VM Labs - NUON",
+        "override": {
+            "company": "VM Labs",
+            "system": "NUON",
+            "suffix": "ExtraDiscs"
         },
         "system_type": "Console"
     },
@@ -1991,6 +2231,16 @@
             "suffix": "Flash Media"
         },
         "system_type": "Computer"
+    },
+    {
+        "company": null,
+        "system": "Future Pinball",
+        "system_type": "Pinball"
+    },
+    {
+        "company": null,
+        "system": "Visual Pinball",
+        "system_type": "Pinball"
     },
     {
         "company": null,

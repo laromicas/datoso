@@ -98,9 +98,12 @@ def add_deduper_parser(subparser: ArgumentParser) -> None:
                         help='Deduplicate dats, removes duplicates from input dat existing in parent dat')
     parser_deduper.add_argument('-i', '--input', required=True,
                         help='Input dat file e.g. "redump:psx_child" or "/mnt/roms/redump_psx_child.dat"')
-    parser_deduper.add_argument('-p', '--parent', default=None,
+    parser_merge = parser_deduper.add_mutually_exclusive_group(required=True)
+    parser_merge.add_argument('-p', '--parent', default=None,
                 help=('Parent dat file e.g. "redump:psx" or "/mnt/roms/redump_psx.dat" '
                     'if not set, parent is taken from input dat with prescanned dats'))
+    parser_merge.add_argument('-au', '--auto-merge', action='store_true',
+                help='Auto merge dats, removes duplicates from input dat')
     parser_deduper.add_argument('-o', '--output', default=None,
                 help='If different from input.dat, must be a file path e.g. "/mnt/roms/redump_psx_child_deduped.dat"')
     parser_deduper.add_argument('-dr', '--dry-run', action='store_true',

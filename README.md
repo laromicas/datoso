@@ -2,14 +2,14 @@
 
 # Datoso
 
-Datoso is a WIP Python command line tool to download and organize your Dat Roms.
-As today the tool supports dat-omatic, redump, and translated-english dats.
+Datoso (DAT Organizer and SOrter) is a WIP Python command line tool to download and organize your Dat Roms.
+As today the tool supports dat-omatic, redump, and pleasuredome dats.
 It merges all the dats in a tree folder structure thought to use with Emulators rather than dats.
 The dat file format must be compatible with [ROMVault](https://www.romvault.com/).
 
 # Features
 
-- It can download dats from different sources (dat-omatic, redump, translated-english)
+- It can download updated dats from different sources (dat-omatic, redump, and pleasuredome)
 - It can process dats to generate a folder structure compatible with emulators
 - It can deduplicate dats
 - It can import dats from existing RomVault
@@ -47,17 +47,18 @@ pip install datoso_seed_nointro
 ```
 ### Seeds available:
 - fbneo (Final Burn Neo)
-- md_enhanced (Mega Drive Enhanced)
 - nointro (No-Intro Datomatic)
-- pleasuredome (Pleasuredome)
 - redump (Redump)
-- sfc_enhancedcolors (Super Famicom Enhanced Colors)
-- sfc_msu1 (Super Famicom MSU1)
-- sfc_speedhacks (Super Famicom Speed Hacks)
+- pleasuredome (Pleasuredome)
 - tdc (Total DOS Collection)
-- translatedenglish (Translated English)
 - vpinmame (Visual Pinball)
 - whdload (WHDLoad)
+- eggman (Eggman Teknoparrot, ALLs.net)
+- md_enhanced (Mega Drive Enhanced) (deprecated)
+- sfc_enhancedcolors (Super Famicom Enhanced Colors) (deprecated)
+- sfc_msu1 (Super Famicom MSU1) (deprecated)
+- sfc_speedhacks (Super Famicom Speed Hacks) (deprecated)
+- translatedenglish (Translated English) (deprecated)
 
 
 ## Usage
@@ -128,7 +129,7 @@ Be careful when updating dats from datomatic, sometimes they put a
 captcha, and you may be banned if the captcha fails.
 
 ## TODO (without priority)
-
+-   Firmwares  https://gbatemp.net/download/nintendo-switch-firmware-datfile.36558/
 -   Better rules update process
 -   Tests
 -   More dat repositories

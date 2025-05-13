@@ -14,7 +14,8 @@ from datoso.commands.doctor import check_module, check_seed
 from datoso.commands.seed import Seed
 from datoso.configuration import config
 from datoso.database.models.dat import Dat
-from datoso.helpers import Bcolors, FileUtils
+from datoso.helpers import Bcolors
+from datoso.helpers.file_utils import parse_path
 from datoso.helpers.plugins import installed_seeds, seed_description
 from datoso.repositories.dedupe import Dedupe
 from datoso.seeds.rules import Rules
@@ -23,12 +24,12 @@ from datoso.seeds.unknown_seed import detect_seed
 
 def command_deduper(args: Namespace) -> None:
     """Deduplicate dats, removes duplicates from input dat existing in parent dat."""
-    if not args.parent and args.input.endswith(('.dat', '.xml')):
+    if not args.parent and args.input.endswith(('.dat', '.xml')) and not args.auto_merge:
         print('Parent dat is required when input is a dat file')
         sys.exit(1)
     if args.dry_run:
         logger.setLevel(logging.DEBUG)
-    merged = Dedupe(args.input, args.parent)
+    merged = Dedupe(args.input, args.parent) if args.parent else Dedupe(args.input)
     merged.dedupe()
     if args.output and not args.dry_run:
         merged.save(args.output)
@@ -65,14 +66,22 @@ def command_import(_) -> None:  # noqa: ANN001
         if not found:
             continue
         print(f'{dat_name} - ', end='')
-        seed, _class = detect_seed(dat_name, rules)
-        print(f'{seed} - {_class.__name__ if _class else None}')
-        if _class:
+        try:
+            seed, _class = detect_seed(dat_name, rules)
+            print(f'{seed} - {_class.__name__ if _class else None}')
             dat = _class(file=dat_name)
             dat.load()
             database = Dat(**{**dat.dict(), 'seed': seed, 'new_file': dat_name})
             database.save()
             database.flush()
+        except LookupError as e:
+            print(f'{Bcolors.FAIL}Error detecting seed type{Bcolors.ENDC} - {e}')
+            # if dat_name == '/mnt/d/ROMVault/DatRoot/Arcade/FinalBurnNeo/roms/arcade/FinalBurn Neo Arcade Games.dat':
+            #     exit()
+        except TypeError as e:
+            print(f'{Bcolors.FAIL}Error detecting seed type{Bcolors.ENDC} - {e}')
+            # if dat_name == '/mnt/d/ROMVault/DatRoot/Arcade/FinalBurnNeo/roms/arcade/FinalBurn Neo Arcade Games.dat':
+            #     exit()
 
 
 def command_dat(args: Namespace) -> None:
@@ -250,6 +259,11 @@ def command_config_mia_update(args: Namespace) -> None:
         print('Please enable logs for more information or use -v parameter')
         command_doctor(args)
 
+def command_config_path(args: Namespace) -> None:
+    """Get path from config."""
+    path = Path(config.get('PATHS.DatosoPath')) / config.get('PATHS.DatabaseFile')
+    print(path)
+
 
 def command_config(args: Namespace) -> None:
     """Config commands."""
@@ -263,6 +277,8 @@ def command_config(args: Namespace) -> None:
         command_config_rules_update(args)
     elif args.mia_update:
         command_config_mia_update(args)
+    elif args.path:
+        command_config_path(args)
     else:
         config_dict = {s:dict(config.items(s)) for s in config.sections()}
         print(json.dumps(config_dict, indent=4))
@@ -293,6 +309,6 @@ def command_doctor(args: Namespace) -> None:
 
 def command_log(_) -> None:  # noqa: ANN001
     """Display the contents of the log file."""
-    log_path = FileUtils.parse_path(config.get('PATHS','DatosoPath', fallback='~/.datoso'))
+    log_path = parse_path(config.get('PATHS','DatosoPath', fallback='~/.datoso'))
     logfile = log_path / config['LOG'].get('LogFile', 'datoso.log')
     os.system(f'cat {logfile}') # noqa: S605

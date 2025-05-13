@@ -1,3 +1,23 @@
+release 1.1.0
+- Extracted FileUtils to a separate module (breaking change)
+- Production Stable (forgot to change this a long time ago)
+- Updated dependencies
+- Now datoso means DAT Organizer and SOrter
+- Updated mia and systems
+- Several fixes to dedupe and automerge
+- Request helper
+
+release 1.0.1
+- Updated systems.json
+- Bump internetarchive library
+
+release 1.0.0 (breaking change)
+- Changed logo
+- Bumped needed python version to 3.11
+- Refactored processor
+- Enhanced dats import detector
+- A lot of refactoring and code cleanup
+
 release 0.3.13
 - Added MIAs for redump!!!
 - Some code refactor.

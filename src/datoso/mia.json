@@ -134,21 +134,6 @@
         "game": "Logicool Mouseware 8.2J (Japan) (En,Ja)",
         "sha1": "7e2548ea1d015da27a7b3823f478cb19fbcd4ff5"
     },
-    "07d617f9c9a163a535fa1750a3eb11ca83ff4a25": {
-        "system": "NEC - PC-88 series",
-        "game": "DIOS (Japan)",
-        "sha1": "07d617f9c9a163a535fa1750a3eb11ca83ff4a25"
-    },
-    "b6cd2270f964fc29a3679896039d75d7fc68a26f": {
-        "system": "NEC - PC-88 series",
-        "game": "DIOS (Japan)",
-        "sha1": "b6cd2270f964fc29a3679896039d75d7fc68a26f"
-    },
-    "3090b6883dc952832d5770f56abe6943a87bdc94": {
-        "system": "NEC - PC-88 series",
-        "game": "DIOS (Japan)",
-        "sha1": "3090b6883dc952832d5770f56abe6943a87bdc94"
-    },
     "7dc243bde5b89667e852804c26bb88ce95c5f15f": {
         "system": "Bandai - Playdia Quick Interactive System",
         "game": "Go! Go! Ackman Planet (Japan)",
@@ -158,11 +143,6 @@
         "system": "Bandai - Playdia Quick Interactive System",
         "game": "Go! Go! Ackman Planet (Japan)",
         "sha1": "d8913abe6ca44cfb4e12ccfcb1c566a9014bc1b3"
-    },
-    "af96d4615103bba11a090b72f8f995cb353d3c7f": {
-        "system": "Sega - Dreamcast",
-        "game": "Chicken Run (Japan) (Beta) (2000-08-01)",
-        "sha1": "af96d4615103bba11a090b72f8f995cb353d3c7f"
     },
     "eec4b2e2cebda69e33c2ef0add8723ba83e2c576": {
         "system": "Sega - Dreamcast",
@@ -188,11 +168,6 @@
         "system": "funworld - Photo Play",
         "game": "Update 2001 (Europe) (Disc 2)",
         "sha1": "5248881684b861b87ad66c3ec4bdeaf2bfe88b61"
-    },
-    "4babed3535bfeea4ea33eb37bc908f12859998ab": {
-        "system": "Pocket PC",
-        "game": "FIFA Soccer 2002 (USA)",
-        "sha1": "4babed3535bfeea4ea33eb37bc908f12859998ab"
     },
     "7cc6f72d4a787db8cfa8ee288d5b90df84ba50f1": {
         "system": "Philips - CD-i",
@@ -268,11 +243,6 @@
         "system": "Philips - CD-i",
         "game": "TR-I - No World Order (Japan)",
         "sha1": "479963bd24d7ff1e26b4e55cf2316cd34d891780"
-    },
-    "6dfe5a90f370019b0bef1ed0cfd8c14f550ec615": {
-        "system": "Sony - PlayStation",
-        "game": "Arc the Lad III (Japan) (Demo 2)",
-        "sha1": "6dfe5a90f370019b0bef1ed0cfd8c14f550ec615"
     },
     "3860c303ef531e48b10be804130dbfa82f39314d": {
         "system": "Sony - PlayStation",

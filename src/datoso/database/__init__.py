@@ -8,11 +8,11 @@ from tinydb import JSONStorage, TinyDB
 from tinydb.middlewares import CachingMiddleware
 
 from datoso.configuration import config
-from datoso.helpers import FileUtils
+from datoso.helpers.file_utils import copy_path, parse_path
 
 XDG_DATA_HOME = Path(os.environ.get('XDG_DATA_HOME', '~/.local/share')).expanduser()
 
-database_path = FileUtils.parse_path(config['PATHS'].get('DatosoPath', '~/.local/share/datoso'))
+database_path = parse_path(config['PATHS'].get('DatosoPath', '~/.local/share/datoso'))
 database_path.mkdir(parents=True, exist_ok=True)
 
 DATABASE_URL = str(database_path / config['PATHS'].get('DatabaseFile', 'datoso.json'))
@@ -72,7 +72,7 @@ class JSONStorageWithBackup(JSONStorage):
 
     def make_backup(self) -> None:
         """Make a backup of the database."""
-        FileUtils.copy(self.path, f'{self.path}.bak')
+        copy_path(self.path, f'{self.path}.bak')
 
 
 class DatabaseSingletonMeta(type):

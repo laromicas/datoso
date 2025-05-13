@@ -2,7 +2,7 @@
 from pathlib import Path
 
 from datoso.configuration import config
-from datoso.helpers import FileUtils
+from datoso.helpers.file_utils import parse_path, remove_path
 
 
 class Folders:
@@ -16,7 +16,7 @@ class Folders:
 
     def __init__(self, seed: str, extras: list | None=None) -> None:
         """Initialize the folders."""
-        self.base = FileUtils.parse_path(config['PATHS'].get('DownloadPath'))
+        self.base = parse_path(config['PATHS'].get('DownloadPath'))
         self.download = Path(self.base) / seed
         self.dats = Path(self.download) / 'dats'
         self.backup = Path(self.download) / 'backup'
@@ -25,7 +25,7 @@ class Folders:
 
     def clean_dats(self) -> None:
         """Clean dats folder."""
-        FileUtils.remove(self.dats)
+        remove_path(self.dats)
         Path(self.dats).mkdir(parents=True, exist_ok=True)
 
     def create_all(self) -> None:
