@@ -27,6 +27,8 @@ class Config(configparser.ConfigParser):
             return super().get(section, option, **kwargs)
         except configparser.NoOptionError:
             return None
+        except configparser.NoSectionError: # Handle missing section
+            return None
 
     def getboolean(self, section: str, option: str, **kwargs) -> bool | None:  # noqa: ANN003
         """Get a boolean configuration value."""
@@ -34,10 +36,13 @@ class Config(configparser.ConfigParser):
         if envvar in os.environ:
             return os.environ[envvar].lower() in ['true', 'yes', '1']
         try:
-            return super().getboolean(section, option, **kwargs)
-        except AttributeError:
-            return self.boolean(super().get(section, option, **kwargs))
+            # Always fetch the raw value using super().get() first
+            val = super().get(section, option, **kwargs)
+            # Then convert using our custom boolean logic
+            return self.boolean(val)
         except configparser.NoOptionError:
+            return None
+        except configparser.NoSectionError: # Handle missing section
             return None
 
     def boolean(self, value: str | bool | int | None) -> bool:
