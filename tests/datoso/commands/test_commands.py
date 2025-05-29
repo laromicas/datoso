@@ -337,7 +337,7 @@ class TestCommandList(TestCommandsBase): # Older version? Test to ensure it runs
         
         # The main thing is that it attempts to print details for each seed.
 
-class TestCommandList(TestCommandsBase): # Older version? Test to ensure it runs.
+class TestCommandListTwo(TestCommandsBase): # Older version? Test to ensure it runs.
     @mock.patch('datoso.commands.commands.installed_seeds')
     def test_command_list_functionality(self, mock_installed_seeds):
         mock_seed_class1 = mock.MagicMock()
