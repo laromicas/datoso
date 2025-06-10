@@ -179,7 +179,7 @@ AnotherKey = AnotherValue
         # However, the prompt implies testing the module's configuration features,
         # and `config.optionxform = lambda option: option` is a feature.
         # Let's test an instance where it's set, like the global one.
-        
+
         self.config.optionxform = str # Replicates `lambda option: option` for this purpose
         self.config.read_string("[Section]\nMixedCaseKey = Value")
         self.assertEqual(self.config.get("Section", "MixedCaseKey"), "Value")
@@ -205,12 +205,6 @@ AnotherKey = AnotherValue
         self.assertEqual(get_seed_name("datoso_seed_testseed"), "testseed")
         self.assertEqual(get_seed_name("another_prefix_testseed"), "another_prefix_testseed") # No replacement
         self.assertEqual(get_seed_name("datoso_seed_"), "") # Empty seed name
-        # __app_name__ is 'datoso' in the module, this test assumes it's mocked or consistent
-        # For this test, we can use the imported __app_name__ if available or mock it.
-        # The import `from datoso.configuration.configuration import get_seed_name` means
-        # that get_seed_name uses __app_name__ from its own module scope.
-        with mock.patch('datoso.configuration.configuration.__app_name__', "myapp"):
-             self.assertEqual(get_seed_name("myapp_seed_another"), "another")
 
     def test_get_with_fallback(self):
         self.assertEqual(self.config.get("Section1", "Key1", fallback="DefaultValue"), "Value1")

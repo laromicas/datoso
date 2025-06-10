@@ -97,7 +97,7 @@ class TestRemoveFolder(TestFileUtilsBase):
     def test_remove_folder_calls_shutil_rmtree(self, mock_rmtree):
         folder_to_remove = self.temp_dir / "folder_to_delete"
         # No need to actually create it since we mock rmtree
-        
+
         remove_folder(str(folder_to_remove))
         mock_rmtree.assert_called_once_with(str(folder_to_remove))
 
@@ -114,7 +114,7 @@ class TestRemovePath(TestFileUtilsBase):
         file_to_remove = self.temp_dir / "file_to_remove.txt"
         file_to_remove.write_text("delete me")
         self.assertTrue(file_to_remove.exists())
-        
+
         remove_path(str(file_to_remove))
         self.assertFalse(file_to_remove.exists())
 
@@ -123,7 +123,7 @@ class TestRemovePath(TestFileUtilsBase):
         dir_to_remove = self.temp_dir / "dir_to_remove"
         dir_to_remove.mkdir()
         self.assertTrue(dir_to_remove.exists())
-        
+
         remove_path(str(dir_to_remove))
         mock_remove_folder_func.assert_called_once_with(dir_to_remove) # Path object is passed
 
@@ -141,7 +141,7 @@ class TestRemovePath(TestFileUtilsBase):
         file_in_parent.write_text("content")
 
         remove_path(str(file_in_parent), remove_empty_parent=True)
-        
+
         self.assertFalse(file_in_parent.exists())
         self.assertFalse(parent_dir.exists(), "Parent directory should have been removed as it became empty.")
 
@@ -154,20 +154,20 @@ class TestRemovePath(TestFileUtilsBase):
         sibling_file.write_text("i stay")
 
         remove_path(str(file_to_remove), remove_empty_parent=True)
-        
+
         self.assertFalse(file_to_remove.exists())
         self.assertTrue(parent_dir.exists(), "Parent directory should NOT have been removed.")
         self.assertTrue(sibling_file.exists())
-        
+
     def test_remove_nested_empty_parents(self):
         grandparent_dir = self.temp_dir / "grandparent"
         parent_dir = grandparent_dir / "parent"
         child_dir = parent_dir / "child" # This will be removed first
         child_dir.mkdir(parents=True, exist_ok=True)
-        
+
         # Remove child_dir, which should trigger removal of parent and grandparent
         remove_path(str(child_dir), remove_empty_parent=True)
-        
+
         self.assertFalse(child_dir.exists())
         self.assertFalse(parent_dir.exists())
         self.assertFalse(grandparent_dir.exists())
@@ -184,27 +184,27 @@ class TestRemoveEmptyFolders(TestFileUtilsBase):
         #     file_in_not_empty.txt
         #     empty_mid_in_not_empty/  (should be removed)
         #   file_in_root.txt
-        
+
         root_dir = self.temp_dir / "root_cleanup"
-        
+
         empty_leaf = root_dir / "empty_top" / "empty_mid" / "empty_leaf"
         empty_leaf.mkdir(parents=True, exist_ok=True)
-        
+
         not_empty_top = root_dir / "not_empty_top"
         not_empty_top.mkdir()
         (not_empty_top / "file_in_not_empty.txt").write_text("content")
         empty_mid_in_not_empty = not_empty_top / "empty_mid_in_not_empty"
         empty_mid_in_not_empty.mkdir()
-        
+
         (root_dir / "file_in_root.txt").write_text("root content")
-        
+
         remove_empty_folders(str(root_dir))
-        
+
         self.assertTrue(root_dir.exists())
         self.assertTrue((root_dir / "file_in_root.txt").exists())
-        
+
         self.assertFalse((root_dir / "empty_top").exists(), "empty_top and its children should be removed")
-        
+
         self.assertTrue(not_empty_top.exists())
         self.assertTrue((not_empty_top / "file_in_not_empty.txt").exists())
         self.assertFalse(empty_mid_in_not_empty.exists(), "empty_mid_in_not_empty should be removed")
@@ -248,7 +248,7 @@ class TestMovePath(TestFileUtilsBase):
         dest_file_str = str(self.temp_dir / "moved_dest" / "dest_moved.txt")
 
         move_path(str(source_file), dest_file_str)
-        
+
         # Check that parent directory of destination was ensured
         # Path(dest_file_str).parent.mkdir should have been called
         # This is implicitly tested by checking shutil.move args if mkdir is part of Path setup.
@@ -266,7 +266,7 @@ class TestMovePath(TestFileUtilsBase):
         dest_file_str = str(self.temp_dir / "dest_on_error.txt")
 
         move_path(source_file_str, dest_file_str)
-        
+
         mock_shutil_move.assert_called_once_with(source_file_str, dest_file_str)
         mock_internal_remove_path.assert_called_once_with(source_file_str)
 

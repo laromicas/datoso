@@ -1,16 +1,15 @@
+import sys
+from pathlib import Path
+
+project_root_for_imports = Path(__file__).parent.parent.parent.parent
+src_path = project_root_for_imports / "src"
+if str(src_path) not in sys.path:
+    sys.path.insert(0, str(src_path))
+
 import unittest
 from unittest import mock
-from pathlib import Path
-import sys
 
-# Ensure src is discoverable for imports
-project_root_for_imports = Path(__file__).parent.parent.parent.parent
-if str(project_root_for_imports) not in sys.path:
-    sys.path.insert(0, str(project_root_for_imports))
-if str(project_root_for_imports / "src") not in sys.path:
-    sys.path.insert(0, str(project_root_for_imports / "src"))
-
-
+import datoso.actions.processor
 from datoso.actions.processor import Processor, Process, LoadDatFile, DeleteOld, Copy, SaveToDatabase, MarkMias, AutoMerge, Deduplicate
 from datoso.configuration import config as datoso_config
 from datoso.configuration import logger as datoso_logger
@@ -74,16 +73,16 @@ class MockDatDB(DatModel):
     def __init__(self, **kwargs):
         name_arg = kwargs.pop('name', "mock_dat_db_default_name")
         seed_arg = kwargs.pop('seed', "mock_dat_db_default_seed")
-        
+
         super().__init__(name=name_arg, seed=seed_arg)
-        
+
         self.id = kwargs.get('id', None)
-        self.new_file = kwargs.get('new_file', None) 
-        self.date = kwargs.get('date', "2023-01-01") 
+        self.new_file = kwargs.get('new_file', None)
+        self.date = kwargs.get('date', "2023-01-01")
         self.enabled = kwargs.get('enabled', True)
-        self.automerge = kwargs.get('automerge', False) 
-        self.parent_id = kwargs.get('parent_id', None) 
-        self.parent = kwargs.get('parent', None) 
+        self.automerge = kwargs.get('automerge', False)
+        self.parent_id = kwargs.get('parent_id', None)
+        self.parent = kwargs.get('parent', None)
         self.static_path = kwargs.get('static_path', "db_static_path/")
         self.company = kwargs.get('company', None)
         self.system = kwargs.get('system', None)
@@ -92,7 +91,7 @@ class MockDatDB(DatModel):
 
         for k,v in kwargs.items():
             setattr(self,k,v)
-        
+
         self.name = name_arg # Ensure these are set on instance even if super() does something different
         self.seed = seed_arg
 
@@ -101,8 +100,8 @@ class MockDatDB(DatModel):
         self.flush = mock.Mock()
 
     def to_dict(self):
-        data = {} 
-        attrs_to_dict = ['id', 'name', 'seed', 'new_file', 'date', 'enabled', 'automerge', 'parent_id', 
+        data = {}
+        attrs_to_dict = ['id', 'name', 'seed', 'new_file', 'date', 'enabled', 'automerge', 'parent_id',
                          'static_path', 'company', 'system', 'version', 'comment']
         for attr in attrs_to_dict:
             if hasattr(self, attr):
@@ -111,7 +110,7 @@ class MockDatDB(DatModel):
                     data[attr] = str(val)
                 else:
                     data[attr] = val
-        
+
         for k,v in self.__dict__.items():
             if k not in data and not k.startswith('_') and \
                k not in DatModel.__dict__ and \
@@ -156,8 +155,8 @@ _mock_actions_for_globals_patch = {
 class TestProcessorClass(unittest.TestCase):
     def setUp(self):
         self.default_seed = "proc_seed"
-        self.patcher = mock.patch.dict(datoso.actions.processor.globals(), 
-                                       _mock_actions_for_globals_patch, 
+        self.patcher = mock.patch.dict(datoso.actions.processor.__dict__,
+                                       _mock_actions_for_globals_patch,
                                        clear=True)
         self.mocked_globals = self.patcher.start()
 
@@ -173,7 +172,7 @@ class TestProcessorClass(unittest.TestCase):
         self.assertIsNone(processor._database_dat)
 
     def test_processor_initialization_with_actions(self):
-        actions_list = [{"action": "SomeAction"}] 
+        actions_list = [{"action": "SomeAction"}]
         processor = Processor(actions=actions_list, seed=self.default_seed)
         self.assertEqual(processor.actions, actions_list)
 
@@ -187,13 +186,13 @@ class TestProcessorClass(unittest.TestCase):
         actions = [{"action": "MockActionSuccess", "name": "TestDat", "seed": self.default_seed}]
         processor = Processor(actions=actions, file="test.dat", seed=self.default_seed)
         results = list(processor.process())
-        
+
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0], "MockActionSuccess: Processed")
         self.assertIsNotNone(processor._file_dat)
-        self.assertEqual(processor._file_dat.name, "processed_action1.dat") 
+        self.assertEqual(processor._file_dat.name, "processed_action1.dat")
         self.assertIsNotNone(processor._database_dat)
-        self.assertEqual(processor._database_dat.name, "db_processed_action1.dat") 
+        self.assertEqual(processor._database_dat.name, "db_processed_action1.dat")
 
     def test_processor_process_multiple_actions_and_data_flow(self):
         actions = [
@@ -201,6 +200,7 @@ class TestProcessorClass(unittest.TestCase):
             {"action": "MockActionUpdateData", "name":"UpdatedDat", "seed": self.default_seed}
         ]
         processor = Processor(actions=actions, file="test.dat", seed=self.default_seed)
+        processor.MockActionSuccess = MockActionSuccess
         results = list(processor.process())
         self.assertEqual(len(results), 2)
         self.assertEqual(results[0], "MockActionSuccess: Processed")
@@ -214,14 +214,14 @@ class TestProcessorClass(unittest.TestCase):
         actions = [
             {"action": "MockActionSuccess", "name":"Dat1", "seed": self.default_seed},
             {"action": "MockActionStop", "name":"Dat2", "seed": self.default_seed},
-            {"action": "MockActionUpdateData", "name":"Dat3", "seed": self.default_seed} 
+            {"action": "MockActionUpdateData", "name":"Dat3", "seed": self.default_seed}
         ]
-        processor = Processor(actions=actions, seed=self.default_seed) 
+        processor = Processor(actions=actions, seed=self.default_seed)
         results = list(processor.process())
         self.assertEqual(len(results), 2)
         self.assertEqual(results[0], "MockActionSuccess: Processed")
         self.assertEqual(results[1], "MockActionStop: Stopped")
-        self.assertEqual(processor._file_dat.name, "processed_action1.dat") 
+        self.assertEqual(processor._file_dat.name, "processed_action1.dat")
 
 
 class TestProcessBaseClass(unittest.TestCase):
@@ -230,31 +230,31 @@ class TestProcessBaseClass(unittest.TestCase):
         class ConcreteProcess(Process):
             # _class is used by Process.load_file_dat if no factory
             # We assign MockDatFile so it attempts to instantiate our mock
-            _class = MockDatFile 
+            _class = MockDatFile
             def process(self): return "Processed" # Dummy implementation for abstract method
         self.ConcreteProcess = ConcreteProcess
-        self.mock_file_path = Path("test_file.dat") 
+        self.mock_file_path = Path("test_file.dat")
         class ConcreteProcess(Process):
-            _class = MockDatFile 
-            def process(self): return "Processed" 
+            _class = MockDatFile
+            def process(self): return "Processed"
         self.ConcreteProcess = ConcreteProcess
         self.default_seed = "test_seed_process_base"
         self.default_name = self.mock_file_path.name
 
     def test_load_file_dat_no_factory(self):
         process_instance = self.ConcreteProcess(file=self.mock_file_path, name=self.default_name, seed=self.default_seed)
-        file_dat = process_instance.load_file_dat() 
+        file_dat = process_instance.load_file_dat()
         self.assertIsInstance(file_dat, MockDatFile)
         self.assertEqual(file_dat.file, self.mock_file_path)
-        file_dat.load.assert_called_once() 
+        file_dat.load.assert_called_once()
 
     def test_load_file_dat_with_factory(self):
-        mock_factory = mock.Mock(return_value=MockDatFile) 
+        mock_factory = mock.Mock(return_value=MockDatFile)
         process_instance = self.ConcreteProcess(file=self.mock_file_path, _factory=mock_factory, name=self.default_name, seed=self.default_seed)
-        file_dat_instance = process_instance.load_file_dat() 
+        file_dat_instance = process_instance.load_file_dat()
         mock_factory.assert_called_once_with(self.mock_file_path)
         self.assertIsInstance(file_dat_instance, MockDatFile)
-        file_dat_instance.load.assert_called_once() 
+        file_dat_instance.load.assert_called_once()
 
     def test_file_dat_property_loads_if_none(self):
         process_instance = self.ConcreteProcess(file=self.mock_file_path, name=self.default_name, seed=self.default_seed)
@@ -269,34 +269,34 @@ class TestProcessBaseClass(unittest.TestCase):
         self.assertIs(file_dat_obj, file_dat_obj_again)
 
 
-    @mock.patch('datoso.actions.processor.Dat', new_callable=MockDatDB) 
+    @mock.patch('datoso.actions.processor.Dat', new_callable=MockDatDB)
     def test_load_database_dat(self, mock_dat_constructor):
         file_dat_dict_content = {"name": "test.dat", "version": "1.0", "company": "Nintendo", "seed": self.default_seed}
         process_instance = self.ConcreteProcess(file=self.mock_file_path, name="test.dat", seed=self.default_seed)
         process_instance._file_dat = MockDatFile(file=self.mock_file_path, **file_dat_dict_content)
-        
-        # This is the instance we expect load_database_dat to create and work with
-        expected_db_instance = mock_dat_constructor.return_value 
-        
-        db_dat_loaded = process_instance.load_database_dat() 
 
-        self.assertIs(db_dat_loaded, expected_db_instance) 
+        # This is the instance we expect load_database_dat to create and work with
+        expected_db_instance = mock_dat_constructor.return_value
+
+        db_dat_loaded = process_instance.load_database_dat()
+
+        self.assertIs(db_dat_loaded, expected_db_instance)
         mock_dat_constructor.assert_called_once_with(**file_dat_dict_content)
         expected_db_instance.load.assert_called_once()
 
 
     def test_database_dat_property_loads_if_none(self):
         process_instance = self.ConcreteProcess(file=self.mock_file_path, name=self.default_name, seed=self.default_seed)
-        process_instance._file_dat = MockDatFile(file=self.mock_file_path, name=self.default_name, seed=self.default_seed) 
-        
+        process_instance._file_dat = MockDatFile(file=self.mock_file_path, name=self.default_name, seed=self.default_seed)
+
         with mock.patch.object(process_instance, 'load_database_dat', wraps=process_instance.load_database_dat) as spy_load:
-            db_dat_obj = process_instance.database_dat 
+            db_dat_obj = process_instance.database_dat
             spy_load.assert_called_once()
             self.assertIsInstance(db_dat_obj, MockDatDB)
 
         spy_load.reset_mock()
-        db_dat_obj_again = process_instance.database_dat 
-        spy_load.assert_not_called() 
+        db_dat_obj_again = process_instance.database_dat
+        spy_load.assert_not_called()
         self.assertIs(db_dat_obj, db_dat_obj_again)
 
 
@@ -304,8 +304,8 @@ class TestProcessBaseClass(unittest.TestCase):
         process_instance = self.ConcreteProcess(file=self.mock_file_path, name=self.default_name, seed=self.default_seed)
         mock_file_dat_instance = MockDatFile(file=self.mock_file_path, custom_field="custom_value", name="specific.dat", seed=self.default_seed)
         process_instance._file_dat = mock_file_dat_instance
-        data = process_instance.file_data 
-        self.assertEqual(data['name'], "specific.dat") 
+        data = process_instance.file_data
+        self.assertEqual(data['name'], "specific.dat")
         self.assertEqual(data.get('custom_field'), "custom_value") # Use .get for custom fields
         self.assertEqual(data['seed'], self.default_seed)
 
@@ -315,16 +315,16 @@ class TestProcessBaseClass(unittest.TestCase):
         process_instance._file_dat = MockDatFile(file=self.mock_file_path, name="filedatname", seed=self.default_seed)
         mock_db_dat_instance = MockDatDB(name="db_name_override", db_field="db_value", system="SNES", seed=self.default_seed)
         process_instance._database_dat = mock_db_dat_instance
-        data = process_instance.database_data 
-        self.assertEqual(data['name'], "db_name_override") 
+        data = process_instance.database_data
+        self.assertEqual(data['name'], "db_name_override")
         self.assertEqual(data.get('db_field'), "db_value") # Use .get for custom fields
         self.assertEqual(data['system'], "SNES")
         self.assertEqual(data['seed'], self.default_seed)
 
 
     def test_database_dat_setter(self):
-        process_instance = self.ConcreteProcess(name=self.default_name, seed=self.default_seed) 
-        new_db_dat = MockDatDB(name="manually_set_db.dat", seed=self.default_seed) 
+        process_instance = self.ConcreteProcess(name=self.default_name, seed=self.default_seed)
+        new_db_dat = MockDatDB(name="manually_set_db.dat", seed=self.default_seed)
         process_instance.database_dat = new_db_dat
         self.assertEqual(process_instance._database_dat.name, "manually_set_db.dat")
         self.assertIs(process_instance.database_dat, new_db_dat)
@@ -342,19 +342,19 @@ class TestLoadDatFileAction(unittest.TestCase):
     @mock.patch('datoso.actions.processor.Dat', new_callable=MockDatDB) # Patch with instance of MockDatDB
     def test_process_success(self, mock_dat_constructor):
         action = LoadDatFile(file=self.mock_file_path, _class=MockDatFile, name=self.default_name, seed=self.default_seed)
-        result = action.process() 
-        
+        result = action.process()
+
         self.assertEqual(result, "Loaded")
         self.assertIsInstance(action._file_dat, MockDatFile)
         self.assertEqual(action._file_dat.file, self.mock_file_path)
         self.assertEqual(action._file_dat.seed, self.default_seed)
         action._file_dat.load.assert_called_once()
-        
+
         self.assertIsInstance(action._database_dat, MockDatDB)
         # Database name and seed should come from file_dat's dict
         self.assertEqual(action._database_dat.name, self.default_name)
         self.assertEqual(action._database_dat.seed, self.default_seed)
-        action._database_dat.load.assert_called_once() 
+        action._database_dat.load.assert_called_once()
 
 
     @mock.patch('datoso.actions.processor.Dat', new_callable=MockDatDB)
@@ -363,9 +363,9 @@ class TestLoadDatFileAction(unittest.TestCase):
         # mock_dat_constructor_instance is the INSTANCE of MockDatDB thanks to new_callable=MockDatDB
         mock_faulty_class = mock.Mock(side_effect=Exception("Load failed"))
         action = LoadDatFile(file=self.mock_file_path, _class=mock_faulty_class, name=self.default_name, seed=self.default_seed)
-        
+
         result = action.process()
-        
+
         self.assertEqual(result, "Error")
         self.assertEqual(action.status, "Error")
         mock_logger_exception.assert_called_once()
@@ -387,7 +387,7 @@ class TestLoadDatFileAction(unittest.TestCase):
     def test_process_with_factory(self, mock_dat_constructor):
         mock_factory = mock.Mock(return_value=MockDatFile) # Factory returns the CLASS
         action = LoadDatFile(file=self.mock_file_path, _factory=mock_factory, name=self.default_name, seed=self.default_seed)
-        
+
         result = action.process()
 
         self.assertEqual(result, "Loaded")
@@ -400,7 +400,7 @@ class TestLoadDatFileAction(unittest.TestCase):
 
 class TestDeleteOldAction(unittest.TestCase):
     def setUp(self):
-        self.mock_file_path_obj = Path("local/file.dat") 
+        self.mock_file_path_obj = Path("local/file.dat")
         self.action_folder = "test_output/dats" # Use a local path for testing
         self.file_dat = MockDatFile(file=self.mock_file_path_obj, name="file.dat", path="system/game", date="2023-01-15", seed="del_seed")
         self.db_dat_path_str = str(Path(self.action_folder) / "system/game/file.dat")
@@ -409,7 +409,7 @@ class TestDeleteOldAction(unittest.TestCase):
     def _create_action(self, file_dat_override=None, db_dat_override=None, folder=None, current_file_path=None):
         # Ensure seed is passed to the action constructor if it's expected by Process base or action itself
         action_seed = (file_dat_override or self.file_dat).seed
-        action = DeleteOld(file=current_file_path or self.mock_file_path_obj, 
+        action = DeleteOld(file=current_file_path or self.mock_file_path_obj,
                            folder=folder if folder is not None else self.action_folder,
                            name=(file_dat_override or self.file_dat).name, # Pass name and seed
                            seed=action_seed)
@@ -419,35 +419,36 @@ class TestDeleteOldAction(unittest.TestCase):
 
     @mock.patch('datoso.helpers.compare_dates')
     def test_process_newer_found_stops(self, mock_compare_dates):
-        mock_compare_dates.return_value = True 
+        mock_compare_dates.return_value = True
         action = self._create_action()
         result = action.process()
         self.assertEqual(result, "No Action Taken, Newer Found")
         self.assertTrue(action.stop)
         mock_compare_dates.assert_called_once_with(self.db_dat.date, self.file_dat.date)
 
-    @mock.patch('datoso.helpers.compare_dates', return_value=False) 
+    @mock.patch('datoso.helpers.compare_dates', return_value=False)
     def test_process_no_new_file_in_db(self, mock_compare_dates):
-        self.db_dat.new_file = None 
+        self.db_dat.new_file = None
         action = self._create_action()
         result = action.process()
         self.assertEqual(result, "New")
         self.assertFalse(action.stop)
 
     @mock.patch('datoso.helpers.compare_dates', return_value=False)
-    @mock.patch('datoso.configuration.config.getboolean', return_value=False) 
-    @mock.patch('datoso.helpers.file_utils.remove_path') 
+    @mock.patch('datoso.configuration.config.getboolean', return_value=False)
+    @mock.patch('datoso.helpers.file_utils.remove_path')
     def test_process_exists_same_file_date_no_overwrite_enabled(self, mock_remove_path, mock_getboolean, mock_compare_dates):
-        self.file_dat.date = self.db_dat.date 
+        self.file_dat.date = self.db_dat.date
         action = self._create_action()
         result = action.process()
         self.assertEqual(result, "Exists")
-        self.assertFalse(action.stop) 
+        self.assertFalse(action.stop)
         mock_remove_path.assert_not_called()
         mock_getboolean.assert_called_once_with('PROCESS', 'Overwrite', fallback=False)
-
-                           name=(file_dat_override or self.file_dat).name, 
-                           seed=action_seed)
+        # action = Copy(file=current_file_path or self.source_file_path,
+        #               folder=folder if folder is not None else self.action_folder,
+        #                    name=(file_dat_override or self.file_dat).name,
+        #                    seed=action_seed)
         action._file_dat = file_dat_override if file_dat_override is not None else self.file_dat
         action._database_dat = db_dat_override if db_dat_override is not None else self.db_dat
         return action
@@ -461,7 +462,7 @@ class TestDeleteOldAction(unittest.TestCase):
         result = action.process()
         self.assertEqual(result, "Disabled")
         self.assertTrue(action.stop)
-        self.assertIsNone(action._database_dat.new_file) 
+        self.assertIsNone(action._database_dat.new_file)
         mock_remove_path.assert_called_once_with(Path(self.db_dat_path_str), remove_empty_parent=True)
         action._database_dat.save.assert_called_once()
         action._database_dat.flush.assert_called_once()
@@ -470,7 +471,7 @@ class TestDeleteOldAction(unittest.TestCase):
     @mock.patch('datoso.helpers.file_utils.remove_path') # Mock remove_path
     @mock.patch('pathlib.Path.mkdir') # Mock mkdir
     def test_process_successful_delete(self, mock_mkdir, mock_remove_path, mock_compare_dates):
-        self.file_dat.date = "2023-01-16" 
+        self.file_dat.date = "2023-01-16"
         action = self._create_action()
         result = action.process()
         self.assertEqual(result, "Deleted")
@@ -479,7 +480,7 @@ class TestDeleteOldAction(unittest.TestCase):
 
     @mock.patch('datoso.helpers.compare_dates', side_effect=ValueError("Date parse error"))
     @mock.patch.object(datoso_logger, 'exception')
-    @mock.patch('pathlib.Path.mkdir') 
+    @mock.patch('pathlib.Path.mkdir')
     def test_process_compare_dates_value_error(self, mock_mkdir, mock_logger_exception, mock_compare_dates):
         action = self._create_action()
         result = action.process()
@@ -487,32 +488,32 @@ class TestDeleteOldAction(unittest.TestCase):
         mock_logger_exception.assert_called_once()
 
     def test_destination_absolute_path_in_dat(self):
-        self.file_dat.path = "/absolute/path" 
+        self.file_dat.path = "/absolute/path"
         # Ensure file_dat.file.name is set for the logic that uses it
-        self.file_dat.file = Path(self.file_dat.path) / self.file_dat.name 
-        action = self._create_action(folder="ignored_folder") 
+        self.file_dat.file = Path(self.file_dat.path) / self.file_dat.name
+        action = self._create_action(folder="ignored_folder")
         dest = action.destination()
         self.assertEqual(dest, Path("/absolute/path/" + self.file_dat.name))
 
 
     def test_destination_with_folder_attribute(self):
-        self.file_dat.path = "relative/subpath" 
+        self.file_dat.path = "relative/subpath"
         self.file_dat.file = Path(self.file_dat.path) / self.file_dat.name
         action = self._create_action(folder="/custom/output")
         dest = action.destination()
         self.assertEqual(dest, Path("/custom/output/relative/subpath/" + self.file_dat.name))
-        
+
     def test_destination_no_folder_attribute_relative_path(self):
         self.file_dat.path = "relative/subpath"
         # Action is created with folder=None
-        action = self._create_action(folder=None) 
+        action = self._create_action(folder=None)
         # Explicitly set self.folder to None on the instance if _create_action doesn't handle it perfectly
-        action.folder = None 
+        action.folder = None
         dest = action.destination()
         self.assertIsNone(dest)
 
 
-    @mock.patch('datoso.helpers.file_utils.get_ext', return_value='.zip') 
+    @mock.patch('datoso.helpers.file_utils.get_ext', return_value='.zip')
     def test_destination_non_dat_xml_extension(self, mock_get_ext):
         self.file_dat.file = Path("archive.zip") # file_dat.file provides the extension
         self.file_dat.name = "archive" # name is used for constructing output if not .dat/.xml
@@ -525,7 +526,7 @@ class TestDeleteOldAction(unittest.TestCase):
 
 class TestCopyAction(unittest.TestCase):
     def setUp(self):
-        self.source_file_path = Path("source/downloads/new_file.dat") 
+        self.source_file_path = Path("source/downloads/new_file.dat")
         self.action_folder = "test_output/dats_copied" # Use a local path
         self.file_dat = MockDatFile(file=self.source_file_path, name="new_file.dat", path="system/game", date="2023-01-15", seed="copy_seed")
         self.db_dat_current_path_str = str(Path(self.action_folder) / "system/game/old_file.dat")
@@ -534,7 +535,7 @@ class TestCopyAction(unittest.TestCase):
 
     def _create_action(self, file_dat_override=None, db_dat_override=None, folder=None, current_file_path=None):
         action_seed = (file_dat_override or self.file_dat).seed
-        action = Copy(file=current_file_path or self.source_file_path, 
+        action = Copy(file=current_file_path or self.source_file_path,
                       folder=folder if folder is not None else self.action_folder,
                       name=(file_dat_override or self.file_dat).name,
                       seed=action_seed)
@@ -545,7 +546,7 @@ class TestCopyAction(unittest.TestCase):
     @mock.patch('datoso.helpers.file_utils.copy_path')
     @mock.patch('pathlib.Path.mkdir')
     def test_process_no_db_dat(self, mock_mkdir, mock_copy_path):
-        action = self._create_action(db_dat_override=None) 
+        action = self._create_action(db_dat_override=None)
         result = action.process()
         self.assertEqual(result, "Copied")
         mock_copy_path.assert_called_once_with(self.source_file_path, self.expected_destination)
@@ -560,7 +561,7 @@ class TestCopyAction(unittest.TestCase):
         self.assertIsNone(action.file_dat.new_file) # Check instance attr directly
         mock_copy_path.assert_not_called()
 
-    @mock.patch('datoso.helpers.compare_dates', return_value=True) 
+    @mock.patch('datoso.helpers.compare_dates', return_value=True)
     @mock.patch('datoso.helpers.file_utils.copy_path')
     @mock.patch('pathlib.Path.mkdir')
     def test_process_newer_in_db_no_action(self, mock_mkdir, mock_copy_path, mock_compare_dates):
@@ -572,9 +573,9 @@ class TestCopyAction(unittest.TestCase):
         mock_copy_path.assert_not_called()
         mock_compare_dates.assert_called_once_with(self.db_dat.date, self.file_dat.date)
 
-    @mock.patch('datoso.helpers.compare_dates', return_value=False) 
-    @mock.patch('datoso.configuration.config.getboolean', return_value=False) 
-    @mock.patch('pathlib.Path.exists', return_value=True) 
+    @mock.patch('datoso.helpers.compare_dates', return_value=False)
+    @mock.patch('datoso.configuration.config.getboolean', return_value=False)
+    @mock.patch('pathlib.Path.exists', return_value=True)
     @mock.patch('datoso.helpers.file_utils.copy_path')
     @mock.patch('pathlib.Path.mkdir')
     def test_process_exists_no_overwrite(self, mock_mkdir, mock_copy_path, mock_path_exists, mock_getboolean, mock_compare_dates):
@@ -590,7 +591,7 @@ class TestCopyAction(unittest.TestCase):
     @mock.patch('datoso.helpers.file_utils.copy_path')
     @mock.patch('pathlib.Path.mkdir')
     def test_process_created(self, mock_mkdir, mock_copy_path, mock_compare_dates):
-        self.db_dat.new_file = None 
+        self.db_dat.new_file = None
         action = self._create_action()
         result = action.process()
         self.assertEqual(result, "Created")
@@ -609,12 +610,12 @@ class TestCopyAction(unittest.TestCase):
         self.assertEqual(str(action.database_dat.new_file), str(self.expected_destination))
 
     @mock.patch('datoso.helpers.compare_dates', return_value=False)
-    @mock.patch('datoso.configuration.config.getboolean', return_value=True) 
+    @mock.patch('datoso.configuration.config.getboolean', return_value=True)
     @mock.patch('pathlib.Path.exists', return_value=True)
     @mock.patch('datoso.helpers.file_utils.copy_path')
     @mock.patch('pathlib.Path.mkdir')
     def test_process_overwritten(self, mock_mkdir, mock_copy_path, mock_path_exists, mock_getboolean, mock_compare_dates):
-        self.db_dat.new_file = str(self.expected_destination) 
+        self.db_dat.new_file = str(self.expected_destination)
         action = self._create_action()
         result = action.process()
         self.assertEqual(result, "Overwritten")
@@ -623,24 +624,24 @@ class TestCopyAction(unittest.TestCase):
         mock_getboolean.assert_any_call('PROCESS', 'Overwrite', fallback=False)
 
     @mock.patch('datoso.helpers.compare_dates', return_value=False)
-    @mock.patch('pathlib.Path.exists', return_value=False) 
+    @mock.patch('pathlib.Path.exists', return_value=False)
     @mock.patch('datoso.helpers.file_utils.copy_path')
     @mock.patch('pathlib.Path.mkdir')
     def test_process_updated_path_same_dest_not_exists(self, mock_mkdir, mock_copy_path, mock_path_exists, mock_compare_dates):
-        self.db_dat.new_file = str(self.expected_destination) 
+        self.db_dat.new_file = str(self.expected_destination)
         action = self._create_action()
         result = action.process()
-        self.assertEqual(result, "Updated") 
+        self.assertEqual(result, "Updated")
         mock_copy_path.assert_called_once_with(self.source_file_path, self.expected_destination)
         self.assertEqual(str(action.database_dat.new_file), str(self.expected_destination))
 
-    def test_destination_logic(self): 
+    def test_destination_logic(self):
         action = self._create_action()
         self.assertEqual(action.destination(), self.expected_destination)
         action.file_dat.path = "/abs/path" # file_dat.path is string
         action.file_dat.file = Path(action.file_dat.path) / action.file_dat.name # Update file_dat.file to match
         self.assertEqual(action.destination(), Path("/abs/path/new_file.dat"))
-        
+
         action.file_dat.path = "system/game" # Reset
         action.file_dat.file = self.source_file_path # Reset
 
@@ -658,18 +659,18 @@ class TestSaveToDatabaseAction(unittest.TestCase):
         self.mock_file_dat = MockDatFile(**self.file_dat_data)
         self.mock_db_dat_old = MockDatDB(**self.db_dat_data)
 
-    @mock.patch('datoso.actions.processor.Dat', new_callable=MockDatDB) 
+    @mock.patch('datoso.actions.processor.Dat', new_callable=MockDatDB)
     def test_process_saves_merged_data(self, mock_dat_constructor):
         action = SaveToDatabase(name="TestSave", seed=self.default_seed) # Actions also take name/seed
         action._file_dat = self.mock_file_dat
-        action._database_dat = self.mock_db_dat_old 
+        action._database_dat = self.mock_db_dat_old
 
         # This is the instance that Dat(**merged_data) should produce
-        expected_instance = mock_dat_constructor.return_value 
+        expected_instance = mock_dat_constructor.return_value
 
         result = action.process()
         self.assertEqual(result, "Saved")
-        
+
         # Check that Dat (our MockDatDB) was called with merged data
         # file_data should take precedence
         expected_merged_data = {**self.db_dat_data, **self.file_dat_data}
@@ -678,10 +679,10 @@ class TestSaveToDatabaseAction(unittest.TestCase):
         expected_merged_data['seed'] = self.file_dat_data['seed']
 
         mock_dat_constructor.assert_called_once()
-        constructor_args = mock_dat_constructor.call_args[1] 
+        constructor_args = mock_dat_constructor.call_args[1]
         for key, value in expected_merged_data.items():
             self.assertEqual(constructor_args.get(key), value, msg=f"Mismatch for key {key}")
-        
+
         expected_instance.save.assert_called_once()
         expected_instance.flush.assert_called_once()
         self.assertIs(action._database_dat, expected_instance)
@@ -719,19 +720,19 @@ class TestMarkMiasAction(unittest.TestCase):
         action = MarkMias(name="TestMIA", seed=self.default_seed)
         action._database_dat = self.db_dat_no_file
         result = action.process()
-        self.assertEqual(result, "Marked") 
+        self.assertEqual(result, "Marked")
         mock_mark_mias_func.assert_called_once_with(dat_file=None)
 
 
-@mock.patch('datoso.actions.processor.Dedupe', spec=DedupeClass) 
+@mock.patch('datoso.actions.processor.Dedupe', spec=DedupeClass)
 class TestAutoMergeAction(unittest.TestCase):
     def setUp(self):
         self.default_seed = "automerge_seed"
     def test_process_no_automerge_attr(self, mock_Dedupe):
         action = AutoMerge(name="TestAM", seed=self.default_seed)
-        action._database_dat = MockDatDB(name="DatNoAM", seed=self.default_seed) 
+        action._database_dat = MockDatDB(name="DatNoAM", seed=self.default_seed)
         if hasattr(action._database_dat, 'automerge'): # Ensure attr is missing for this specific test
-            delattr(action._database_dat, 'automerge') 
+            delattr(action._database_dat, 'automerge')
         result = action.process()
         self.assertEqual(result, "Skipped")
         mock_Dedupe.assert_not_called()
@@ -747,7 +748,7 @@ class TestAutoMergeAction(unittest.TestCase):
         action = AutoMerge(name="TestAM", seed=self.default_seed)
         action._database_dat = MockDatDB(automerge=True, name="DatAMTrue", seed=self.default_seed)
         mock_dedupe_instance = mock_Dedupe.return_value
-        mock_dedupe_instance.dedupe.return_value = 0 
+        mock_dedupe_instance.dedupe.return_value = 0
 
         result = action.process()
         self.assertEqual(result, "Skipped")
@@ -759,7 +760,7 @@ class TestAutoMergeAction(unittest.TestCase):
         action = AutoMerge(name="TestAM", seed=self.default_seed)
         action._database_dat = MockDatDB(automerge=True, name="TestDATMerge", seed=self.default_seed)
         mock_dedupe_instance = mock_Dedupe.return_value
-        mock_dedupe_instance.dedupe.return_value = 5 
+        mock_dedupe_instance.dedupe.return_value = 5
 
         result = action.process()
         self.assertEqual(result, "Automerged")
@@ -775,7 +776,7 @@ class TestDeduplicateAction(unittest.TestCase):
     def test_process_no_parent_attr(self, mock_Dedupe):
         action = Deduplicate(name="TestDedup", seed=self.default_seed)
         action._database_dat = MockDatDB(name="ChildDatNoParentAttr", seed=self.default_seed)
-        if hasattr(action._database_dat, 'parent'): 
+        if hasattr(action._database_dat, 'parent'):
             delattr(action._database_dat, 'parent')
         result = action.process()
         self.assertEqual(result, "Skipped")
@@ -792,7 +793,7 @@ class TestDeduplicateAction(unittest.TestCase):
         action = Deduplicate(name="TestDedup", seed=self.default_seed)
         parent_dat = MockDatDB(name="ParentDat", seed="parent_seed")
         action._database_dat = MockDatDB(name="ChildDatWithParent", parent=parent_dat, seed=self.default_seed)
-        
+
         mock_dedupe_instance = mock_Dedupe.return_value
         mock_dedupe_instance.dedupe.return_value = 0
 
@@ -808,7 +809,7 @@ class TestDeduplicateAction(unittest.TestCase):
         action._database_dat = MockDatDB(name="ChildDatToMerge", parent=parent_dat, seed=self.default_seed)
 
         mock_dedupe_instance = mock_Dedupe.return_value
-        mock_dedupe_instance.dedupe.return_value = 3 
+        mock_dedupe_instance.dedupe.return_value = 3
 
         result = action.process()
         self.assertEqual(result, "Deduped")

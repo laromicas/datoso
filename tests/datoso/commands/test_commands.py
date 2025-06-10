@@ -56,7 +56,7 @@ class TestCommandsBase(unittest.TestCase):
         self.config_patcher = mock.patch('datoso.commands.commands.config')
         self.logger_patcher = mock.patch('datoso.commands.commands.logger') # Main logger used in processor.py
         self.logging_patcher = mock.patch('datoso.commands.commands.logging') # logging module itself
-        
+
         self.mock_config = self.config_patcher.start()
         self.mock_logger = self.logger_patcher.start() # This is likely 'from venv import logger' in commands.py
         self.mock_logging = self.logging_patcher.start()
@@ -80,9 +80,9 @@ class TestCommandDeduper(TestCommandsBase):
         self.mock_args.parent = None
         self.mock_args.input = "input.dat" # Ends with .dat
         self.mock_args.auto_merge = False # Ensure auto_merge is false
-        
+
         command_deduper(self.mock_args)
-        
+
         mock_sys_exit.assert_called_once_with(1)
         mock_Dedupe_class.assert_not_called()
 
@@ -93,9 +93,9 @@ class TestCommandDeduper(TestCommandsBase):
         self.mock_args.parent = "parent_file"
         self.mock_args.output = "output_file"
         self.mock_args.dry_run = False
-        
+
         command_deduper(self.mock_args)
-        
+
         mock_Dedupe_class.assert_called_once_with(self.mock_args.input, self.mock_args.parent)
         mock_dedupe_instance.dedupe.assert_called_once()
         mock_dedupe_instance.save.assert_called_once_with(self.mock_args.output)
@@ -109,9 +109,9 @@ class TestCommandDeduper(TestCommandsBase):
         self.mock_args.parent = None
         self.mock_args.output = None # Save to input
         self.mock_args.dry_run = False
-        
+
         command_deduper(self.mock_args)
-        
+
         mock_Dedupe_class.assert_called_once_with(self.mock_args.input)
         mock_dedupe_instance.dedupe.assert_called_once()
         mock_dedupe_instance.save.assert_called_once_with() # No output arg, saves to input
@@ -124,15 +124,15 @@ class TestCommandDeduper(TestCommandsBase):
         self.mock_args.parent = "parent_file"
         self.mock_args.output = "output_file"
         self.mock_args.dry_run = True
-        
+
         command_deduper(self.mock_args)
-        
+
         # self.mock_logger.setLevel.assert_called_once_with(logging.DEBUG) # This is the venv logger
-        self.mock_logger.setLevel.assert_called_once_with(logging.DEBUG) 
+        self.mock_logger.setLevel.assert_called_once_with(logging.DEBUG)
         mock_Dedupe_class.assert_called_once_with(self.mock_args.input, self.mock_args.parent)
         mock_dedupe_instance.dedupe.assert_called_once()
-        mock_dedupe_instance.save.assert_not_called() 
-        self.mock_logging.info.assert_called() 
+        mock_dedupe_instance.save.assert_not_called()
+        self.mock_logging.info.assert_called()
 
 
 class TestCommandImport(TestCommandsBase):
@@ -174,10 +174,10 @@ class TestCommandImport(TestCommandsBase):
         mock_path_instance.rglob.return_value = [mock_dat_file_path]
 
         self.mock_config.__getitem__.side_effect = lambda key: {'DatPath': '/fake/datroot', 'IMPORT': {}}.get(key, mock.MagicMock())
-        
+
         mock_dat_file_obj_instance = mock.MagicMock()
         mock_dat_file_obj_instance.dict.return_value = {"name": "file1", "version": "1.0"}
-        
+
         mock_detected_class = mock.Mock(return_value=mock_dat_file_obj_instance)
         mock_detect_seed.return_value = ("detected_seed_name", mock_detected_class)
 
@@ -193,10 +193,10 @@ class TestCommandImport(TestCommandsBase):
         mock_detect_seed.assert_called_once_with(str(mock_dat_file_path), mock_rules_instance.rules)
         mock_detected_class.assert_called_once_with(file=str(mock_dat_file_path))
         mock_dat_file_obj_instance.load.assert_called_once()
-        
+
         expected_dat_constructor_args = {
             "name": "file1", "version": "1.0", # from mock_dat_file_obj_instance.dict()
-            "seed": "detected_seed_name", 
+            "seed": "detected_seed_name",
             "new_file": str(mock_dat_file_path)
         }
         mock_DatModel_constructor.assert_called_once_with(**expected_dat_constructor_args)
@@ -208,7 +208,7 @@ class TestCommandImport(TestCommandsBase):
     @mock.patch('datoso.commands.commands.Path')
     @mock.patch('datoso.commands.commands.Rules')
     @mock.patch('datoso.commands.commands.detect_seed', side_effect=LookupError("Seed not found"))
-    @mock.patch('datoso.commands.commands.Dat') 
+    @mock.patch('datoso.commands.commands.Dat')
     def test_import_lookup_error(self, mock_DatModel_constructor, mock_detect_seed, mock_Rules_class, mock_Path_class):
         mock_path_instance = mock_Path_class.return_value
         mock_path_instance.exists.return_value = True
@@ -219,30 +219,30 @@ class TestCommandImport(TestCommandsBase):
 
         with mock.patch('builtins.print') as mock_print:
             command_import(self.mock_args)
-        
+
         mock_print.assert_any_call(f'{str(mock_dat_file_path)} - ', end='')
-        mock_print.assert_any_call(f"{mock.ANY}Error detecting seed type{mock.ANY} - Seed not found")
+        self.assertTrue(any("Error detecting seed type" in call[0][0] and "Seed not found" in call[0][0] for call in mock_print.call_args_list), "Expected error message not found")
         mock_DatModel_constructor.assert_not_called() # Should not proceed to save
 
     @mock.patch('datoso.commands.commands.Path')
     @mock.patch('datoso.commands.commands.Rules')
     @mock.patch('datoso.commands.commands.detect_seed')
     @mock.patch('datoso.commands.commands.re.compile')
-    @mock.patch('datoso.commands.commands.Dat') 
+    @mock.patch('datoso.commands.commands.Dat')
     def test_import_with_ignore_regex(self, mock_DatModel_constructor, mock_re_compile, mock_detect_seed, mock_Rules_class, mock_Path_class):
         mock_path_instance = mock_Path_class.return_value
         mock_path_instance.exists.return_value = True
-        
+
         mock_file1 = mock.MagicMock(spec=Path); mock_file1.__str__.return_value = "/dats/file1.dat"
         mock_file_ignored = mock.MagicMock(spec=Path); mock_file_ignored.__str__.return_value = "/dats/ignored_file.dat"
         mock_path_instance.rglob.return_value = [mock_file1, mock_file_ignored]
 
         # Setup IgnoreRegEx in config
         self.mock_config.__getitem__.side_effect = lambda key: {
-            'DatPath': '/dats', 
+            'DatPath': '/dats',
             'IMPORT': {'IgnoreRegEx': '.*ignored.*'}
         }.get(key, mock.MagicMock())
-        
+
         mock_regex = mock_re_compile.return_value
         mock_regex.match.side_effect = lambda x: True if "ignored" in x else False # Simulate regex matching
 
@@ -257,7 +257,7 @@ class TestCommandImport(TestCommandsBase):
 
         mock_re_compile.assert_called_once_with('.*ignored.*')
         # detect_seed should only be called for file1.dat, not for ignored_file.dat
-        mock_detect_seed.assert_called_once_with(str(mock_file1), mock.ANY) 
+        mock_detect_seed.assert_called_once_with(str(mock_file1), mock.ANY)
         # Verify that Dat model was saved for file1
         mock_DatModel_constructor.assert_called_once_with(name="file1", seed="seed1", new_file=str(mock_file1))
 
@@ -306,7 +306,7 @@ class TestCommandSeedInstalled(TestCommandsBase):
         # Let's assume it means to print that string.
         # The formatting is `* {Bcolors.OKGREEN}{seed_name}{Bcolors.ENDC} - {description}`
         # So we search for the seed name and its description part.
-        
+
         # Example of a more specific check for one of the calls, if Bcolors were not an issue:
         # calls = [call[0][0] for call in mock_print.call_args_list if call[0]] # Get all first arguments to print
         # self.assertTrue(any(f"* {mock.ANY}seedone{mock.ANY} - {{'Description for Seed One'}}" in c for c in calls))
@@ -322,19 +322,19 @@ class TestCommandList(TestCommandsBase): # Older version? Test to ensure it runs
         mock_seed_class1.description.return_value = "Description 1"
         mock_seed_class2 = mock.MagicMock()
         mock_seed_class2.description.return_value = "A very very very very very very very long description that will surely be cut."
-        
+
         mock_installed_seeds.return_value = {
             "seed_one_key": mock_seed_class1,
             "seed_two_key": mock_seed_class2,
         }
-        
+
         with mock.patch('builtins.print') as mock_print:
             command_list(self.mock_args) # Argument is not used
-            
+
         mock_installed_seeds.assert_called_once()
         mock_seed_class1.description.assert_called_once()
         mock_seed_class2.description.assert_called_once()
-        
+
         # The main thing is that it attempts to print details for each seed.
 
 class TestCommandListTwo(TestCommandsBase): # Older version? Test to ensure it runs.
@@ -344,19 +344,19 @@ class TestCommandListTwo(TestCommandsBase): # Older version? Test to ensure it r
         mock_seed_class1.description.return_value = "Description 1"
         mock_seed_class2 = mock.MagicMock()
         mock_seed_class2.description.return_value = "A very very very very very very very long description that will surely be cut."
-        
+
         mock_installed_seeds.return_value = {
             "seed_one_key": mock_seed_class1,
             "seed_two_key": mock_seed_class2,
         }
-        
+
         with mock.patch('builtins.print') as mock_print:
             command_list(self.mock_args) # Argument is not used
-            
+
         mock_installed_seeds.assert_called_once()
         mock_seed_class1.description.assert_called_once()
         mock_seed_class2.description.assert_called_once()
-        
+
         # Verify basic print calls occurred
         self.assertGreaterEqual(mock_print.call_count, 2)
 
@@ -371,18 +371,18 @@ class TestCommandSeedDetails(TestCommandsBase):
         mock_seed_module.__version__ = "1.0"
         mock_seed_module.__author__ = "Test Author"
         mock_seed_module.__description__ = "A mock seed module."
-        
+
         mock_installed_seeds.return_value = {
             "datoso_test_app_seed_myseed": mock_seed_module
         }
         self.mock_args.seed = "myseed" # This is the short name
-        
+
         with mock.patch('builtins.print') as mock_print:
             command_seed_details(self.mock_args)
-            
+
         mock_installed_seeds.assert_called_once()
         mock_sys_exit.assert_not_called()
-        
+
         # Check that print was called with the details
         output = "".join(str(call_arg[0]) for call_arg in mock_print.call_args_list if call_arg[0]) # Safely join args
         self.assertIn("Seed myseed details:", output)
@@ -399,16 +399,16 @@ class TestCommandSeedDetails(TestCommandsBase):
             "datoso_test_app_seed_anotherseed": mock.MagicMock()
         }
         self.mock_args.seed = "nonexistentseed"
-        
+
         with mock.patch('builtins.print') as mock_print:
             command_seed_details(self.mock_args)
-            
+
         mock_installed_seeds.assert_called_once()
         mock_sys_exit.assert_called_once_with(1)
         # Check that the specific print call about the seed not being installed was made
         found_print = False
         for call in mock_print.call_args_list:
-            if call[0] and f'Seed {mock.ANY}nonexistentseed{mock.ANY} not installed' in call[0][0]:
+            if call[0] and "nonexistentseed not installed" in call[0][0]:
                 found_print = True
                 break
         self.assertTrue(found_print, "Print call for 'seed not installed' not found or with wrong format.")
@@ -433,9 +433,9 @@ class TestCommandSeed(TestCommandsBase):
         # Ensure other flags that would trigger actions are false
         self.mock_args.fetch = False
         self.mock_args.process = False
-        
+
         command_seed(self.mock_args)
-        
+
         mock_command_seed_parse_actions.assert_called_once_with(self.mock_args)
         mock_command_seed_details.assert_called_once_with(self.mock_args)
 
@@ -448,20 +448,19 @@ class TestCommandSeed(TestCommandsBase):
         self.mock_args.details = False
         self.mock_args.fetch = True
         self.mock_args.process = False # Ensure process is not called
-        
+
         mock_seed_instance = mock_Seed_class.return_value
         mock_seed_instance.fetch.return_value = None # Successful fetch returns None or 0
-        
+
         with mock.patch('builtins.print') as mock_print:
             command_seed(self.mock_args)
-            
+
         mock_command_seed_parse_actions.assert_called_once_with(self.mock_args)
         mock_Seed_class.assert_called_once_with(name="myseed")
         mock_seed_instance.fetch.assert_called_once()
         mock_command_doctor.assert_not_called() # Not called on success
         mock_sys_exit.assert_not_called() # Not called on success
-        mock_print.assert_any_call(f'{mock.ANY}Finished fetching {mock.ANY}myseed{mock.ANY}')
-
+        self.assertTrue(any("Finished fetching" in args[0] and "myseed" in args[0] for args, _ in mock_print.call_args_list))
 
     @mock.patch('datoso.commands.commands.command_seed_parse_actions')
     @mock.patch('datoso.commands.commands.Seed')
@@ -472,17 +471,17 @@ class TestCommandSeed(TestCommandsBase):
         self.mock_args.details = False
         self.mock_args.fetch = True
         self.mock_args.process = False
-        
+
         mock_seed_instance = mock_Seed_class.return_value
         mock_seed_instance.fetch.return_value = 1 # Error fetch returns non-zero
-        
+
         with mock.patch('builtins.print') as mock_print:
             command_seed(self.mock_args)
-            
+
         mock_command_seed_parse_actions.assert_called_once_with(self.mock_args)
         mock_Seed_class.assert_called_once_with(name="myseed")
         mock_seed_instance.fetch.assert_called_once()
-        mock_print.assert_any_call(f'Errors fetching {mock.ANY}myseed{mock.ANY}')
+        self.assertTrue(any("Errors fetching" in args[0] and "myseed" in args[0] for args, _ in mock_print.call_args_list))
         mock_command_doctor.assert_called_once_with(self.mock_args)
         mock_sys_exit.assert_called_once_with(1)
 
@@ -497,19 +496,19 @@ class TestCommandSeed(TestCommandsBase):
         self.mock_args.process = True
         self.mock_args.filter = "somefilter"
         self.mock_args.actions = ["action1", "action2"]
-        
+
         mock_seed_instance = mock_Seed_class.return_value
         mock_seed_instance.process_dats.return_value = None # Successful process returns None or 0
-        
+
         with mock.patch('builtins.print') as mock_print:
             command_seed(self.mock_args)
-            
+
         mock_command_seed_parse_actions.assert_called_once_with(self.mock_args)
         mock_Seed_class.assert_called_once_with(name="myseed")
         mock_seed_instance.process_dats.assert_called_once_with(fltr="somefilter", actions_to_execute=["action1", "action2"])
         mock_command_doctor.assert_not_called()
         mock_sys_exit.assert_not_called()
-        mock_print.assert_any_call(f'{mock.ANY}Finished processing {mock.ANY}myseed{mock.ANY}')
+        self.assertTrue(any("Finished processing" in args[0] and "myseed" in args[0] for args, _ in mock_print.call_args_list))
 
     @mock.patch('datoso.commands.commands.command_seed_parse_actions')
     @mock.patch('datoso.commands.commands.Seed')
@@ -522,17 +521,17 @@ class TestCommandSeed(TestCommandsBase):
         self.mock_args.process = True
         self.mock_args.filter = None
         self.mock_args.actions = None # No specific actions
-        
+
         mock_seed_instance = mock_Seed_class.return_value
         mock_seed_instance.process_dats.return_value = 1 # Error process returns non-zero
-        
+
         with mock.patch('builtins.print') as mock_print:
             command_seed(self.mock_args)
-            
+
         mock_command_seed_parse_actions.assert_called_once_with(self.mock_args)
         mock_Seed_class.assert_called_once_with(name="myseed")
         mock_seed_instance.process_dats.assert_called_once_with(fltr=None, actions_to_execute=None)
-        mock_print.assert_any_call(f'Errors processing {mock.ANY}myseed{mock.ANY}')
+        self.assertTrue(any("Errors processing" in args[0] and "myseed" in args[0] for args, _ in mock_print.call_args_list))
         mock_command_doctor.assert_called_once_with(self.mock_args)
         mock_sys_exit.assert_called_once_with(1)
 

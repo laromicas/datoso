@@ -48,7 +48,7 @@ def remove_empty_folders(path_abs: str | Path) -> None:
 def parse_path(path: str) -> Path:
     """Get folder from config."""
     path = path if path is not None else ''
-    if path.startswith(('/', '~')):
+    if path.startswith('~'):
         return Path(path).expanduser()
     return Path.cwd() / path
 

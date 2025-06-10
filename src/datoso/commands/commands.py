@@ -11,6 +11,7 @@ from venv import logger
 
 from datoso import __app_name__
 from datoso.commands.doctor import check_module, check_seed
+from datoso.commands.helpers.seed import command_seed_all, command_seed_parse_actions
 from datoso.commands.seed import Seed
 from datoso.configuration import config
 from datoso.database.models.dat import Dat
@@ -120,7 +121,6 @@ def command_seed_details(args: Namespace) -> None:
 
 def command_seed(args: Namespace) -> None:
     """Commands with the seed (must be installed)."""
-    from datoso.commands.helpers.seed import command_seed_all, command_seed_parse_actions
     command_seed_parse_actions(args)
     if args.seed == 'all':
         command_seed_all(args, command_seed)

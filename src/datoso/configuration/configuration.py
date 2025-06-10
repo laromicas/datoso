@@ -12,6 +12,7 @@ XDG_CONFIG_HOME = Path(os.environ.get('XDG_CONFIG_HOME', '~/.config')).expanduse
 
 def get_seed_name(seed: str) -> str:
     """Get seed name."""
+    print(f"app_name: {__app_name__}")
     return seed.replace(f'{__app_name__}_seed_', '')
 
 

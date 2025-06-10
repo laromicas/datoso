@@ -64,6 +64,7 @@ class UrllibDownload(Download):
         if not filename_from_headers:
             urllib.request.urlretrieve(url, destination, reporthook=reporthook)  # noqa: S310
             return destination
+        headers = None
         try:
             tmp_filename, headers = urllib.request.urlretrieve(url)  # noqa: S310
             local_filename = Path(destination) / headers.get_filename()
@@ -96,7 +97,12 @@ class WgetDownload(Download):
 
     def parse_filename(self, output: str) -> str:
         """Parse the filename from the output."""
-        my_list = re.findall(r'"([^"]*)"', output)
+        my_list = [
+            match for group in re.findall(
+            r"(?:'([^']*)'|\"([^\"]*)\"|‘([^’]*)’)", output
+            )
+            for match in group if match
+        ]
         return my_list[-1]
 
 
@@ -120,7 +126,12 @@ class CurlDownload(Download):
 
     def parse_filename(self, output: str) -> str:
         """Parse the filename from the output."""
-        my_list = re.findall(r"'([^']*)'", output)
+        my_list = [
+            match for group in re.findall(
+            r"(?:'([^']*)'|\"([^\"]*)\"|‘([^’]*)’)", output
+            )
+            for match in group if match
+        ]
         return my_list[-1]
 
 
