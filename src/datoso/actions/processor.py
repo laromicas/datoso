@@ -63,7 +63,7 @@ class Process(ABC):
         """Load file."""
         if getattr(self, '_factory', None) and self._factory:
             self._class = self._factory(self.file)
-        self._file_dat = self._class(file=self.file)
+        self._file_dat = self._class(file=self.file, seed=self.seed)
         self._file_dat.load()
         return self._file_dat
 
@@ -108,8 +108,10 @@ class LoadDatFile(Process):
             self._class = self._factory(self.file)
 
         try:
-            self.load_file_dat()
-            self.load_database_dat()
+            if not self._file_dat:
+                self.load_file_dat()
+            if not self._database_dat:
+                self.load_database_dat()
         except Exception as e:  # noqa: BLE001
             self.status = 'Error'
             logger.exception(e)
@@ -140,8 +142,7 @@ class DeleteOld(Process):
                 self.stop = True
                 return 'No Action Taken, Newer Found'
         except ValueError as e:
-            logger.exception(e)
-            print(self.database_dat.date, self.file_dat.date)
+            logger.exception(e, self.database_dat.date, self.file_dat.date)
             return 'Error'
 
         if not self.database_data.get('new_file', None):

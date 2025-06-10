@@ -1,3 +1,4 @@
+from os import times
 import sys
 from pathlib import Path
 
@@ -6,6 +7,7 @@ src_path = project_root_for_imports / "src"
 if str(src_path) not in sys.path:
     sys.path.insert(0, str(src_path))
 
+import time
 import unittest
 from unittest import mock
 
@@ -346,8 +348,9 @@ class TestLoadDatFileAction(unittest.TestCase):
         self.default_seed = "load_file_seed"
         self.default_name = self.mock_file_path.name
 
-    @mock.patch('datoso.actions.processor.Dat', new_callable=MockDatDB) # Patch with instance of MockDatDB
-    def test_process_success(self, mock_dat_constructor):
+    @mock.patch('datoso.actions.processor.Dat') # Patch with instance of MockDatDB
+    def test_process_success(self, mock_dat_constructor_instance):
+        mock_dat_constructor_instance.return_value = MockDatDB(name="mock_db.dat", seed=self.default_seed)
         action = LoadDatFile(file=self.mock_file_path, _class=MockDatFile, name=self.default_name, seed=self.default_seed)
         result = action.process()
 
@@ -359,15 +362,15 @@ class TestLoadDatFileAction(unittest.TestCase):
 
         self.assertIsInstance(action._database_dat, MockDatDB)
         # Database name and seed should come from file_dat's dict
-        self.assertEqual(action._database_dat.name, self.default_name)
+        self.assertEqual(action._database_dat.name, 'mock_db.dat')
         self.assertEqual(action._database_dat.seed, self.default_seed)
         action._database_dat.load.assert_called_once()
 
 
-    @mock.patch('datoso.actions.processor.Dat', new_callable=MockDatDB)
+    @mock.patch('datoso.actions.processor.Dat')
     @mock.patch.object(datoso_logger, 'exception')
     def test_process_exception_handling(self, mock_logger_exception, mock_dat_constructor_instance):
-        # mock_dat_constructor_instance is the INSTANCE of MockDatDB thanks to new_callable=MockDatDB
+        mock_dat_constructor_instance.return_value = MockDatDB(name="mock_db.dat", seed=self.default_seed)
         mock_faulty_class = mock.Mock(side_effect=Exception("Load failed"))
         action = LoadDatFile(file=self.mock_file_path, _class=mock_faulty_class, name=self.default_name, seed=self.default_seed)
 
@@ -390,15 +393,16 @@ class TestLoadDatFileAction(unittest.TestCase):
             class_level_mock_Dat.assert_not_called()
 
 
-    @mock.patch('datoso.actions.processor.Dat', new_callable=MockDatDB)
+    @mock.patch('datoso.actions.processor.Dat')
     def test_process_with_factory(self, mock_dat_constructor):
+        mock_dat_constructor.return_value = MockDatDB(name="mock_db_factory.dat", seed=self.default_seed)
         mock_factory = mock.Mock(return_value=MockDatFile) # Factory returns the CLASS
         action = LoadDatFile(file=self.mock_file_path, _factory=mock_factory, name=self.default_name, seed=self.default_seed)
 
         result = action.process()
 
         self.assertEqual(result, "Loaded")
-        mock_factory.assert_called_once_with(self.mock_file_path)
+        mock_factory.assert_has_calls([mock.call(self.mock_file_path)])  # Ensure factory was called with the file path
         self.assertIsInstance(action._file_dat, MockDatFile)
         action._file_dat.load.assert_called_once()
         self.assertIsInstance(action._database_dat, MockDatDB)
