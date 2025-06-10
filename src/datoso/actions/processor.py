@@ -7,6 +7,7 @@ from datoso.configuration import config, logger
 from datoso.database.models.dat import Dat
 from datoso.helpers import compare_dates
 from datoso.helpers.file_utils import copy_path, get_ext, remove_path
+from datoso.mias.mia import mark_mias
 from datoso.repositories.dat_file import DatFile
 from datoso.repositories.dedupe import Dedupe
 
@@ -242,7 +243,6 @@ class MarkMias(Process):
         """Mark missing in action."""
         if not config.getboolean('PROCESS', 'ProcessMissingInAction', fallback=False):
             return 'Skipped'
-        from datoso.mias.mia import mark_mias
         mark_mias(dat_file=self.database_dat.new_file)
         return 'Marked'
 

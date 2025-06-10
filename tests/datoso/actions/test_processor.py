@@ -183,7 +183,7 @@ class TestProcessorClass(unittest.TestCase):
 
     def test_processor_process_single_action(self):
         # Action dict now includes name and seed which MockActionSuccess will use
-        actions = [{"action": "MockActionSuccess", "name": "TestDat", "seed": self.default_seed}]
+        actions = [{"action": "MockActionSuccess", "name": "TestDat"}]
         processor = Processor(actions=actions, file="test.dat", seed=self.default_seed)
         results = list(processor.process())
 
@@ -196,8 +196,8 @@ class TestProcessorClass(unittest.TestCase):
 
     def test_processor_process_multiple_actions_and_data_flow(self):
         actions = [
-            {"action": "MockActionSuccess", "name":"InitialDat", "seed": self.default_seed},
-            {"action": "MockActionUpdateData", "name":"UpdatedDat", "seed": self.default_seed}
+            {"action": "MockActionSuccess", "name":"InitialDat"},
+            {"action": "MockActionUpdateData", "name":"UpdatedDat"}
         ]
         processor = Processor(actions=actions, file="test.dat", seed=self.default_seed)
         processor.MockActionSuccess = MockActionSuccess
@@ -212,9 +212,9 @@ class TestProcessorClass(unittest.TestCase):
 
     def test_processor_process_stops_on_action_stop_true(self):
         actions = [
-            {"action": "MockActionSuccess", "name":"Dat1", "seed": self.default_seed},
-            {"action": "MockActionStop", "name":"Dat2", "seed": self.default_seed},
-            {"action": "MockActionUpdateData", "name":"Dat3", "seed": self.default_seed}
+            {"action": "MockActionSuccess", "name":"Dat1"},
+            {"action": "MockActionStop", "name":"Dat2"},
+            {"action": "MockActionUpdateData", "name":"Dat3"}
         ]
         processor = Processor(actions=actions, seed=self.default_seed)
         results = list(processor.process())
@@ -271,7 +271,7 @@ class TestProcessBaseClass(unittest.TestCase):
 
     @mock.patch('datoso.actions.processor.Dat', new_callable=MockDatDB)
     def test_load_database_dat(self, mock_dat_constructor):
-        file_dat_dict_content = {"name": "test.dat", "version": "1.0", "company": "Nintendo", "seed": self.default_seed}
+        file_dat_dict_content = {"name": "test.dat", "version": "1.0", "company": "Nintendo"}
         process_instance = self.ConcreteProcess(file=self.mock_file_path, name="test.dat", seed=self.default_seed)
         process_instance._file_dat = MockDatFile(file=self.mock_file_path, **file_dat_dict_content)
 
