@@ -544,7 +544,7 @@ class TestCopyAction(unittest.TestCase):
                       name=(file_dat_override or self.file_dat).name,
                       seed=action_seed)
         action._file_dat = file_dat_override if file_dat_override is not None else self.file_dat
-        action._database_dat = db_dat_override if db_dat_override != False else self.db_dat
+        action._database_dat = db_dat_override if db_dat_override is not False else self.db_dat
         return action
 
     @mock.patch('datoso.actions.processor.copy_path')
