@@ -7,6 +7,7 @@ from datoso.configuration import config, logger
 from datoso.database.models.dat import Dat
 from datoso.helpers import compare_dates
 from datoso.helpers.file_utils import copy_path, get_ext, remove_path
+from datoso.mias.mia import mark_mias
 from datoso.repositories.dat_file import DatFile
 from datoso.repositories.dedupe import Dedupe
 
@@ -62,7 +63,7 @@ class Process(ABC):
         """Load file."""
         if getattr(self, '_factory', None) and self._factory:
             self._class = self._factory(self.file)
-        self._file_dat = self._class(file=self.file)
+        self._file_dat = self._class(file=self.file, seed=self.seed)
         self._file_dat.load()
         return self._file_dat
 
@@ -93,7 +94,7 @@ class Process(ABC):
         return self._database_dat if self._database_dat else self.load_database_dat()
 
     @database_dat.setter
-    def database_dat(self, value: Dat) -> None:
+    def database_dat(self, value: Dat | None) -> None:
         self._database_dat = value
 
 
@@ -107,8 +108,10 @@ class LoadDatFile(Process):
             self._class = self._factory(self.file)
 
         try:
-            self.load_file_dat()
-            self.load_database_dat()
+            if not self._file_dat:
+                self.load_file_dat()
+            if not self._database_dat:
+                self.load_database_dat()
         except Exception as e:  # noqa: BLE001
             self.status = 'Error'
             logger.exception(e)
@@ -139,8 +142,7 @@ class DeleteOld(Process):
                 self.stop = True
                 return 'No Action Taken, Newer Found'
         except ValueError as e:
-            logger.exception(e)
-            print(self.database_dat.date, self.file_dat.date)
+            logger.exception(e, self.database_dat.date, self.file_dat.date)
             return 'Error'
 
         if not self.database_data.get('new_file', None):
@@ -155,7 +157,7 @@ class DeleteOld(Process):
                 and self.database_dat.is_enabled():
                 return 'Exists'
 
-        remove_path(self.database_dat.new_file, remove_empty_parent=True)
+        remove_path(Path(self.database_dat.new_file), remove_empty_parent=True)
         if not self.database_dat.is_enabled():
             self.stop = True
             self.database_dat.new_file = None
@@ -197,7 +199,7 @@ class Copy(Process):
             self.stop = True
             return 'Exists'
 
-        if not old_file:
+        if old_file.name == '':
             result = 'Created'
         elif old_file != new_file:
             result = 'Updated'
@@ -228,11 +230,17 @@ class SaveToDatabase(Process):
 
     def process(self) -> str:
         """Save process to database."""
-        data_to_save = {**self.database_data, **self.file_data}
-        self.database_dat = Dat(**data_to_save)
-        self.database_dat.save()
-        self.database_dat.flush()
-        return 'Saved'
+        try:
+            data_to_save = {**self.database_data, **self.file_data}
+            instance = Dat(**data_to_save)
+            instance.save()
+            instance.flush()
+            self._database_dat = instance
+        except Exception as e:  # noqa: BLE001
+            logger.exception(e)
+            return 'Error'
+        else:
+            return 'Saved'
 
 
 class MarkMias(Process):
@@ -242,7 +250,6 @@ class MarkMias(Process):
         """Mark missing in action."""
         if not config.getboolean('PROCESS', 'ProcessMissingInAction', fallback=False):
             return 'Skipped'
-        from datoso.mias.mia import mark_mias
         mark_mias(dat_file=self.database_dat.new_file)
         return 'Marked'
 

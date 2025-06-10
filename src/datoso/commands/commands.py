@@ -11,6 +11,8 @@ from venv import logger
 
 from datoso import __app_name__
 from datoso.commands.doctor import check_module, check_seed
+from datoso.commands.helpers.dat import helper_command_dat
+from datoso.commands.helpers.seed import command_seed_all, command_seed_parse_actions
 from datoso.commands.seed import Seed
 from datoso.configuration import config
 from datoso.database.models.dat import Dat
@@ -27,6 +29,7 @@ def command_deduper(args: Namespace) -> None:
     if not args.parent and args.input.endswith(('.dat', '.xml')) and not args.auto_merge:
         print('Parent dat is required when input is a dat file')
         sys.exit(1)
+        return
     if args.dry_run:
         logger.setLevel(logging.DEBUG)
     merged = Dedupe(args.input, args.parent) if args.parent else Dedupe(args.input)
@@ -44,18 +47,19 @@ def command_deduper(args: Namespace) -> None:
 
 def command_import(_) -> None:  # noqa: ANN001
     """Make changes in dat config."""
-    dat_root_path = config['PATHS']['DatPath']
+    dat_root_path = config.get('PATHS', 'DatPath', fallback='')
 
     if not dat_root_path or not Path(dat_root_path).exists():
         print(f'{Bcolors.FAIL}Dat root path not set or does not exist{Bcolors.ENDC}')
         sys.exit(1)
+        return
 
     rules = Rules().rules
 
     dats = { str(x):None for x in Path(dat_root_path).rglob('*.[dD][aA][tT]') }
 
-    if config['IMPORT'].get('IgnoreRegEx'):
-        ignore_regex = re.compile(config['IMPORT']['IgnoreRegEx'])
+    if config.get('IMPORT', 'IgnoreRegEx'):
+        ignore_regex = re.compile(config.get('IMPORT', 'IgnoreRegEx'))
         dats = [ dat for dat in dats if not ignore_regex.match(dat) ]
 
     fromhere = ''
@@ -76,17 +80,12 @@ def command_import(_) -> None:  # noqa: ANN001
             database.flush()
         except LookupError as e:
             print(f'{Bcolors.FAIL}Error detecting seed type{Bcolors.ENDC} - {e}')
-            # if dat_name == '/mnt/d/ROMVault/DatRoot/Arcade/FinalBurnNeo/roms/arcade/FinalBurn Neo Arcade Games.dat':
-            #     exit()
         except TypeError as e:
             print(f'{Bcolors.FAIL}Error detecting seed type{Bcolors.ENDC} - {e}')
-            # if dat_name == '/mnt/d/ROMVault/DatRoot/Arcade/FinalBurnNeo/roms/arcade/FinalBurn Neo Arcade Games.dat':
-            #     exit()
 
 
 def command_dat(args: Namespace) -> None:
     """Make changes in dat config."""
-    from datoso.commands.helpers.dat import helper_command_dat
     helper_command_dat(args)
 
 
@@ -111,6 +110,7 @@ def command_seed_details(args: Namespace) -> None:
     if not module:
         print(f'Seed {Bcolors.FAIL}{args.seed}{Bcolors.ENDC} not installed')
         sys.exit(1)
+        return
     print(f'Seed {Bcolors.OKGREEN}{args.seed}{Bcolors.ENDC} details:')
     print(f'  * Name: {module.__name__}')
     print(f'  * Version: {module.__version__}')
@@ -120,7 +120,6 @@ def command_seed_details(args: Namespace) -> None:
 
 def command_seed(args: Namespace) -> None:
     """Commands with the seed (must be installed)."""
-    from datoso.commands.helpers.seed import command_seed_all, command_seed_parse_actions
     command_seed_parse_actions(args)
     if args.seed == 'all':
         command_seed_all(args, command_seed)
@@ -259,7 +258,7 @@ def command_config_mia_update(args: Namespace) -> None:
         print('Please enable logs for more information or use -v parameter')
         command_doctor(args)
 
-def command_config_path(args: Namespace) -> None:
+def command_config_path(_: Namespace) -> None:
     """Get path from config."""
     path = Path(config.get('PATHS.DatosoPath')) / config.get('PATHS.DatabaseFile')
     print(path)

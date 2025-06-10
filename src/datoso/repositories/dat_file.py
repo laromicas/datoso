@@ -446,7 +446,7 @@ class ClrMameProDatFile(DatFile):
 
     def merge_with(self, parent: DatFile) -> None:
         """Merge the dat file with the parent."""
-        print("Not yet implemented")
+        print('Not yet implemented')
         return
         if not self.merged_roms:
             self.merged_roms = []
