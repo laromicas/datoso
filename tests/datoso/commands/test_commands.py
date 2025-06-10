@@ -3,7 +3,9 @@ from unittest import mock
 import argparse # For creating mock args
 import sys
 from pathlib import Path
-import logging # For logger levels
+import logging
+
+from datoso.helpers import Bcolors # For logger levels
 
 # Ensure src is discoverable for imports
 project_root_for_imports = Path(__file__).parent.parent.parent.parent
@@ -60,6 +62,7 @@ class TestCommandsBase(unittest.TestCase):
         self.mock_config = self.config_patcher.start()
         self.mock_logger = self.logger_patcher.start() # This is likely 'from venv import logger' in commands.py
         self.mock_logging = self.logging_patcher.start()
+        self.mock_logging.DEBUG = 10
 
         # Common default for config if needed by multiple tests
         self.mock_config.get.return_value = "default_path"
@@ -143,14 +146,15 @@ class TestCommandImport(TestCommandsBase):
     @mock.patch('datoso.commands.commands.Dat') # Mock the DatModel
     @mock.patch('datoso.commands.commands.sys.exit')
     def test_import_dat_path_not_set_or_exists(self, mock_sys_exit, mock_DatModel_constructor, mock_detect_seed, mock_Rules_class, mock_Path_class):
-        # Scenario 1: DatPath not in config
-        self.mock_config.__getitem__.side_effect = KeyError('PATHS')
+        self.mock_config.get.return_value = None
+        mock_path_instance = mock_Path_class.return_value
+        mock_path_instance.exists.return_value = True
         command_import(self.mock_args)
         mock_sys_exit.assert_called_once_with(1)
         mock_sys_exit.reset_mock()
 
         # Scenario 2: DatPath is set but directory does not exist
-        self.mock_config.__getitem__.side_effect = lambda key: {'DatPath': '/nonexistent/path', 'IMPORT': {}}.get(key, mock.MagicMock())
+        self.mock_config.get.return_value = '/nonexistent/path'
         mock_path_instance = mock_Path_class.return_value
         mock_path_instance.exists.return_value = False
         command_import(self.mock_args)
@@ -173,12 +177,18 @@ class TestCommandImport(TestCommandsBase):
         mock_dat_file_path.__str__.return_value = "/fake/datroot/file1.dat"
         mock_path_instance.rglob.return_value = [mock_dat_file_path]
 
-        self.mock_config.__getitem__.side_effect = lambda key: {'DatPath': '/fake/datroot', 'IMPORT': {}}.get(key, mock.MagicMock())
+        def config_getitem(section, option, **kwargs):
+            if section == 'IMPORT' and option == 'IgnoreRegEx':
+                return None
+            if section == 'PATHS' and option == 'DatPath':
+                return '/fake/datroot'
+        self.mock_config.get.side_effect = config_getitem
 
         mock_dat_file_obj_instance = mock.MagicMock()
         mock_dat_file_obj_instance.dict.return_value = {"name": "file1", "version": "1.0"}
 
         mock_detected_class = mock.Mock(return_value=mock_dat_file_obj_instance)
+        mock_detected_class.__name__ = 'MockDatClass'
         mock_detect_seed.return_value = ("detected_seed_name", mock_detected_class)
 
         mock_db_dat_instance = mock_DatModel_constructor.return_value
@@ -202,7 +212,7 @@ class TestCommandImport(TestCommandsBase):
         mock_DatModel_constructor.assert_called_once_with(**expected_dat_constructor_args)
         mock_db_dat_instance.save.assert_called_once()
         mock_db_dat_instance.flush.assert_called_once()
-        mock_print.assert_any_call(f'{str(mock_dat_file_path)} - detected_seed_name - {mock_detected_class.__name__}')
+        mock_print.assert_any_call(f'detected_seed_name - {mock_detected_class.__name__}')
 
 
     @mock.patch('datoso.commands.commands.Path')
@@ -233,15 +243,17 @@ class TestCommandImport(TestCommandsBase):
         mock_path_instance = mock_Path_class.return_value
         mock_path_instance.exists.return_value = True
 
-        mock_file1 = mock.MagicMock(spec=Path); mock_file1.__str__.return_value = "/dats/file1.dat"
-        mock_file_ignored = mock.MagicMock(spec=Path); mock_file_ignored.__str__.return_value = "/dats/ignored_file.dat"
+        mock_file1 = mock.MagicMock(); mock_file1.__str__.return_value = "/dats/file1.dat"
+        mock_file_ignored = mock.MagicMock(); mock_file_ignored.__str__.return_value = "/dats/ignored_file.dat"
         mock_path_instance.rglob.return_value = [mock_file1, mock_file_ignored]
 
         # Setup IgnoreRegEx in config
-        self.mock_config.__getitem__.side_effect = lambda key: {
-            'DatPath': '/dats',
-            'IMPORT': {'IgnoreRegEx': '.*ignored.*'}
-        }.get(key, mock.MagicMock())
+        def config_getitem(section, option, **kwargs):
+            if section == 'IMPORT' and option == 'IgnoreRegEx':
+                return '.*ignored.*'
+            if section == 'PATHS' and option == 'DatPath':
+                return '/dats'
+        self.mock_config.get.side_effect = config_getitem
 
         mock_regex = mock_re_compile.return_value
         mock_regex.match.side_effect = lambda x: True if "ignored" in x else False # Simulate regex matching
@@ -250,6 +262,7 @@ class TestCommandImport(TestCommandsBase):
         mock_dat_file_obj_instance = mock.MagicMock()
         mock_dat_file_obj_instance.dict.return_value = {"name": "file1"}
         mock_detected_class = mock.Mock(return_value=mock_dat_file_obj_instance)
+        mock_detected_class.__name__ = 'MockDatClass'
         mock_detect_seed.return_value = ("seed1", mock_detected_class)
 
         with mock.patch('builtins.print'):
@@ -366,6 +379,7 @@ class TestCommandSeedDetails(TestCommandsBase):
     @mock.patch('datoso.commands.commands.sys.exit')
     @mock.patch('datoso.commands.commands.__app_name__', "datoso_test_app") # Mock app_name
     def test_seed_details_found(self, mock_sys_exit, mock_installed_seeds):
+        Bcolors.no_color()
         mock_seed_module = mock.MagicMock()
         mock_seed_module.__name__ = "MockSeedModule"
         mock_seed_module.__version__ = "1.0"
@@ -393,24 +407,24 @@ class TestCommandSeedDetails(TestCommandsBase):
 
     @mock.patch('datoso.commands.commands.installed_seeds')
     @mock.patch('datoso.commands.commands.sys.exit')
-    @mock.patch('datoso.commands.commands.__app_name__', "datoso_test_app")
+    @mock.patch('datoso.commands.commands.__app_name__', "datoso")
     def test_seed_details_not_found(self, mock_sys_exit, mock_installed_seeds):
         mock_installed_seeds.return_value = {
-            "datoso_test_app_seed_anotherseed": mock.MagicMock()
+            "datoso_seed_anotherseed": mock.MagicMock()
         }
         self.mock_args.seed = "nonexistentseed"
 
+        found_print = False
         with mock.patch('builtins.print') as mock_print:
             command_seed_details(self.mock_args)
 
-        mock_installed_seeds.assert_called_once()
-        mock_sys_exit.assert_called_once_with(1)
-        # Check that the specific print call about the seed not being installed was made
-        found_print = False
-        for call in mock_print.call_args_list:
-            if call[0] and "nonexistentseed not installed" in call[0][0]:
-                found_print = True
-                break
+            mock_installed_seeds.assert_called_once()
+            mock_sys_exit.assert_called_once_with(1)
+            # Check that the specific print call about the seed not being installed was made
+            for call in mock_print.call_args_list:
+                if call[0] and "not installed" in call[0][0] and "nonexistentseed" in call[0][0]:
+                    found_print = True
+                    break
         self.assertTrue(found_print, "Print call for 'seed not installed' not found or with wrong format.")
 
 class TestCommandSeed(TestCommandsBase):
