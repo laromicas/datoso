@@ -94,7 +94,7 @@ class Process(ABC):
         return self._database_dat if self._database_dat else self.load_database_dat()
 
     @database_dat.setter
-    def database_dat(self, value: Dat) -> None:
+    def database_dat(self, value: Dat | None) -> None:
         self._database_dat = value
 
 
@@ -156,7 +156,7 @@ class DeleteOld(Process):
                 and self.database_dat.is_enabled():
                 return 'Exists'
 
-        remove_path(self.database_dat.new_file, remove_empty_parent=True)
+        remove_path(Path(self.database_dat.new_file), remove_empty_parent=True)
         if not self.database_dat.is_enabled():
             self.stop = True
             self.database_dat.new_file = None
@@ -198,7 +198,7 @@ class Copy(Process):
             self.stop = True
             return 'Exists'
 
-        if not old_file:
+        if old_file.name == '':
             result = 'Created'
         elif old_file != new_file:
             result = 'Updated'

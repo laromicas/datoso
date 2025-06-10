@@ -454,7 +454,7 @@ class TestDeleteOldAction(unittest.TestCase):
         mock_getboolean.assert_called_once_with('PROCESS', 'Overwrite', fallback=False)
 
     @mock.patch('datoso.actions.processor.compare_dates', return_value=False)
-    @mock.patch('datoso.helpers.file_utils.remove_path') # Mock remove_path
+    @mock.patch('datoso.actions.processor.remove_path') # Mock remove_path
     @mock.patch('pathlib.Path.mkdir') # Mock mkdir
     def test_process_dat_disabled(self, mock_mkdir, mock_remove_path, mock_compare_dates):
         self.db_dat.enabled = False
@@ -468,7 +468,7 @@ class TestDeleteOldAction(unittest.TestCase):
         action._database_dat.flush.assert_called_once()
 
     @mock.patch('datoso.actions.processor.compare_dates', return_value=False)
-    @mock.patch('datoso.helpers.file_utils.remove_path') # Mock remove_path
+    @mock.patch('datoso.actions.processor.remove_path') # Mock remove_path
     @mock.patch('pathlib.Path.mkdir') # Mock mkdir
     def test_process_successful_delete(self, mock_mkdir, mock_remove_path, mock_compare_dates):
         self.file_dat.date = "2023-01-16"
@@ -533,20 +533,21 @@ class TestCopyAction(unittest.TestCase):
         self.db_dat = MockDatDB(name="old_file.dat", new_file=self.db_dat_current_path_str, date="2023-01-01", enabled=True, seed="copy_seed")
         self.expected_destination = Path(self.action_folder) / self.file_dat.path / self.file_dat.name
 
-    def _create_action(self, file_dat_override=None, db_dat_override=None, folder=None, current_file_path=None):
+    def _create_action(self, file_dat_override=None, db_dat_override=False, folder=None, current_file_path=None, database_dat_override=False):
         action_seed = (file_dat_override or self.file_dat).seed
         action = Copy(file=current_file_path or self.source_file_path,
                       folder=folder if folder is not None else self.action_folder,
                       name=(file_dat_override or self.file_dat).name,
                       seed=action_seed)
         action._file_dat = file_dat_override if file_dat_override is not None else self.file_dat
-        action._database_dat = db_dat_override if db_dat_override is not None else self.db_dat
+        action._database_dat = db_dat_override if db_dat_override != False else self.db_dat
         return action
 
     @mock.patch('datoso.actions.processor.copy_path')
     @mock.patch('pathlib.Path.mkdir')
     def test_process_no_db_dat(self, mock_mkdir, mock_copy_path):
         action = self._create_action(db_dat_override=None)
+        action.load_database_dat = mock.Mock(return_value=None)  # Simulate no database dat loaded
         result = action.process()
         self.assertEqual(result, "Copied")
         mock_copy_path.assert_called_once_with(self.source_file_path, self.expected_destination)

@@ -42,7 +42,7 @@ def remove_empty_folders(path_abs: str | Path) -> None:
     """Remove empty folders."""
     walk = list(os.walk(str(path_abs)))
     for path, _, _ in walk[::-1]:
-        if len(os.listdir(path)) == 0:
+        if not any(Path(path).iterdir()):
             remove_path(path)
 
 def parse_path(path: str) -> Path:
