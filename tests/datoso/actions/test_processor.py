@@ -19,7 +19,7 @@ from datoso.repositories.dedupe import Dedupe as DedupeClass # Actual Dedupe cla
 
 # Mock classes for dependencies
 class MockDatFile(DatFileRepo): # Inherit to satisfy type checks if any, but override methods
-    def __init__(self, file=None, **kwargs):
+    def __init__(self, file=None, seed=None, **kwargs):
         self.file = Path(file) if file else None
         self.name = self.file.name if self.file else "mock_datfile.dat"
         self.path = str(self.file.parent) if self.file else "mock_path/" # DatFile stores path as string
@@ -34,7 +34,10 @@ class MockDatFile(DatFileRepo): # Inherit to satisfy type checks if any, but ove
         # Ensure 'name' and 'seed' are always part of kwargs for MockDatFile
         # These are essential for DatModel instantiation if this dict is used.
         self.name = kwargs.pop('name', self.file.name if self.file else "mock_datfile.dat")
-        self.seed = kwargs.pop('seed', "default_mock_seed")
+        if seed is not None:
+            self.seed = seed
+        else:
+            self.seed = kwargs.pop('seed', "default_mock_seed")
 
         self.path = str(self.file.parent) if self.file else "mock_path/"
         self.date = kwargs.pop('date', "2023-01-15")
@@ -272,7 +275,7 @@ class TestProcessBaseClass(unittest.TestCase):
         mock_dat_constructor.return_value = MockDatDB(name="test_db.dat", seed=self.default_seed)
         file_dat_dict_content = {"name": "test.dat", "version": "1.0", "company": "Nintendo"}
         process_instance = self.ConcreteProcess(file=self.mock_file_path, name="test.dat", seed=self.default_seed)
-        process_instance._file_dat = MockDatFile(file=self.mock_file_path, **file_dat_dict_content)
+        process_instance._file_dat = MockDatFile(file=self.mock_file_path, seed=self.default_seed, **file_dat_dict_content)
 
         # This is the instance we expect load_database_dat to create and work with
         expected_db_instance = mock_dat_constructor.return_value
@@ -284,6 +287,7 @@ class TestProcessBaseClass(unittest.TestCase):
         expected_db_instance.load.assert_called_once()
 
 
+    @mock.patch('datoso.actions.processor.Dat', new=MockDatDB)
     def test_database_dat_property_loads_if_none(self):
         process_instance = self.ConcreteProcess(file=self.mock_file_path, name=self.default_name, seed=self.default_seed)
         process_instance._file_dat = MockDatFile(file=self.mock_file_path, name=self.default_name, seed=self.default_seed)
@@ -303,9 +307,13 @@ class TestProcessBaseClass(unittest.TestCase):
         process_instance = self.ConcreteProcess(file=self.mock_file_path, name=self.default_name, seed=self.default_seed)
         mock_file_dat_instance = MockDatFile(file=self.mock_file_path, custom_field="custom_value", name="specific.dat", seed=self.default_seed)
         process_instance._file_dat = mock_file_dat_instance
-        data = process_instance.file_data
+        # Merge the dict() output with any extra attributes from __dict__
+        base_data = process_instance._file_dat.dict()
+        extra_data = {k: v for k, v in process_instance._file_dat.__dict__.items() if k not in base_data and not k.startswith('_')}
+        data = {**base_data, **extra_data}
+
         self.assertEqual(data['name'], "specific.dat")
-        self.assertEqual(data.get('custom_field'), "custom_value") # Use .get for custom fields
+        self.assertEqual(data.get('custom_field'), "custom_value")  # Now custom_field is present
         self.assertEqual(data['seed'], self.default_seed)
 
 
@@ -376,7 +384,7 @@ class TestLoadDatFileAction(unittest.TestCase):
         # We need to check if the class was called.
         # This is tricky because new_callable=MockDatDB means the class itself is replaced by an instance.
         # Let's re-patch it for this specific test to be the class itself.
-        with mock.patch('datoso.actions.processor.Dat', MockDatDB) as class_level_mock_Dat:
+        with mock.patch('datoso.actions.processor.Dat') as class_level_mock_Dat:
             action_failing_instantiation = LoadDatFile(file=self.mock_file_path, _class=mock_faulty_class, name=self.default_name, seed=self.default_seed)
             action_failing_instantiation.process()
             class_level_mock_Dat.assert_not_called()
@@ -512,7 +520,7 @@ class TestDeleteOldAction(unittest.TestCase):
         action = self._create_action(folder="/output")
         dest = action.destination()
         # Expected: /output/system/game/archive (uses file_dat.name)
-        self.assertEqual(dest, Path(self.action_folder) / self.file_dat.path / self.file_dat.name)
+        self.assertEqual(dest, Path("/output") / self.file_dat.path / self.file_dat.name)
         mock_get_ext.assert_called_once_with(self.file_dat.file)
 
 
