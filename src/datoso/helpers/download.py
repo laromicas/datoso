@@ -98,9 +98,7 @@ class WgetDownload(Download):
     def parse_filename(self, output: str) -> str:
         """Parse the filename from the output."""
         my_list = [
-            match for group in re.findall(
-            r"(?:'([^']*)'|\"([^\"]*)\"|‘([^’]*)’)", output
-            )
+            match for group in re.findall(r"(?:'([^']*)'|\"([^\"]*)\"|‘([^’]*)’)", output)  # noqa: RUF001
             for match in group if match
         ]
         return my_list[-1]
@@ -127,9 +125,7 @@ class CurlDownload(Download):
     def parse_filename(self, output: str) -> str:
         """Parse the filename from the output."""
         my_list = [
-            match for group in re.findall(
-            r"(?:'([^']*)'|\"([^\"]*)\"|‘([^’]*)’)", output
-            )
+            match for group in re.findall(r"(?:'([^']*)'|\"([^\"]*)\"|‘([^’]*)’)", output)  # noqa: RUF001
             for match in group if match
         ]
         return my_list[-1]

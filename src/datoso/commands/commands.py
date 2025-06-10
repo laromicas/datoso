@@ -258,7 +258,7 @@ def command_config_mia_update(args: Namespace) -> None:
         print('Please enable logs for more information or use -v parameter')
         command_doctor(args)
 
-def command_config_path(args: Namespace) -> None:
+def command_config_path(_: Namespace) -> None:
     """Get path from config."""
     path = Path(config.get('PATHS.DatosoPath')) / config.get('PATHS.DatabaseFile')
     print(path)

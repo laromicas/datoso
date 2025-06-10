@@ -236,7 +236,7 @@ class SaveToDatabase(Process):
             instance.save()
             instance.flush()
             self._database_dat = instance
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.exception(e)
             return 'Error'
         else:

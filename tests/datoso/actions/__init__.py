@@ -1,1 +1,1 @@
-# This file makes the tests/datoso/actions directory a Python package.
+"""Makes the tests/datoso/actions directory a Python package."""
