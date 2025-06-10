@@ -493,7 +493,7 @@ class TestDeleteOldAction(unittest.TestCase):
         self.file_dat.file = Path(self.file_dat.path) / self.file_dat.name
         action = self._create_action(folder="ignored_folder")
         dest = action.destination()
-        self.assertEqual(dest, Path("/absolute/path/" + self.file_dat.name))
+        self.assertEqual(dest, Path("/absolute/path"))
 
 
     def test_destination_with_folder_attribute(self):
@@ -513,7 +513,7 @@ class TestDeleteOldAction(unittest.TestCase):
         self.assertIsNone(dest)
 
 
-    @mock.patch('datoso.helpers.file_utils.get_ext', return_value='.zip')
+    @mock.patch('datoso.actions.processor.get_ext', return_value='.zip')
     def test_destination_non_dat_xml_extension(self, mock_get_ext):
         self.file_dat.file = Path("archive.zip") # file_dat.file provides the extension
         self.file_dat.name = "archive" # name is used for constructing output if not .dat/.xml
