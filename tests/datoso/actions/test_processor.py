@@ -424,7 +424,7 @@ class TestDeleteOldAction(unittest.TestCase):
         action._database_dat = db_dat_override if db_dat_override is not None else self.db_dat
         return action
 
-    @mock.patch('datoso.helpers.compare_dates')
+    @mock.patch('datoso.actions.processor.compare_dates')
     def test_process_newer_found_stops(self, mock_compare_dates):
         mock_compare_dates.return_value = True
         action = self._create_action()
@@ -433,7 +433,7 @@ class TestDeleteOldAction(unittest.TestCase):
         self.assertTrue(action.stop)
         mock_compare_dates.assert_called_once_with(self.db_dat.date, self.file_dat.date)
 
-    @mock.patch('datoso.helpers.compare_dates', return_value=False)
+    @mock.patch('datoso.actions.processor.compare_dates', return_value=False)
     def test_process_no_new_file_in_db(self, mock_compare_dates):
         self.db_dat.new_file = None
         action = self._create_action()
@@ -441,7 +441,7 @@ class TestDeleteOldAction(unittest.TestCase):
         self.assertEqual(result, "New")
         self.assertFalse(action.stop)
 
-    @mock.patch('datoso.helpers.compare_dates', return_value=False)
+    @mock.patch('datoso.actions.processor.compare_dates', return_value=False)
     @mock.patch('datoso.configuration.config.getboolean', return_value=False)
     @mock.patch('datoso.helpers.file_utils.remove_path')
     def test_process_exists_same_file_date_no_overwrite_enabled(self, mock_remove_path, mock_getboolean, mock_compare_dates):
@@ -453,7 +453,7 @@ class TestDeleteOldAction(unittest.TestCase):
         mock_remove_path.assert_not_called()
         mock_getboolean.assert_called_once_with('PROCESS', 'Overwrite', fallback=False)
 
-    @mock.patch('datoso.helpers.compare_dates', return_value=False)
+    @mock.patch('datoso.actions.processor.compare_dates', return_value=False)
     @mock.patch('datoso.helpers.file_utils.remove_path') # Mock remove_path
     @mock.patch('pathlib.Path.mkdir') # Mock mkdir
     def test_process_dat_disabled(self, mock_mkdir, mock_remove_path, mock_compare_dates):
@@ -467,7 +467,7 @@ class TestDeleteOldAction(unittest.TestCase):
         action._database_dat.save.assert_called_once()
         action._database_dat.flush.assert_called_once()
 
-    @mock.patch('datoso.helpers.compare_dates', return_value=False)
+    @mock.patch('datoso.actions.processor.compare_dates', return_value=False)
     @mock.patch('datoso.helpers.file_utils.remove_path') # Mock remove_path
     @mock.patch('pathlib.Path.mkdir') # Mock mkdir
     def test_process_successful_delete(self, mock_mkdir, mock_remove_path, mock_compare_dates):
@@ -478,7 +478,7 @@ class TestDeleteOldAction(unittest.TestCase):
         self.assertFalse(action.stop)
         mock_remove_path.assert_called_once_with(Path(self.db_dat_path_str), remove_empty_parent=True)
 
-    @mock.patch('datoso.helpers.compare_dates', side_effect=ValueError("Date parse error"))
+    @mock.patch('datoso.actions.processor.compare_dates', side_effect=ValueError("Date parse error"))
     @mock.patch.object(datoso_logger, 'exception')
     @mock.patch('pathlib.Path.mkdir')
     def test_process_compare_dates_value_error(self, mock_mkdir, mock_logger_exception, mock_compare_dates):
@@ -573,7 +573,7 @@ class TestCopyAction(unittest.TestCase):
         mock_copy_path.assert_not_called()
         mock_compare_dates.assert_called_once_with(self.db_dat.date, self.file_dat.date)
 
-    @mock.patch('datoso.helpers.compare_dates', return_value=False)
+    @mock.patch('datoso.actions.processor.compare_dates', return_value=False)
     @mock.patch('datoso.configuration.config.getboolean', return_value=False)
     @mock.patch('pathlib.Path.exists', return_value=True)
     @mock.patch('datoso.helpers.file_utils.copy_path')
@@ -587,7 +587,7 @@ class TestCopyAction(unittest.TestCase):
         mock_copy_path.assert_not_called()
         mock_getboolean.assert_called_once_with('PROCESS', 'Overwrite', fallback=False)
 
-    @mock.patch('datoso.helpers.compare_dates', return_value=False)
+    @mock.patch('datoso.actions.processor.compare_dates', return_value=False)
     @mock.patch('datoso.actions.processor.copy_path')
     @mock.patch('pathlib.Path.mkdir')
     def test_process_created(self, mock_mkdir, mock_copy_path, mock_compare_dates):
@@ -598,7 +598,7 @@ class TestCopyAction(unittest.TestCase):
         mock_copy_path.assert_called_once_with(self.source_file_path, self.expected_destination)
         self.assertEqual(str(action.database_dat.new_file), str(self.expected_destination))
 
-    @mock.patch('datoso.helpers.compare_dates', return_value=False)
+    @mock.patch('datoso.actions.processor.compare_dates', return_value=False)
     @mock.patch('datoso.actions.processor.copy_path')
     @mock.patch('pathlib.Path.mkdir')
     def test_process_updated_different_path(self, mock_mkdir, mock_copy_path, mock_compare_dates):
@@ -609,10 +609,10 @@ class TestCopyAction(unittest.TestCase):
         mock_copy_path.assert_called_once_with(self.source_file_path, self.expected_destination)
         self.assertEqual(str(action.database_dat.new_file), str(self.expected_destination))
 
-    @mock.patch('datoso.helpers.compare_dates', return_value=False)
+    @mock.patch('datoso.actions.processor.compare_dates', return_value=False)
     @mock.patch('datoso.configuration.config.getboolean', return_value=True)
     @mock.patch('pathlib.Path.exists', return_value=True)
-    @mock.patch('datoso.helpers.file_utils.copy_path')
+    @mock.patch('datoso.actions.processor.copy_path')
     @mock.patch('pathlib.Path.mkdir')
     def test_process_overwritten(self, mock_mkdir, mock_copy_path, mock_path_exists, mock_getboolean, mock_compare_dates):
         self.db_dat.new_file = str(self.expected_destination)
@@ -623,7 +623,7 @@ class TestCopyAction(unittest.TestCase):
         self.assertEqual(str(action.database_dat.new_file), str(self.expected_destination))
         mock_getboolean.assert_any_call('PROCESS', 'Overwrite', fallback=False)
 
-    @mock.patch('datoso.helpers.compare_dates', return_value=False)
+    @mock.patch('datoso.actions.processor.compare_dates', return_value=False)
     @mock.patch('pathlib.Path.exists', return_value=False)
     @mock.patch('datoso.actions.processor.copy_path')
     @mock.patch('pathlib.Path.mkdir')
