@@ -229,11 +229,17 @@ class SaveToDatabase(Process):
 
     def process(self) -> str:
         """Save process to database."""
-        data_to_save = {**self.database_data, **self.file_data}
-        self.database_dat = Dat(**data_to_save)
-        self.database_dat.save()
-        self.database_dat.flush()
-        return 'Saved'
+        try:
+            data_to_save = {**self.database_data, **self.file_data}
+            instance = Dat(**data_to_save)
+            instance.save()
+            instance.flush()
+            self._database_dat = instance
+        except Exception as e:
+            logger.exception(e)
+            return 'Error'
+        else:
+            return 'Saved'
 
 
 class MarkMias(Process):
