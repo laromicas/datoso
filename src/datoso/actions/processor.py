@@ -31,6 +31,7 @@ class Processor:
     def process(self) -> Iterator[str]:
         """Process actions."""
         for action in self.actions:
+            logger.info(f"Processing action: [bold cyan]{action['action']}[/bold cyan]")
             action_class = globals()[
                 action['action']](
                     file=self.file, seed=self.seed, previous=self._file_data,
@@ -103,6 +104,7 @@ class LoadDatFile(Process):
 
     def process(self) -> str:
         """Load a dat file."""
+        logger.info(f"Loading DAT file: [bold magenta]{self.file}[/bold magenta]")
         # If there is a factory method, use it to create the class
         if getattr(self, '_factory', None) and self._factory:
             self._class = self._factory(self.file)
@@ -114,8 +116,9 @@ class LoadDatFile(Process):
                 self.load_database_dat()
         except Exception as e:  # noqa: BLE001
             self.status = 'Error'
-            logger.exception(e)
+            logger.exception(f"Error loading DAT file [bold red]{self.file}[/bold red]: {e}")
             return 'Error'
+        logger.info(f"DAT file [bold green]{self.file}[/bold green] loaded successfully.")
         return 'Loaded'
 
 
@@ -140,30 +143,39 @@ class DeleteOld(Process):
             if self.database_data and self.database_data.get('date', None) and self.file_data.get('date', None) \
                 and compare_dates(self.database_dat.date, self.file_dat.date):
                 self.stop = True
+                logger.info(f"Skipping delete for [bold magenta]{self.file_dat.name}[/bold magenta], newer version found in database.")
                 return 'No Action Taken, Newer Found'
         except ValueError as e:
-            logger.exception(e, self.database_dat.date, self.file_dat.date)
+            logger.exception(f"Error comparing dates for [bold red]{self.file_dat.name}[/bold red]: {e}")
             return 'Error'
 
         if not self.database_data.get('new_file', None):
+            logger.info(f"No old file found for [bold magenta]{self.file_dat.name}[/bold magenta], nothing to delete.")
             return 'New'
 
+        old_file_path_str = self.database_data.get('new_file', '')
+        old_file_path = Path(old_file_path_str or '')
+        destination_path = self.destination()
+
         if getattr(self, 'folder', None) and self.database_data.get('date', None):
-            old_file = Path(self.database_data.get('new_file', '') or '')
-            new_file = self.destination()
-            if old_file == new_file \
+            if old_file_path == destination_path \
                 and self.database_data.get('date', None) == self.file_data.get('date', None) \
                 and not config.getboolean('PROCESS', 'Overwrite', fallback=False) \
                 and self.database_dat.is_enabled():
+                logger.info(f"File [bold magenta]{old_file_path}[/bold magenta] already exists and is up-to-date.")
                 return 'Exists'
 
-        remove_path(Path(self.database_dat.new_file), remove_empty_parent=True)
+        logger.info(f"Deleting old file: [bold magenta]{old_file_path}[/bold magenta]")
+        remove_path(old_file_path, remove_empty_parent=True)
+
         if not self.database_dat.is_enabled():
             self.stop = True
             self.database_dat.new_file = None
             self.database_dat.save()
             self.database_dat.flush()
+            logger.info(f"DAT file [bold magenta]{self.file_dat.name}[/bold magenta] is disabled, removed from filesystem.")
             return 'Disabled'
+        logger.info(f"Old file [bold green]{old_file_path}[/bold green] deleted successfully.")
         return 'Deleted'
 
 
@@ -185,30 +197,42 @@ class Copy(Process):
         result = None
         origin = self.file if self.file else None
         destination = self.destination()
+        logger.info(f"Copying file from [bold magenta]{origin}[/bold magenta] to [bold magenta]{destination}[/bold magenta]")
+
         if not self.database_dat:
             copy_path(origin, destination)
+            logger.info(f"File [bold green]{origin}[/bold green] copied to [bold green]{destination}[/bold green] (no database entry).")
             return 'Copied'
+
         if not self.database_dat.is_enabled():
             self.file_dat.new_file = None
+            logger.info(f"DAT file [bold magenta]{self.file_dat.name}[/bold magenta] is disabled, copy ignored.")
             return 'Ignored'
-        old_file = Path(self.database_data.get('new_file', '') or '')
-        new_file = destination
 
-        if old_file == new_file and destination.exists() \
+        old_file_path_str = self.database_data.get('new_file', '')
+        old_file_path = Path(old_file_path_str or '')
+
+        if old_file_path == destination and destination.exists() \
             and not config.getboolean('PROCESS', 'Overwrite', fallback=False):
             self.stop = True
+            logger.info(f"File [bold magenta]{destination}[/bold magenta] already exists and is up-to-date.")
             return 'Exists'
 
-        if old_file.name == '':
+        if old_file_path.name == '':
             result = 'Created'
-        elif old_file != new_file:
+            logger.info(f"Creating new file: [bold magenta]{destination}[/bold magenta]")
+        elif old_file_path != destination:
             result = 'Updated'
+            logger.info(f"Updating file path from [bold magenta]{old_file_path}[/bold magenta] to [bold magenta]{destination}[/bold magenta]")
         elif config.getboolean('PROCESS', 'Overwrite', fallback=False):
             result = 'Overwritten'
-        elif not new_file.exists():
-            result = 'Updated'
+            logger.info(f"Overwriting existing file: [bold magenta]{destination}[/bold magenta]")
+        elif not destination.exists():
+            result = 'Updated' # Or 'Created' if old_file_path was also empty, though covered by first case
+            logger.info(f"Destination file [bold magenta]{destination}[/bold magenta] does not exist, creating/updating.")
         else:
-            msg = 'Unknown state'
+            msg = f"Unknown state for copy operation: old_file='{old_file_path}', new_file='{destination}'"
+            logger.error(msg)
             raise TypeError(msg)
 
         try:
@@ -216,12 +240,18 @@ class Copy(Process):
                 and self.database_data.get('date', None) \
                 and self.file_data.get('date', None) \
                 and compare_dates(self.database_dat.date, self.file_dat.date):
+                logger.info(f"Skipping copy for [bold magenta]{self.file_dat.name}[/bold magenta], newer version found in database.")
                 return 'No Action Taken, Newer Found'
 
-            self.database_dat.new_file = destination
+            self.database_dat.new_file = str(destination)
             copy_path(origin, destination)
-        except ValueError:
-            pass
+            logger.info(f"File [bold green]{origin}[/bold green] copied to [bold green]{destination}[/bold green] successfully.")
+        except ValueError: # Assuming this is for date comparison errors
+            logger.exception("Error comparing dates during copy operation.")
+            pass # Or return 'Error'
+        except Exception as e:
+            logger.exception(f"Error copying file [bold red]{origin}[/bold red] to [bold red]{destination}[/bold red]: {e}")
+            return 'Error' # Ensure errors during copy are reported
         return result
 
 
@@ -230,16 +260,22 @@ class SaveToDatabase(Process):
 
     def process(self) -> str:
         """Save process to database."""
+        dat_name = self.file_data.get('name', 'Unknown DAT')
+        logger.info(f"Saving data for [bold magenta]{dat_name}[/bold magenta] to database.")
         try:
             data_to_save = {**self.database_data, **self.file_data}
+            # Ensure new_file is a string for Pydantic model
+            if 'new_file' in data_to_save and isinstance(data_to_save['new_file'], Path):
+                data_to_save['new_file'] = str(data_to_save['new_file'])
             instance = Dat(**data_to_save)
             instance.save()
             instance.flush()
             self._database_dat = instance
         except Exception as e:  # noqa: BLE001
-            logger.exception(e)
+            logger.exception(f"Error saving data for [bold red]{dat_name}[/bold red] to database: {e}")
             return 'Error'
         else:
+            logger.info(f"Data for [bold green]{dat_name}[/bold green] saved to database successfully.")
             return 'Saved'
 
 
@@ -248,9 +284,17 @@ class MarkMias(Process):
 
     def process(self) -> str:
         """Mark missing in action."""
+        dat_name = self.database_dat.name if self.database_dat else 'Unknown DAT'
         if not config.getboolean('PROCESS', 'ProcessMissingInAction', fallback=False):
+            logger.info(f"Skipping MIA processing for [bold magenta]{dat_name}[/bold magenta] (disabled in config).")
             return 'Skipped'
-        mark_mias(dat_file=self.database_dat.new_file)
+        logger.info(f"Marking MIAs for DAT file: [bold magenta]{self.database_dat.new_file}[/bold magenta]")
+        try:
+            mark_mias(dat_file=self.database_dat.new_file)
+        except Exception as e:
+            logger.exception(f"Error marking MIAs for [bold red]{self.database_dat.new_file}[/bold red]: {e}")
+            return 'Error'
+        logger.info(f"MIAs marked for [bold green]{self.database_dat.new_file}[/bold green] successfully.")
         return 'Marked'
 
 
@@ -261,13 +305,22 @@ class AutoMerge(Process):
 
     def process(self) -> str:
         """Save process to database."""
+        dat_name = self.database_dat.name if self.database_dat else 'Unknown DAT'
         if getattr(self.database_dat, 'automerge', None):
+            logger.info(f"Attempting automerge for [bold magenta]{dat_name}[/bold magenta].")
             merged = Dedupe(self.database_dat)
         else:
+            logger.info(f"Skipping automerge for [bold magenta]{dat_name}[/bold magenta] (not configured for automerge).")
             return 'Skipped'
-        if merged.dedupe() > 0:
-            merged.save()
-            return 'Automerged'
+        try:
+            if merged.dedupe() > 0:
+                merged.save()
+                logger.info(f"Automerge successful for [bold green]{dat_name}[/bold green].")
+                return 'Automerged'
+        except Exception as e:
+            logger.exception(f"Error during automerge for [bold red]{dat_name}[/bold red]: {e}")
+            return 'Error'
+        logger.info(f"No changes made during automerge for [bold magenta]{dat_name}[/bold magenta].")
         return 'Skipped'
 
 
@@ -276,13 +329,22 @@ class Deduplicate(Process):
 
     def process(self) -> str:
         """Save process to database."""
+        dat_name = self.database_dat.name if self.database_dat else 'Unknown DAT'
         if parent := getattr(self.database_dat, 'parent', None):
+            logger.info(f"Attempting deduplication for [bold magenta]{dat_name}[/bold magenta] with parent [bold magenta]{parent.name}[/bold magenta].")
             merged = Dedupe(self.database_dat, parent)
         else:
+            logger.info(f"Skipping deduplication for [bold magenta]{dat_name}[/bold magenta] (no parent found).")
             return 'Skipped'
-        if merged.dedupe() > 0:
-            merged.save()
-            return 'Deduped'
+        try:
+            if merged.dedupe() > 0:
+                merged.save()
+                logger.info(f"Deduplication successful for [bold green]{dat_name}[/bold green].")
+                return 'Deduped'
+        except Exception as e:
+            logger.exception(f"Error during deduplication for [bold red]{dat_name}[/bold red]: {e}")
+            return 'Error'
+        logger.info(f"No changes made during deduplication for [bold magenta]{dat_name}[/bold magenta].")
         return 'Skipped'
 
 
