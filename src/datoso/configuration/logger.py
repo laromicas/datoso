@@ -1,5 +1,6 @@
 """Logging configuration for datoso."""
 import logging
+from rich.logging import RichHandler
 
 from datoso.helpers import Bcolors
 from datoso.helpers.file_utils import parse_path
@@ -7,7 +8,7 @@ from datoso.helpers.file_utils import parse_path
 from .configuration import config
 
 log_level = config['LOG'].get('LogLevel', logging.DEBUG)
-formatter = logging.Formatter('[%(asctime)s - %(levelname)s] - %(message)s', '%Y-%m-%d %H:%M:%S')
+formatter = logging.Formatter('%(message)s', '%Y-%m-%d %H:%M:%S')
 
 class TrimmedFileHandler(logging.FileHandler):
     """File handler that removes color codes from the log message."""
@@ -33,32 +34,6 @@ class TrimmedFileHandler(logging.FileHandler):
             except Exception:  # noqa: BLE001
                 self.handleError(record)
 
-
-
-class TrimmedStreamHandler(logging.StreamHandler):
-    """Stream handler that allows to stdout while logging."""
-
-    def emit(self, record: str) -> None:
-        """Emit a record.
-
-        If a formatter is specified, it is used to format the record.
-        The record is then written to the stream with a trailing newline.  If
-        exception information is present, it is formatted using
-        traceback.print_exception and appended to the stream.  If the stream
-        has an 'encoding' attribute, it is used to determine how to do the
-        output to the stream.
-        """
-        try:
-            msg = self.format(record)
-            stream = self.stream
-            # issue 35046: merged two stream.writes into one.
-            stream.write(msg)
-            self.flush()
-        except RecursionError:  # See issue 36272
-            raise
-        except Exception:  # noqa: BLE001
-            self.handleError(record)
-
 # Get root logger
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -78,7 +53,7 @@ if config.getboolean('LOG', 'Logging', fallback=False):
     enable_logging()
 
 # Create a stream handler
-stream_handler = TrimmedStreamHandler()
+stream_handler = RichHandler(rich_tracebacks=True, markup=True, show_path=False)
 stream_handler.setLevel(logging.INFO)
 if config.getboolean('COMMAND', 'Verbose', fallback=False):
     stream_handler.setLevel(logging.DEBUG)
