@@ -1,3 +1,9 @@
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/laromicas/datoso)
+[![PyPI version](https://badge.fury.io/py/datoso.svg)](https://badge.fury.io/py/datoso)
+[![Downloads](https://pepy.tech/badge/datoso)](https://pepy.tech/project/datoso)
+[![License](https://img.shields.io/pypi/l/datoso.svg)](https://pypi.org/project/datoso/)
+[![Python Version](https://img.shields.io/pypi/pyversions/datoso.svg)](https://pypi.org/project/datoso/)
+
 ![Datoso](/bearlogo.svg)
 
 # Datoso
