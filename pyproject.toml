@@ -66,6 +66,7 @@ dev = [
     # documentation
     "sphinx>=8.0.0",
     "sphinx-rtd-theme>=3.0.0",
+    "setuptools"
     ]
 test = [
     # test
