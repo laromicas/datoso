@@ -263,6 +263,8 @@ class XMLDatFile(DatFile):
             self.merged_roms = []
         parent.get_rom_shas()
         new_games = []
+        if isinstance(self.data[self.main_key][self.game_key], dict):
+            self.data[self.main_key][self.game_key] = [self.data[self.main_key][self.game_key]]
         for game in self.data[self.main_key][self.game_key]:
             if 'rom' not in game:
                 continue
