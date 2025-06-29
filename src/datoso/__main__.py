@@ -74,6 +74,7 @@ def initial_setup(args: Namespace) -> None:
 
 def main() -> None:
     """Execute the main function."""
+    logging.info(f"Datoso {__version__} starting...")
     detect_first_run()
     args = parse_args()
     args.func(args)

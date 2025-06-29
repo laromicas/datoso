@@ -47,9 +47,9 @@ def command_deduper(args: Namespace) -> None:
 
 def command_import(_) -> None:  # noqa: ANN001
     """Make changes in dat config."""
-    dat_root_path = config.get('PATHS', 'DatPath', fallback='')
+    dat_root_path = parse_path(config.get('PATHS', 'DatPath', fallback=''))
 
-    if not dat_root_path or not Path(dat_root_path).exists():
+    if not dat_root_path or not dat_root_path.exists():
         print(f'{Bcolors.FAIL}Dat root path not set or does not exist{Bcolors.ENDC}')
         sys.exit(1)
         return
@@ -79,9 +79,9 @@ def command_import(_) -> None:  # noqa: ANN001
             database.save()
             database.flush()
         except LookupError as e:
-            print(f'{Bcolors.FAIL}Error detecting seed type{Bcolors.ENDC} - {e}')
+            logger.exception(f'{Bcolors.FAIL}Error detecting seed type for {dat_name}{Bcolors.ENDC} - {e}')
         except TypeError as e:
-            print(f'{Bcolors.FAIL}Error detecting seed type{Bcolors.ENDC} - {e}')
+            logger.exception(f'{Bcolors.FAIL}Error detecting seed type for {dat_name}{Bcolors.ENDC} - {e}')
 
 
 def command_dat(args: Namespace) -> None:
@@ -276,8 +276,6 @@ def command_config(args: Namespace) -> None:
         command_config_rules_update(args)
     elif args.mia_update:
         command_config_mia_update(args)
-    elif args.path:
-        command_config_path(args)
     else:
         config_dict = {s:dict(config.items(s)) for s in config.sections()}
         print(json.dumps(config_dict, indent=4))
