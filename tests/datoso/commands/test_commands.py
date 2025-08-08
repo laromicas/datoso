@@ -149,6 +149,7 @@ class TestCommandImport(TestCommandsBase):
         self.mock_config.get.return_value = None
         mock_path_instance = mock_Path_class.return_value
         mock_path_instance.exists.return_value = True
+        self.mock_args.ignore = None
         command_import(self.mock_args)
         mock_sys_exit.assert_called_once_with(1)
         mock_sys_exit.reset_mock()
@@ -193,6 +194,8 @@ class TestCommandImport(TestCommandsBase):
 
         mock_db_dat_instance = mock_DatModel_constructor.return_value
 
+        self.mock_args.ignore = None
+
         # Call the function
         with mock.patch('builtins.print') as mock_print: # Suppress print output during test
             command_import(self.mock_args)
@@ -226,6 +229,7 @@ class TestCommandImport(TestCommandsBase):
         mock_dat_file_path.__str__.return_value = "/fake/datroot/file_lookup_error.dat"
         mock_path_instance.rglob.return_value = [mock_dat_file_path]
         self.mock_config.__getitem__.side_effect = lambda key: {'DatPath': '/fake/datroot', 'IMPORT': {}}.get(key, mock.MagicMock())
+        self.mock_args.ignore = None
 
         with mock.patch('builtins.print') as mock_print:
             command_import(self.mock_args)
@@ -264,6 +268,7 @@ class TestCommandImport(TestCommandsBase):
         mock_detected_class = mock.Mock(return_value=mock_dat_file_obj_instance)
         mock_detected_class.__name__ = 'MockDatClass'
         mock_detect_seed.return_value = ("seed1", mock_detected_class)
+        self.mock_args.ignore = None
 
         with mock.patch('builtins.print'):
             command_import(self.mock_args)
@@ -273,7 +278,6 @@ class TestCommandImport(TestCommandsBase):
         mock_detect_seed.assert_called_once_with(str(mock_file1), mock.ANY)
         # Verify that Dat model was saved for file1
         mock_DatModel_constructor.assert_called_once_with(name="file1", seed="seed1", new_file=str(mock_file1))
-
 
 class TestCommandDat(TestCommandsBase):
     @mock.patch('datoso.commands.commands.helper_command_dat')

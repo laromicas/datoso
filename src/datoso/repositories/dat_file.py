@@ -3,6 +3,7 @@ import logging
 import os
 import shlex
 from enum import Enum
+from hashlib import md5
 from pathlib import Path
 from typing import Any, Generator
 
@@ -370,10 +371,12 @@ class XMLDatFile(DatFile):
                     extensions_to_remove = ['.iso', '.cue', '.bin', '.chd', '.rvz']
                     clean_rom_name = rom.get('@name', '')
                     for ext in extensions_to_remove:
-                        if clean_rom_name.endswith(ext):
-                            clean_rom_name = clean_rom_name[:-len(ext)]
-                    yield f'"{clean_rom_name}"\t"{rom.get('@sha1', '')}"\t"{rom.get('@md5', '')}"\t' \
-                                f'"{rom.get('@crc', '')}"\n'
+                        clean_rom_name = clean_rom_name.removesuffix(ext)
+
+                    sha = rom.get('@sha1', '')
+                    md5 = rom.get('@md5', '')
+                    crc = rom.get('@crc', '')
+                    yield f'"{clean_rom_name}"\t"{sha}"\t"{md5}"\t"{crc}"\n'
 
 class ClrMameProDatFile(DatFile):
     """ClrMamePro dat file."""
