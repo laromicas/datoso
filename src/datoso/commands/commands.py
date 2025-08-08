@@ -45,7 +45,7 @@ def command_deduper(args: Namespace) -> None:
                  )
 
 
-def command_import(_) -> None:  # noqa: ANN001
+def command_import(args) -> None:  # noqa: ANN001
     """Make changes in dat config."""
     dat_root_path = config.get('PATHS', 'DatPath', fallback='')
 
@@ -69,6 +69,9 @@ def command_import(_) -> None:  # noqa: ANN001
             found = True
         if not found:
             continue
+        if args.ignore and any(x in dat_name for x in args.ignore):
+            print(f'Ignoring {Bcolors.WARNING}{dat_name}{Bcolors.ENDC}')
+            continue
         print(f'{dat_name} - ', end='')
         try:
             seed, _class = detect_seed(dat_name, rules)
@@ -79,9 +82,9 @@ def command_import(_) -> None:  # noqa: ANN001
             database.save()
             database.flush()
         except LookupError as e:
-            print(f'{Bcolors.FAIL}Error detecting seed type{Bcolors.ENDC} - {e}')
+            print(f'{Bcolors.FAIL}Error detecting seed type err1{Bcolors.ENDC} - {e}')
         except TypeError as e:
-            print(f'{Bcolors.FAIL}Error detecting seed type{Bcolors.ENDC} - {e}')
+            print(f'{Bcolors.FAIL}Error detecting seed type err2{Bcolors.ENDC} - {e}')
 
 
 def command_dat(args: Namespace) -> None:

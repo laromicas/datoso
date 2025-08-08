@@ -61,6 +61,11 @@
             "empty_suffix": {
                 "nointro": "Floppies",
                 "redump": "Discs"
+            },
+            "if_suffix": {
+                "SBI Subchannels": {
+                    "suffix": "SBI Subchannels"
+                }
             }
         },
         "system_type": "Computer"
@@ -322,6 +327,11 @@
         "system_type": "Console"
     },
     {
+        "company": "Blaze Entertainment",
+        "system": "Evercade",
+        "system_type": "Arcade"
+    },
+    {
         "company": "Capcom",
         "system": "Play System III",
         "system_type": "Arcade"
@@ -548,6 +558,11 @@
         "extra_configs": {
             "empty_suffix": {
                 "redump": "Discs/Discs"
+            },
+            "if_suffix": {
+                "SBI Subchannels": {
+                    "suffix": "SBI Subchannels"
+                }
             }
         },
         "system_type": "Computer"
@@ -708,6 +723,10 @@
             "if_suffix": {
                 "Development Kit Hard Drives": {
                     "modifier": "Source Code"
+                },
+                "BIOS Images (DoM Version)": {
+                    "suffix": "DoM Version",
+                    "modifier": "BIOS Images"
                 }
             },
             "empty_suffix": {
@@ -831,11 +850,17 @@
     {
         "company": "Mobile",
         "system": "J2ME",
+        "override": {
+            "company": "Sun"
+        },
         "system_type": "Mobile"
     },
     {
         "company": "Mobile",
         "system": "Symbian",
+        "override": {
+            "company": "Symbian"
+        },
         "system_type": "Mobile"
     },
     {
@@ -874,6 +899,13 @@
     {
         "company": "Namco-Sega-Nintendo",
         "system": "Triforce",
+        "extra_configs": {
+            "if_suffix": {
+                "GDI Files": {
+                    "suffix": "GDI Files"
+                }
+            }
+        },
         "system_type": "Arcade"
     },
     {
@@ -1073,6 +1105,12 @@
         "extra_configs": {
             "empty_suffix": {
                 "redump": "Discs"
+            },
+            "if_suffix": {
+                "BIOS Images (DoM Version)": {
+                    "suffix": "DoM Version",
+                    "modifier": "BIOS Images"
+                }
             }
         },
         "system_type": "Console"
@@ -1098,6 +1136,11 @@
         "extra_configs": {
             "empty_suffix": {
                 "redump": "Discs"
+            },
+            "if_suffix": {
+                "Disc Keys": {
+                    "suffix": "Disc Keys"
+                }
             }
         },
         "system_type": "Console"
@@ -1185,7 +1228,7 @@
         "system": "GameCube - NKit RVZ [zstd-19-128k]",
         "override": {
             "system": "GameCube",
-            "suffix": "NKit RVZ [zstd-19-128k]"
+            "suffix": "NKit RVZ"
         },
         "system_type": "Console"
     },
@@ -1194,7 +1237,7 @@
         "system": "Wii - NKit RVZ [zstd-19-128k]",
         "override": {
             "system": "Wii",
-            "suffix": "NKit RVZ [zstd-19-128k]"
+            "suffix": "NKit RVZ"
         },
         "system_type": "Console"
     },
@@ -1347,6 +1390,23 @@
         "system_type": "Source Code"
     },
     {
+        "company": "Nintendo",
+        "system": "Nintendo Music",
+        "override": {
+            "system": "Music"
+        },
+        "system_type": "Audio"
+    },
+    {
+        "company": "No-Intro",
+        "system": "Nintendo - Nintendo Music",
+        "override": {
+            "company": "Nintendo",
+            "system": "Music"
+        },
+        "system_type": "Audio"
+    },
+    {
         "company": "Nokia",
         "system": "N-Gage",
         "extra_configs": {
@@ -1468,6 +1528,9 @@
                 },
                 "Private": {
                     "suffix": "Private"
+                },
+                "GDI Files": {
+                    "suffix": "GDI Files"
                 }
             },
             "empty_suffix": {
@@ -1605,6 +1668,13 @@
     {
         "company": "Sega",
         "system": "Chihiro",
+        "extra_configs": {
+            "if_suffix": {
+                "GDI Files": {
+                    "suffix": "GDI Files"
+                }
+            }
+        },
         "system_type": "Arcade"
     },
     {
@@ -1743,11 +1813,25 @@
     {
         "company": "Sega",
         "system": "Naomi",
+        "extra_configs": {
+            "if_suffix": {
+                "GDI Files": {
+                    "suffix": "GDI Files"
+                }
+            }
+        },
         "system_type": "Arcade"
     },
     {
         "company": "Sega",
         "system": "Naomi 2",
+        "extra_configs": {
+            "if_suffix": {
+                "GDI Files": {
+                    "suffix": "GDI Files"
+                }
+            }
+        },
         "system_type": "Arcade"
     },
     {
@@ -1876,6 +1960,15 @@
         "extra_configs": {
             "empty_suffix": {
                 "redump": "Discs"
+            },
+            "if_suffix": {
+                "SBI Subchannels": {
+                    "suffix": "SBI Subchannels"
+                },
+                "BIOS Images (DoM Version)": {
+                    "suffix": "DoM Version",
+                    "modifier": "BIOS Images"
+                }
             }
         },
         "system_type": "Console"
@@ -1886,6 +1979,12 @@
         "extra_configs": {
             "empty_suffix": {
                 "redump": "Discs"
+            },
+            "if_suffix": {
+                "BIOS Images (DoM Version)": {
+                    "suffix": "DoM Version",
+                    "modifier": "BIOS Images"
+                }
             }
         },
         "system_type": "Console"
@@ -1897,6 +1996,12 @@
             "if_suffix": {
                 "Development Kit Hard Drives": {
                     "modifier": "Source Code"
+                },
+                "Disc Keys": {
+                    "suffix": "Disc Keys"
+                },
+                "Disc Keys TXT": {
+                    "suffix": "Disc Keys TXT"
                 }
             },
             "empty_suffix": {
@@ -2155,16 +2260,41 @@
     {
         "company": null,
         "system": "Audio CD",
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
         "system_type": "Audio"
     },
     {
         "company": null,
         "system": "BD-Video",
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Video"
+    },
+    {
+        "company": null,
+        "system": "HD DVD-Video",
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
         "system_type": "Video"
     },
     {
         "company": null,
         "system": "DVD-Video",
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
         "system_type": "Video"
     },
     {

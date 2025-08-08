@@ -4,7 +4,7 @@ import os
 import shlex
 from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import Any, Generator
 
 import xmltodict
 
@@ -63,6 +63,11 @@ class DatFile:
     # @abstractmethod
     def get_date(self) -> str:
         """Get the date from the dat file."""
+
+    # @abstractmethod
+    def to_csv(self) -> Generator[str, None, None]:
+        """Convert the dat file to CSV."""
+        raise NotImplementedError('This method should be implemented in the subclass.')
 
     def close(self) -> None:
         """Close the dat file if needed."""
@@ -352,6 +357,24 @@ class XMLDatFile(DatFile):
         """Get the date from the dat file."""
         return self.date
 
+    def to_csv(self) -> str:
+        """Convert the dat file to a CSV file."""
+        if not self.data[self.main_key][self.game_key]:
+            self.load()
+        if not self.data[self.main_key][self.game_key]:
+            raise ValueError('No games found in the dat file')
+        for game in self.data[self.main_key][self.game_key]:
+            if 'rom' in game:
+                roms = game['rom'] if isinstance(game['rom'], list) else [game['rom']]
+                for rom in roms:
+                    extensions_to_remove = ['.iso', '.cue', '.bin', '.chd', '.rvz']
+                    clean_rom_name = rom.get('@name', '')
+                    for ext in extensions_to_remove:
+                        if clean_rom_name.endswith(ext):
+                            clean_rom_name = clean_rom_name[:-len(ext)]
+                    yield f'"{clean_rom_name}"\t"{rom.get('@sha1', '')}"\t"{rom.get('@md5', '')}"\t' \
+                                f'"{rom.get('@crc', '')}"\n'
+
 class ClrMameProDatFile(DatFile):
     """ClrMamePro dat file."""
 
@@ -575,3 +598,36 @@ class DirMultiDatFile(DatFile):
         }
         self.name = self.header['name']
         self.full_name = self.header['description']
+
+
+class DatFileTypes(Enum):
+    """Dat file types Enum."""
+
+    XML = 'xml', XMLDatFile
+    CLRMAMEPRO = 'clrmamepro', ClrMameProDatFile
+    DOSCENTER = 'doscenter', DOSCenterDatFile
+    ZIP_MULTI = 'zip_multi', ZipMultiDatFile
+    DIR_MULTI = 'dir_multi', DirMultiDatFile
+    UNKNOWN = 'unknown', DatFile
+
+    def __new__(cls, *args: str, **_: str) -> 'DatFileTypes':
+        """Create a new instance of DatFileTypes."""
+        obj = object.__new__(cls)
+        obj._value_ = args[0]
+        return obj
+
+    def __init__(self, _: str, cls: str | None = None) -> None:
+        """Initialize the DatFileTypes."""
+        self._cls = cls
+
+    def __str__(self) -> str:
+        """Return the string representation of the DatFileTypes."""
+        return self.value
+
+    def __repr__(self) -> str:
+        """Return the string representation of the DatFileTypes."""
+        return f'DatFileTypes.{self.value.upper()}'
+    @property
+    def cls(self) -> type[DatFile]:
+        """Return the class associated with the DatFileTypes."""
+        return self._cls

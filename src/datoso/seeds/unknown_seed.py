@@ -3,12 +3,15 @@ import logging
 import re
 from typing import Any
 
-from datoso.repositories.dat_file import DatFile
+from datoso.repositories.dat_file import DatFile, DatFileTypes
 
 
 def detect_from_rules(dat: DatFile, rules: list) -> tuple[str, DatFile]:
     """Detect the seed for a dat file."""
     for rule_details in rules:
+        if rule_details.get('type', False) in [e.value for e in DatFileTypes] \
+            and not isinstance(dat, DatFileTypes(rule_details['type']).cls):
+            continue
         found = True
         for rule in rule_details['rules']:
             if not comparator(dat.header.get(rule['key']), rule['value'], rule.get('operator', 'eq')):

@@ -2,7 +2,7 @@
 from pydoc import locate
 from shutil import which
 
-import pkg_resources
+from packaging.version import parse
 
 from datoso import __app_name__
 from datoso.helpers import Bcolors
@@ -16,8 +16,8 @@ def check_seed(seed: str) -> bool:
 
 def check_version(detected: str, required: str, expression: str) -> bool:
     """Check if version of required package is correct."""
-    detected = pkg_resources.parse_version(detected)
-    required = pkg_resources.parse_version(required)
+    detected = parse(detected)
+    required = parse(required)
     match expression:
         case '>':
             return detected > required
