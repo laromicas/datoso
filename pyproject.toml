@@ -42,23 +42,23 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 all = [
-    "datoso-seed-fbneo>=1.0.1",
-    "datoso-seed-enhanced>=1.0.0",
-    "datoso-seed-nointro>=1.1.0",
-    "datoso-seed-pleasuredome>=1.1.0",
-    "datoso-seed-redump>=1.0.0",
+    "datoso-seed-fbneo>=1.0.2",
+    "datoso-seed-enhanced>=1.1.0",
+    "datoso-seed-nointro>=1.1.1",
+    "datoso-seed-pleasuredome>=1.1.1",
+    "datoso-seed-redump>=1.0.1",
     "datoso-seed-tdc>=1.1.0",
-    "datoso-seed-translatedenglish>=1.0.1",
-    "datoso-seed-vpinmame>=1.0.1",
+    "datoso-seed-translatedenglish>=1.1.1",
+    "datoso-seed-vpinmame>=1.0.2",
     ]
-fbneo = [ "datoso-seed-fbneo>=1.0.1" ]
-enhanced = [ "datoso-seed-enhanced>=1.0.0" ]
-nointro = [ "datoso-seed-nointro>=1.1.0" ]
-pleasuredome = [ "datoso-seed-pleasuredome>=1.1.0" ]
-redump = [ "datoso-seed-redump>=1.0.0" ]
+fbneo = [ "datoso-seed-fbneo>=1.0.2" ]
+enhanced = [ "datoso-seed-enhanced>=1.1.0" ]
+nointro = [ "datoso-seed-nointro>=1.1.1" ]
+pleasuredome = [ "datoso-seed-pleasuredome>=1.1.1" ]
+redump = [ "datoso-seed-redump>=1.0.1" ]
 tdc = [ "datoso-seed-tdc>=1.1.0" ]
-translatedenglish = [ "datoso-seed-translatedenglish>=1.0.1" ]
-vpinmame = [ "datoso-seed-vpinmame>=1.0.1" ]
+translatedenglish = [ "datoso-seed-translatedenglish>=1.1.1" ]
+vpinmame = [ "datoso-seed-vpinmame>=1.0.2" ]
 dev = [
     # code quality
     "ruff>=0.6.3",

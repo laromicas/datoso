@@ -32,11 +32,6 @@
         "game": "Code of Joker (No. 2) (Japan) (Rev F)",
         "sha1": "a34c3b5f736685ebab3fd110426309b1846725d0"
     },
-    "012a1e13179648315163cb9bdb107fcd8ba902aa": {
-        "system": "Sega - Lindbergh",
-        "game": "Let's Go Jungle (Export)",
-        "sha1": "012a1e13179648315163cb9bdb107fcd8ba902aa"
-    },
     "80cfeb01835cca9ed7eb2cb42a76c3603a9d1b5f": {
         "system": "Sega - Lindbergh",
         "game": "VBIOS Update (Japan) (Rev A)",
@@ -153,21 +148,6 @@
         "system": "Sega - Mega CD & Sega CD",
         "game": "WireHead (Europe) (Beta) (1995-09-12)",
         "sha1": "46d2cc707718e1e8a9e25910cd3dc2645b733857"
-    },
-    "16603595c6821b845f83a42354a5c428cca44dac": {
-        "system": "funworld - Photo Play",
-        "game": "Snake II (Europe)",
-        "sha1": "16603595c6821b845f83a42354a5c428cca44dac"
-    },
-    "ed1e73f60bfb5b1608a3867f470941316e841a23": {
-        "system": "funworld - Photo Play",
-        "game": "Update 2001 (Europe) (Disc 1)",
-        "sha1": "ed1e73f60bfb5b1608a3867f470941316e841a23"
-    },
-    "5248881684b861b87ad66c3ec4bdeaf2bfe88b61": {
-        "system": "funworld - Photo Play",
-        "game": "Update 2001 (Europe) (Disc 2)",
-        "sha1": "5248881684b861b87ad66c3ec4bdeaf2bfe88b61"
     },
     "7cc6f72d4a787db8cfa8ee288d5b90df84ba50f1": {
         "system": "Philips - CD-i",

@@ -12,7 +12,7 @@ from datoso.helpers import Bcolors
 from datoso.helpers.file_utils import parse_path
 from datoso.helpers.plugins import PluginType, installed_seeds
 
-STATUS_TO_SHOW = ['Updated', 'Created', 'Error', 'Disabled', 'Deduped', 'Automerged', 'No Action Taken, Newer Found']
+STATUS_TO_SHOW = ['Updated', 'Created', 'Error', 'Disabled', 'Deduped', 'Automerged', 'No Action Taken, Newer Found', 'Overwritten']
 
 class Seed:
     """Seed class."""

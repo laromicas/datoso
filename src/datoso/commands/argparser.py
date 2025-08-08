@@ -23,6 +23,7 @@ def add_log_parser(subparser: ArgumentParser) -> None:
 def add_config_parser(subparser: ArgumentParser) -> None:
     """Config parser."""
     parser_config = subparser.add_parser('config', help='Show configuration')
+    parser_config.add_argument('-p', '--path', action='store_true', help='datoso config file')
     parser_config.add_argument('-s', '--save', action='store_true', help='Save configuration to .datosorc')
     parser_config.add_argument('-d', '--directory', default='~', choices=['~', '.'], help='Directory to save .datosorc')
     parser_config.set_defaults(func=command_config)
@@ -90,6 +91,7 @@ def add_seed_parser(subparser: ArgumentParser) -> None:
 def add_import_parser(subparser: ArgumentParser) -> None:
     """Import parser."""
     parser_import = subparser.add_parser('import', help='Import dats from existing romvault')
+    parser_import.add_argument('-i', '--ignore', nargs='*', default=[], help='Ignore dats, can be used multiple times')
     parser_import.set_defaults(func=command_import)
 
 def add_deduper_parser(subparser: ArgumentParser) -> None:
