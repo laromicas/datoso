@@ -2,10 +2,11 @@
 import logging
 import os
 import shlex
+from collections.abc import Callable, Generator
 from enum import Enum
 from hashlib import md5
 from pathlib import Path
-from typing import Any, Generator
+from typing import Any
 
 import xmltodict
 
@@ -303,11 +304,98 @@ class XMLDatFile(DatFile):
                         rom['@mia'] = 'yes'
                     break
 
+    def _iter_games(self, container: dict) -> Generator[dict, None, None]:
+        """Recursively yield game dicts from a container that may hold 'game' and/or 'dir' entries.
+
+        A container is a dict that may contain a 'game' key (one game or a list of games) and/or
+        a 'dir' key (one sub-container or a list of sub-containers) which may recursively contain
+        more 'game'/'dir' entries. This allows dat files with nested <dir> elements to be walked
+        the same way as flat ones.
+        """
+        if 'game' in container:
+            games = container['game']
+            if not isinstance(games, list):
+                games = [games]
+            yield from games
+        if 'dir' in container:
+            dirs = container['dir']
+            if not isinstance(dirs, list):
+                dirs = [dirs]
+            for sub_dir in dirs:
+                yield from self._iter_games(sub_dir)
+
+    def _dedupe_game(
+        self,
+        game: dict,
+        has_rom: Callable[[dict], bool],
+        on_keep: Callable[[dict], None] | None,
+    ) -> dict | None:
+        """Filter duplicate roms out of a single game, returning None if no roms remain."""
+        roms = game['rom'] if isinstance(game['rom'], list) else [game['rom']]
+        new_roms = []
+        for rom in roms:
+            if has_rom(self.parse_rom(rom)):
+                self.merged_roms.append(self.parse_rom(rom))
+            else:
+                if on_keep:
+                    on_keep(rom)
+                new_roms.append(rom)
+        if not new_roms:
+            return None
+        new_game = {key: value for key, value in game.items() if key != 'rom'}
+        new_game['rom'] = new_roms
+        return new_game
+
+    def _dedupe_games(
+        self,
+        container: dict,
+        has_rom: Callable[[dict], bool],
+        on_keep: Callable[[dict], None] | None = None,
+    ) -> None:
+        """Recursively filter out duplicate roms from a container, dropping empty games/dirs.
+
+        `container` is a dict that may hold 'game' and/or 'dir' entries (see `_iter_games`).
+        Games are kept in place wherever they appear in the tree; a game is dropped entirely if
+        all of its roms are duplicates, and a 'dir' is dropped if it ends up with no games and no
+        sub-dirs left.
+
+        has_rom: given a parsed rom, return True if it's a duplicate that should be removed.
+        on_keep: optional callback invoked with the raw rom dict for every rom that is kept.
+        """
+        if 'game' in container:
+            games = container['game']
+            if not isinstance(games, list):
+                games = [games]
+            new_games = [
+                new_game
+                for game in games if 'rom' in game
+                for new_game in (self._dedupe_game(game, has_rom, on_keep),)
+                if new_game is not None
+            ]
+            if new_games:
+                container['game'] = new_games
+            else:
+                container.pop('game', None)
+
+        if 'dir' in container:
+            dirs = container['dir']
+            if not isinstance(dirs, list):
+                dirs = [dirs]
+            new_dirs = []
+            for sub_dir in dirs:
+                self._dedupe_games(sub_dir, has_rom, on_keep)
+                if 'game' in sub_dir or 'dir' in sub_dir:
+                    new_dirs.append(sub_dir)
+            if new_dirs:
+                container['dir'] = new_dirs
+            else:
+                container.pop('dir', None)
+
     def get_rom_shas(self) -> None:
         """Get the shas for the roms and creates an index."""
         self.shas = HashesIndex()
 
-        for game in self.data[self.main_key][self.game_key]:
+        for game in self._iter_games(self.data[self.main_key]):
             if 'rom' not in game:
                 continue
             if not isinstance(game['rom'], list):
@@ -321,62 +409,14 @@ class XMLDatFile(DatFile):
         if not self.merged_roms:
             self.merged_roms = []
         parent.get_rom_shas()
-        new_games = []
-        if isinstance(self.data[self.main_key][self.game_key], dict):
-            self.data[self.main_key][self.game_key] = [self.data[self.main_key][self.game_key]]
-        for game in self.data[self.main_key][self.game_key]:
-            if 'rom' not in game:
-                continue
-            new_game = {}
-            for key in game:
-                if key != 'rom':
-                    new_game[key] = game[key]
-            if not isinstance(game['rom'], list):
-                if parent.shas.has_rom(self.parse_rom(game['rom'])):
-                    self.merged_roms.append(self.parse_rom(game['rom']))
-                else:
-                    new_game['rom'] = game['rom']
-            else:
-                new_roms = []
-                for rom in game['rom']:
-                    if not parent.shas.has_rom(self.parse_rom(rom)):
-                        new_roms.append(rom)
-                    else:
-                        self.merged_roms.append(self.parse_rom(rom))
-                new_game['rom'] = new_roms
-            new_games.append(new_game)
-        self.data[self.main_key][self.game_key] = new_games
+        self._dedupe_games(self.data[self.main_key], has_rom=parent.shas.has_rom)
 
     def dedupe(self) -> None:
         """Dedupe the dat file."""
-        new_games = []
         self.shas = HashesIndex()
         if not self.merged_roms:
             self.merged_roms = []
-        for game in self.data[self.main_key][self.game_key]:
-            if 'rom' not in game:
-                continue
-            new_game = {}
-            for key in game:
-                if key != 'rom':
-                    new_game[key] = game[key]
-            if not isinstance(game['rom'], list):
-                if self.shas.has_rom(self.parse_rom(game['rom'])):
-                    self.merged_roms.append(self.parse_rom(game['rom']))
-                else:
-                    self.add_rom(game['rom'])
-                    new_game['rom'] = game['rom']
-            else:
-                new_roms = []
-                for rom in game['rom']:
-                    if self.shas.has_rom(self.parse_rom(rom)):
-                        self.merged_roms.append(self.parse_rom(rom))
-                    else:
-                        self.add_rom(rom)
-                        new_roms.append(rom)
-                new_game['rom'] = new_roms
-            new_games.append(new_game)
-        self.data[self.main_key][self.game_key] = new_games
+        self._dedupe_games(self.data[self.main_key], has_rom=self.shas.has_rom, on_keep=self.add_rom)
 
     def get_name(self) -> str:
         """Get the name of the dat file."""
@@ -673,7 +713,7 @@ class ZipMultiDatFile(DatFile):
         """Get the header from the dat file."""
         return { 'name': Path(self.file).name, 'description': self.file }
 
-    def load(self) -> None:
+    def load(self, *, load_games: bool = False) -> None:  # noqa: ARG002
         """Load the data from a ClrMamePro file."""
         self.main_key = 'datafile'
         self.games = []
@@ -696,7 +736,7 @@ class DirMultiDatFile(DatFile):
         """Get the header from the dat file."""
         return { 'name': self.name, 'description': self.file }
 
-    def load(self) -> None:
+    def load(self, *, load_games: bool = False) -> None:  # noqa: ARG002
         """Load the data from a ClrMamePro file."""
         self.main_key = 'datafile'
         self.games = []

@@ -88,7 +88,7 @@ class Dedupe:
             if isinstance(dat, ClrMameProDatFile):
                 dat.load(load_games=True)
             else:
-                dat.load()
+                dat.load(load_games=True)
         except Exception as e:  # noqa: BLE001
             msg = 'Invalid dat file'
             raise ValueError(msg, e) from None
