@@ -12,6 +12,16 @@
     },
     {
         "company": "Acorn",
+        "system": "Archimedes & Risc PC",
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Acorn",
         "system": "Atom",
         "system_type": "Computer"
     },
@@ -31,12 +41,53 @@
         "system_type": "Computer"
     },
     {
+        "company": "Amstrad",
+        "system": "CPC (CDT)",
+        "override": {
+            "system": "CPC",
+            "suffix": "CDT"
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Amstrad",
+        "system": "CPC (CPR)",
+        "override": {
+            "system": "CPC",
+            "suffix": "CPR"
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Amstrad",
+        "system": "CPC (DSK)",
+        "override": {
+            "system": "CPC",
+            "suffix": "DSK"
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Amstrad",
+        "system": "CPC (SNA)",
+        "override": {
+            "system": "CPC",
+            "suffix": "SNA"
+        },
+        "system_type": "Computer"
+    },
+    {
         "company": null,
         "system": "Merit Megatouch",
         "override": {
-            "company": "Merit",
-            "system": "Megatouch"
+            "company": "Merit Industries",
+            "system": "Megatouch ION"
         },
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Merit Industries",
+        "system": "Megatouch ION",
         "system_type": "Arcade"
     },
     {
@@ -87,6 +138,15 @@
         "system_type": "Computer"
     },
     {
+        "company": null,
+        "system": "Apple II",
+        "override": {
+            "system": "Apple II",
+            "company": "Apple"
+        },
+        "system_type": "Computer"
+    },
+    {
         "company": "Apple",
         "system": "II Plus",
         "override": {
@@ -111,13 +171,49 @@
         "system_type": "Computer"
     },
     {
+        "company": "Apple",
+        "system": "Pippin",
+        "override": {
+            "company": "Apple-Bandai"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
         "company": "Apple-Bandai",
         "system": "Pippin",
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies",
+                "redump": "Discs"
+            }
+        },
         "system_type": "Console"
     },
     {
         "company": "Arduboy Inc",
         "system": "Arduboy",
+        "system_type": "Console"
+    },
+    {
+        "company": "Arduboy Inc.",
+        "system": "Arduboy",
+        "override": {
+            "company": "Arduboy Inc"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Arduboy Inc.",
+        "system": "Arduboy FX",
+        "override": {
+            "company": "Arduboy Inc"
+        },
         "system_type": "Console"
     },
     {
@@ -152,6 +248,42 @@
             }
         },
         "system_type": "Computer"
+    },
+    {
+        "company": "Atari",
+        "system": "ST Series",
+        "override": {
+            "system": "ST"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Atari",
+        "system": "ST series",
+        "override": {
+            "system": "ST"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Atari",
+        "system": "Jaguar CD",
+        "override": {
+            "system": "Jaguar CD"
+        },
+        "system_type": "Console"
     },
     {
         "company": "Atari",
@@ -397,9 +529,40 @@
         "system_type": "Computer"
     },
     {
+        "company": "Datel",
+        "system": "PlayStation Cheat Device Updates",
+        "override": {
+            "company": "Sony",
+            "system": "PlayStation"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Datel - PlayStation Cheat Device Updates"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
         "company": "Digital Media Cartridge",
         "system": "Firecore",
         "system_type": "Console"
+    },
+    {
+        "company": null,
+        "system": "Elektor TV Games Computer",
+        "override": {
+            "company": "Elektor",
+            "system": "TV Games Computer"
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": null,
+        "system": "Enhanced CD",
+        "override": {
+            "company": "RCA"
+        },
+        "system_type": "Video"
     },
     {
         "company": "Emerson",
@@ -453,7 +616,26 @@
     },
     {
         "company": "Fujitsu",
+        "system": "FM Towns series",
+        "override": {
+            "system": "FM-Towns"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Fujitsu",
         "system": "FM-7",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Fujitsu",
+        "system": "FM77AV",
         "system_type": "Computer"
     },
     {
@@ -630,6 +812,11 @@
     },
     {
         "company": "Konami",
+        "system": "M2",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Konami",
         "system": "e-Amusement",
         "system_type": "Arcade"
     },
@@ -679,6 +866,14 @@
         "system_type": "Console"
     },
     {
+        "company": "Magnavox",
+        "system": "Odyssey2",
+        "override": {
+            "system": "Odyssey 2"
+        },
+        "system_type": "Console"
+    },
+    {
         "company": "Mattel",
         "system": "Fisher-Price iXL",
         "system_type": "Console"
@@ -697,6 +892,16 @@
         "company": "Memorex",
         "system": "Visual Information System",
         "system_type": "Console"
+    },
+    {
+        "company": "Microsoft",
+        "system": "DOS",
+        "override": {
+            "system": "PC and Compatibles",
+            "company": "IBM",
+            "suffix": "DOS"
+        },
+        "system_type": "Computer"
     },
     {
         "company": "Microsoft",
@@ -777,6 +982,42 @@
     {
         "company": "Microsoft",
         "system": "MSX",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Microsoft",
+        "system": "MSX - CAS",
+        "override": {
+            "system": "MSX",
+            "suffix": "CAS"
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Microsoft",
+        "system": "MSX - DSK",
+        "override": {
+            "system": "MSX",
+            "suffix": "DSK"
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Microsoft",
+        "system": "MSX - ROM",
+        "override": {
+            "system": "MSX",
+            "suffix": "ROM"
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Microsoft",
+        "system": "MSX - TAP",
+        "override": {
+            "system": "MSX",
+            "suffix": "TAP"
+        },
         "system_type": "Computer"
     },
     {
@@ -914,6 +1155,11 @@
         "system_type": "Computer"
     },
     {
+        "company": "Navisoft",
+        "system": "Naviken",
+        "system_type": "Computer"
+    },
+    {
         "company": "NEC",
         "system": "PC-88",
         "override": {
@@ -949,6 +1195,24 @@
                 "nointro": "Floppies",
                 "redump": "Discs"
             }
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "NEC",
+        "system": "PC-8801 - D88",
+        "override": {
+            "system": "PC-88 series",
+            "suffix": "D88"
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "NEC",
+        "system": "PC-8801 - T88",
+        "override": {
+            "system": "PC-88 series",
+            "suffix": "T88"
         },
         "system_type": "Computer"
     },
@@ -1011,6 +1275,14 @@
             "empty_suffix": {
                 "redump": "Discs"
             }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "NEC",
+        "system": "PC Engine CD - TurboGrafx-CD",
+        "override": {
+            "system": "PC Engine CD & TurboGrafx CD"
         },
         "system_type": "Console"
     },
@@ -1140,6 +1412,9 @@
             "if_suffix": {
                 "Disc Keys": {
                     "suffix": "Disc Keys"
+                },
+                "Development Kit Hard Drives": {
+                    "modifier": "Source Code"
                 }
             }
         },
@@ -1200,6 +1475,14 @@
     },
     {
         "company": "Nintendo",
+        "system": "Famicom Disk System",
+        "override": {
+            "system": "Family Computer Disk System"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
         "system": "Family Computer Disk System",
         "system_type": "Console"
     },
@@ -1247,6 +1530,24 @@
         "override": {
             "system": "Wii",
             "suffix": "NKit WBFS [lossless]"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Wii - ISO",
+        "override": {
+            "system": "Wii",
+            "suffix": "ISO"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Wii - WBFS",
+        "override": {
+            "system": "Wii",
+            "suffix": "WBFS"
         },
         "system_type": "Console"
     },
@@ -1357,6 +1658,40 @@
         "system_type": "Console"
     },
     {
+        "company": "Nintendo",
+        "system": "Famicom - NES",
+        "override": {
+            "system": "Nintendo Entertainment System"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Famicom - NES (UNF)",
+        "override": {
+            "system": "Nintendo Entertainment System",
+            "suffix": "UNF"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Super Famicom - SNES",
+        "override": {
+            "system": "Super Nintendo Entertainment System"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Super Famicom - SNES - MSU-1",
+        "override": {
+            "system": "Super Nintendo Entertainment System",
+            "suffix": "MSU-1"
+        },
+        "system_type": "Console"
+    },
+    {
         "company": null,
         "system": "Super Mario Maker Courses",
         "override": {
@@ -1440,10 +1775,39 @@
         },
         "extra_configs": {
             "empty_suffix": {
-                "nointro": "Roms"
+                "nointro": "Roms",
+                "redump": "Discs"
             }
         },
         "system_type": "Mobile"
+    },
+    {
+        "company": null,
+        "system": "Palm OS",
+        "override": {
+            "company": "Palm",
+            "system": "Palm OS"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Roms",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Mobile"
+    },
+    {
+        "company": null,
+        "system": "3DO Interactive Multiplayer",
+        "override": {
+            "company": "Panasonic"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
     },
     {
         "company": "Panasonic",
@@ -1490,6 +1854,11 @@
         "system_type": "Mobile"
     },
     {
+        "company": "Playmaji",
+        "system": "Polymega",
+        "system_type": "Console"
+    },
+    {
         "company": "Pocket PC",
         "system": "Pocket PC",
         "override": {
@@ -1507,6 +1876,24 @@
         "company": null,
         "system": "Project EGG",
         "system_type": "Computer"
+    },
+    {
+        "company": "Psion",
+        "system": "Psion",
+        "system_type": "PDA"
+    },
+    {
+        "company": null,
+        "system": "Psion",
+        "override": {
+            "company": "Psion"
+        },
+        "system_type": "PDA"
+    },
+    {
+        "company": "Psion",
+        "system": "Psion Series",
+        "system_type": "PDA"
     },
     {
         "company": "RCA",
@@ -1541,6 +1928,33 @@
     },
     {
         "company": "Sega",
+        "system": "Dreamcast - BIN-CUE",
+        "override": {
+            "system": "Dreamcast",
+            "suffix": "BIN-CUE"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Sega",
+        "system": "Dreamcast - GDI",
+        "override": {
+            "system": "Dreamcast",
+            "suffix": "GDI"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Sega",
+        "system": "Dreamcast - NRG",
+        "override": {
+            "system": "Dreamcast",
+            "suffix": "NRG"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Sega",
         "system": "Mega CD",
         "override": {
             "system": "Mega CD & Sega CD"
@@ -1559,6 +1973,14 @@
             "empty_suffix": {
                 "redump": "Discs"
             }
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Sega",
+        "system": "Sega CD",
+        "override": {
+            "system": "Mega CD & Sega CD"
         },
         "system_type": "Console"
     },
@@ -1739,6 +2161,11 @@
     {
         "company": "Sega",
         "system": "Nu",
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
         "system_type": "Arcade"
     },
     {
@@ -1749,6 +2176,11 @@
             "system": "Nu",
             "suffix": "DataCollective"
         },
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
         "system_type": "Arcade"
     },
     {
@@ -1758,6 +2190,11 @@
             "company": "Sega",
             "system": "Nu",
             "suffix": "DataCollective"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
         },
         "system_type": "Arcade"
     },
@@ -1836,12 +2273,22 @@
     },
     {
         "company": "Sega",
+        "system": "Naomi Satellite Terminal PC",
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Sega",
         "system": "PICO",
         "system_type": "Console"
     },
     {
         "company": "Sega",
         "system": "Prologue 21",
+        "system_type": "Video"
+    },
+    {
+        "company": "Sega",
+        "system": "Prologue 21 Multimedia Karaoke System",
         "system_type": "Video"
     },
     {
@@ -1859,7 +2306,13 @@
         "system": "Sega RingEdge-Wide",
         "override": {
             "company": "Sega",
-            "system": "RingEdge-Wide"
+            "system": "RingWide"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies",
+                "redump": "Discs"
+            }
         },
         "system_type": "Arcade"
     },
@@ -1867,19 +2320,52 @@
         "company": "Sega",
         "system": "Sega RingEdge-Wide",
         "override": {
-            "company": "Sega",
-            "system": "RingEdge-Wide"
+            "system": "RingWide"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies",
+                "redump": "Discs"
+            }
         },
         "system_type": "Arcade"
     },
     {
         "company": "Sega",
         "system": "RingEdge-Wide",
+        "override": {
+            "system": "RingWide"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies",
+                "redump": "Discs"
+            }
+        },
         "system_type": "Arcade"
     },
     {
         "company": "Sega",
+        "system": "RingWide",
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Floppies",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Arcade"
+    },
+    {
+        "company": "Sega",
+        "system": "SG-1000 - SC-3000",
+        "system_type": "Console"
+    },
+    {
+        "company": "Sega",
         "system": "SG-1000",
+        "override": {
+            "system": "SG-1000 - SC-3000"
+        },
         "system_type": "Console"
     },
     {
@@ -1920,8 +2406,16 @@
     },
     {
         "company": "Sinclair",
+        "system": "ZX Spectrum",
+        "system_type": "Computer"
+    },
+    {
+        "company": "Sinclair",
         "system": "ZX Spectrum +3",
-        "system_type": "Console"
+        "override": {
+            "system": "ZX Spectrum"
+        },
+        "system_type": "Computer"
     },
     {
         "company": "SNK",
@@ -2050,6 +2544,42 @@
     },
     {
         "company": "Sony",
+        "system": "PlayStation Portable (EBOOT)",
+        "override": {
+            "system": "PlayStation Portable",
+            "suffix": "EBOOT"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Sony",
+        "system": "PlayStation Portable (ISO)",
+        "override": {
+            "system": "PlayStation Portable",
+            "suffix": "ISO"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Sony",
+        "system": "PlayStation Portable (TBD)",
+        "override": {
+            "system": "PlayStation Portable",
+            "suffix": "TBD"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Sony",
+        "system": "PlayStation Portable (CSO)",
+        "override": {
+            "system": "PlayStation Portable",
+            "suffix": "CSO"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Sony",
         "system": "PlayStation Mobile",
         "system_type": "Mobile"
     },
@@ -2057,6 +2587,11 @@
         "company": "Sony",
         "system": "PlayStation Vita",
         "system_type": "Console"
+    },
+    {
+        "company": "Sun Microsystems",
+        "system": "Ultra",
+        "system_type": "Computer"
     },
     {
         "company": "TAB-Austria",
@@ -2131,6 +2666,16 @@
     },
     {
         "company": "Non-Redump",
+        "system": "Commodore - Amiga CD",
+        "override": {
+            "company": "Commodore",
+            "system": "Amiga CD",
+            "suffix": "ExtraDiscs"
+        },
+        "system_type": "Computer"
+    },
+    {
+        "company": "Non-Redump",
         "system": "VM Labs - NUON",
         "override": {
             "company": "VM Labs",
@@ -2167,6 +2712,14 @@
     {
         "company": "Welback",
         "system": "Mega Duck",
+        "system_type": "Console"
+    },
+    {
+        "company": "Wellback",
+        "system": "Mega Duck",
+        "override": {
+            "company": "Welback"
+        },
         "system_type": "Console"
     },
     {
@@ -2315,6 +2868,15 @@
     {
         "company": null,
         "system": "Sony Electronic Book",
+        "override": {
+            "company": "Sony",
+            "system": "Electronic Book"
+        },
+        "system_type": "Book"
+    },
+    {
+        "company": "Sony",
+        "system": "Electronic Book",
         "system_type": "Book"
     },
     {
@@ -2391,5 +2953,25 @@
         "company": null,
         "system": "Video Game Manual Scans",
         "system_type": "Manuals"
+    },
+    {
+        "company": null,
+        "system": "WASM-4",
+        "system_type": "Web"
+    },
+    {
+        "company": null,
+        "system": "MP3 CD",
+        "system_type": "Audio"
+    },
+    {
+        "company": null,
+        "system": "MP3 Audio Disc",
+        "system_type": "Audio"
+    },
+    {
+        "company": null,
+        "system": "Uzebox",
+        "system_type": "Console"
     }
 ]

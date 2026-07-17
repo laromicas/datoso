@@ -152,12 +152,30 @@ class DatFile:
         with open(dat_file, encoding='utf-8', errors='ignore') as file:
             file_header = file.read(10).encode('ascii', errors='ignore')[:5].decode()
         if file_header == FileHeaders.XML.value:
+            # Check if it's a DB Export format (no header element)
+            if DatFile._is_xml_db_export(dat_file):
+                return XMLDBExportDatFile
             return XMLDatFile
         if file_header == FileHeaders.CLRMAMEPRO.value:
             return ClrMameProDatFile
         if file_header == FileHeaders.DOSCENTER.value:
             return DOSCenterDatFile
         return None
+
+    @staticmethod
+    def _is_xml_db_export(dat_file: str | Path) -> bool:
+        """Check if XML file is DB Export format (has no header element)."""
+        with open(dat_file, encoding='utf-8', errors='ignore') as file:
+            # Read first few lines to check for header element
+            for _ in range(50):  # Check first 50 lines
+                line = file.readline()
+                if not line:
+                    break
+                if '<header>' in line or '<header ' in line:
+                    return False  # Has header, not DB Export
+                if '<game' in line:
+                    return True  # Found game before header, it's DB Export
+        return False  # Default to regular XML
 
 class XMLDatFile(DatFile):
     """XML dat file."""
@@ -169,10 +187,13 @@ class XMLDatFile(DatFile):
     merged_roms: list = None
     merge_options = 'dedupe' # dedupe, merge
 
-    def load(self) -> None:
+    def load(self, *, load_games: bool = False) -> None:
         """Load the data from a XML file."""
-        with open(self.file, encoding='utf-8') as fild:
-            self.data = xmltodict.parse(fild.read())
+        with open(self.file, encoding='utf-8-sig') as fild:
+            # Load the entire file or just header based on load_games flag
+            xml_content = fild.read() if load_games else self._read_header_only(fild)
+
+            self.data = xmltodict.parse(xml_content)
             self.detect_main_key()
             self.header = self.data[self.main_key].get('header', {})
             if self.header:
@@ -190,7 +211,39 @@ class XMLDatFile(DatFile):
             else:
                 self.name = self.data[self.main_key].get('@name')
                 self.full_name = self.data[self.main_key].get('@description')
-            self.detect_game_key()
+            if load_games:
+                self.detect_game_key()
+
+    def _read_header_only(self, file_obj: Any) -> str:  # noqa: ANN401
+        """Read only the header portion of the XML file for memory efficiency."""
+        lines = []
+        header_closed = False
+        main_tag = None
+
+        for line in file_obj:
+            lines.append(line)
+
+            # Capture the main tag name (e.g., "datafile", "logiqx", etc.)
+            stripped = line.strip()
+            if main_tag is None and '<' in line and not stripped.startswith('<?') and not stripped.startswith('<!'):
+                # Extract tag name from opening tag
+                tag_start = line.find('<') + 1
+                tag_end = line.find('>', tag_start)
+                if tag_end > tag_start:
+                    tag_name = line[tag_start:tag_end].split()[0].strip()
+                    if tag_name and not tag_name.startswith('/'):
+                        main_tag = tag_name
+
+            # Check if we've reached the end of the header
+            if '</header>' in line:
+                header_closed = True
+                break
+
+        # Add closing tag for the main element
+        if header_closed and main_tag:
+            lines.append(f'</{main_tag}>\n')
+
+        return ''.join(lines)
 
     def save(self) -> None:
         """Save the data to a XML file."""
@@ -377,6 +430,68 @@ class XMLDatFile(DatFile):
                     md5 = rom.get('@md5', '')
                     crc = rom.get('@crc', '')
                     yield f'"{clean_rom_name}"\t"{sha}"\t"{md5}"\t"{crc}"\n'
+
+
+class XMLDBExportDatFile(XMLDatFile):
+    """XML DB Export dat file - XML format without header element."""
+
+    def load(self, *, load_games: bool = False) -> None:
+        """Load the data from a XML DB Export file (no header element)."""
+        with open(self.file, encoding='utf-8') as fild:
+            # Load the entire file or just first game based on load_games flag
+            xml_content = fild.read() if load_games else self._read_first_game_only(fild)
+
+            self.data = xmltodict.parse(xml_content)
+            self.detect_main_key()
+            # DB Export format has no header element
+            self.header = {}
+
+            # Set placeholder values for missing header fields
+            self.name = self.data[self.main_key].get('@name', 'DB Export')
+            self.full_name = self.data[self.main_key].get('@description', 'Database Export')
+            self.date = None  # Placeholder - to be determined later from filename or metadata
+            self.homepage = None
+            self.url = None
+            self.author = None
+            self.email = None
+
+            if load_games:
+                self.detect_game_key()
+
+    def _read_first_game_only(self, file_obj: Any) -> str:  # noqa: ANN401
+        """Read only the first game for structure detection in DB Export format."""
+        lines = []
+        main_tag = None
+        game_count = 0
+        max_games_to_read = 1
+
+        for line in file_obj:
+            lines.append(line)
+
+            # Capture the main tag name (e.g., "datafile")
+            stripped = line.strip()
+            if main_tag is None and '<' in line and not stripped.startswith('<?') and not stripped.startswith('<!'):
+                # Extract tag name from opening tag
+                tag_start = line.find('<') + 1
+                tag_end = line.find('>', tag_start)
+                if tag_end > tag_start:
+                    tag_name = line[tag_start:tag_end].split()[0].strip()
+                    if tag_name and not tag_name.startswith('/'):
+                        main_tag = tag_name
+
+            # Count game tags to stop after first game
+            if main_tag and '<game' in line and not line.strip().startswith('<!'):
+                game_count += 1
+            if game_count >= max_games_to_read and '</game>' in line:
+                # We've read enough to parse the structure
+                break
+
+        # Add closing tag for the main element
+        if game_count > 0 and main_tag:
+            lines.append(f'</{main_tag}>\n')
+
+        return ''.join(lines)
+
 
 class ClrMameProDatFile(DatFile):
     """ClrMamePro dat file."""

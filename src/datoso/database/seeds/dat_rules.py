@@ -48,9 +48,13 @@ def import_dats() -> None:
         json.dump(systems, file, indent=4)
     System.truncate()
     for system in systems:
-        row = System.from_dict(system)
-        row.save()
-        row.flush()
+        try:
+            row = System.from_dict(system)
+            row.save()
+            row.flush()
+        except Exception as e:  # noqa: BLE001
+            print(f'Error importing system: {system}', e)
+            print(e)
 
 
 def init() -> None:

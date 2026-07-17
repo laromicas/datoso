@@ -135,7 +135,7 @@ def command_seed(args: Namespace) -> None:
             message = f'{Bcolors.OKCYAN}Fetching seed {Bcolors.OKGREEN}{args.seed}{Bcolors.ENDC}'
             print('='*(len(message)-14))
             print(message)
-            print('='*(len(message)-14))
+            print('-'*(len(message)-14))
             if seed.fetch():
                 print(f'Errors fetching {Bcolors.FAIL}{args.seed}{Bcolors.ENDC}')
                 print('Please enable logs for more information or use -v parameter')
