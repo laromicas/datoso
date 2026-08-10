@@ -107,6 +107,11 @@
     },
     {
         "company": "Apple",
+        "system": "Newton",
+        "system_type": "Mobile"
+    },
+    {
+        "company": "Apple",
         "system": "Macintosh",
         "extra_configs": {
             "empty_suffix": {
@@ -1097,10 +1102,18 @@
         "system_type": "Mobile"
     },
     {
+        "company": null,
+        "system": "Symbian",
+        "override": {
+            "company": "Nokia"
+        },
+        "system_type": "Mobile"
+    },
+    {
         "company": "Mobile",
         "system": "Symbian",
         "override": {
-            "company": "Symbian"
+            "company": "Nokia"
         },
         "system_type": "Mobile"
     },
@@ -1517,10 +1530,37 @@
     },
     {
         "company": "Nintendo",
+        "system": "GameCube - NKit ISO",
+        "override": {
+            "system": "GameCube",
+            "suffix": "NKit ISO"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "GameCube - RVZ",
+        "override": {
+            "system": "GameCube",
+            "suffix": "RVZ"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
         "system": "Wii - NKit RVZ [zstd-19-128k]",
         "override": {
             "system": "Wii",
             "suffix": "NKit RVZ"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Nintendo",
+        "system": "Wii - RVZ",
+        "override": {
+            "system": "Wii",
+            "suffix": "RVZ"
         },
         "system_type": "Console"
     },
@@ -2372,6 +2412,11 @@
         "company": "Seta",
         "system": "Aleck64",
         "system_type": "Arcade"
+    },
+    {
+        "company": "SGI",
+        "system": "Indigo series",
+        "system_type": "Computer"
     },
     {
         "company": "Sharp",
