@@ -36,6 +36,16 @@
         "system_type": "Computer"
     },
     {
+        "company": "American Laser Games",
+        "system": "3DO-based Arcade",
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Arcade"
+    },
+    {
         "company": "Amstrad",
         "system": "CPC",
         "system_type": "Computer"
@@ -1107,6 +1117,11 @@
         "override": {
             "company": "Nokia"
         },
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
         "system_type": "Mobile"
     },
     {
@@ -1114,6 +1129,11 @@
         "system": "Symbian",
         "override": {
             "company": "Nokia"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
         },
         "system_type": "Mobile"
     },
@@ -2710,6 +2730,16 @@
         "system_type": "Console"
     },
     {
+        "company": "VM Labs",
+        "system": "Nuon",
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Console"
+    },
+    {
         "company": "Non-Redump",
         "system": "Commodore - Amiga CD",
         "override": {
@@ -3018,5 +3048,95 @@
         "company": null,
         "system": "Uzebox",
         "system_type": "Console"
+    },
+    {
+        "company": "Handheld",
+        "system": "Cybiko",
+        "override": {
+            "company": "Cybiko"
+        },
+        "system_type": "PDA"
+    },
+    {
+        "company": "Handheld",
+        "system": "Palm OS",
+        "override": {
+            "company": "Palm",
+            "system": "Palm OS"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Roms",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "PDA"
+    },
+    {
+        "company": "Handheld",
+        "system": "Psion",
+        "override": {
+            "company": "Psion"
+        },
+        "system_type": "PDA"
+    },
+    {
+        "company": "Handheld",
+        "system": "Symbian",
+        "override": {
+            "company": "Nokia"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Mobile"
+    },
+    {
+        "company": "Handheld-Apple",
+        "system": "Newton",
+        "override": {
+            "company": "Apple"
+        },
+        "system_type": "Mobile"
+    },
+    {
+        "company": "Handheld-Mattel",
+        "system": "Fisher-Price iXL",
+        "override": {
+            "company": "Mattel"
+        },
+        "system_type": "Console"
+    },
+    {
+        "company": "Handheld-Microsoft",
+        "system": "Pocket PC",
+        "override": {
+            "company": "Microsoft"
+        },
+        "extra_configs": {
+            "empty_suffix": {
+                "nointro": "Roms",
+                "redump": "Discs"
+            }
+        },
+        "system_type": "Mobile"
+    },
+    {
+        "company": "Handheld-Sharp",
+        "system": "Zaurus",
+        "override": {
+            "company": "Sharp"
+        },
+        "system_type": "Mobile"
+    },
+    {
+        "company": "Handheld-Texas Instruments",
+        "system": "TI series",
+        "override": {
+            "company": "Texas Instruments"
+        },
+        "system_type": "Calculator"
     }
 ]
