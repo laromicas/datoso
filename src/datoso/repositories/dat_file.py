@@ -312,8 +312,8 @@ class XMLDatFile(DatFile):
         more 'game'/'dir' entries. This allows dat files with nested <dir> elements to be walked
         the same way as flat ones.
         """
-        if 'game' in container:
-            games = container['game']
+        if self.game_key in container:
+            games = container[self.game_key]
             if not isinstance(games, list):
                 games = [games]
             yield from games
@@ -362,8 +362,8 @@ class XMLDatFile(DatFile):
         has_rom: given a parsed rom, return True if it's a duplicate that should be removed.
         on_keep: optional callback invoked with the raw rom dict for every rom that is kept.
         """
-        if 'game' in container:
-            games = container['game']
+        if self.game_key in container:
+            games = container[self.game_key]
             if not isinstance(games, list):
                 games = [games]
             new_games = [
@@ -373,9 +373,9 @@ class XMLDatFile(DatFile):
                 if new_game is not None
             ]
             if new_games:
-                container['game'] = new_games
+                container[self.game_key] = new_games
             else:
-                container.pop('game', None)
+                container.pop(self.game_key, None)
 
         if 'dir' in container:
             dirs = container['dir']
@@ -384,7 +384,7 @@ class XMLDatFile(DatFile):
             new_dirs = []
             for sub_dir in dirs:
                 self._dedupe_games(sub_dir, has_rom, on_keep)
-                if 'game' in sub_dir or 'dir' in sub_dir:
+                if self.game_key in sub_dir or 'dir' in sub_dir:
                     new_dirs.append(sub_dir)
             if new_dirs:
                 container['dir'] = new_dirs
