@@ -255,21 +255,45 @@ class XMLDatFile(DatFile):
         """Detect the main key for the dat file."""
         self.main_key = next(iter(self.data))
 
-    def detect_game_key(self) -> str:
+    def detect_game_key(self) -> None:
         """Get the game key."""
-        for key in self.data[self.main_key]:
+        def get_key(parent_data: list) -> str:
+            if isinstance(parent_data, dict):
+                parent_data = [parent_data]
+            for data in parent_data:
+                game_dir = data
+                if 'dir' in game_dir:
+                    key = get_key(game_dir['dir'])
+                    if key:
+                        return key
+                else:
+                    for key in game_dir:
+                        if not key.startswith('@'):
+                            return key
+            return ''
+        for key, value in self.data[self.main_key].items():
             if key != 'header' and not key.startswith('@'):
-                self.game_key = key
+                if key == 'dir':
+                    if isinstance(value, list):
+                        game_key = get_key(value)
+                        self.game_key = game_key if game_key and game_key != 'dir' and not game_key.startswith('@') else self.game_key
+                    elif isinstance(value, dict):
+                        game_key = get_key(value)
+                        # for internalkey in value:
+                        #     if not key.startswith('@') and internalkey != 'dir':
+                        self.game_key = game_key if game_key and game_key != 'dir' and not game_key.startswith('@') else self.game_key
+                else:
+                    self.game_key = key
                 break
 
     def parse_rom(self, rom: dict) -> dict:
         """Standarize the rom."""
         parsed_rom = {}
-        for key in rom:
+        for key, value in rom.items():
             if key.startswith('@'):
-                parsed_rom[key[1:]] = rom[key]
+                parsed_rom[key[1:]] = value
             else:
-                parsed_rom[key] = rom[key]
+                parsed_rom[key] = value
         return parsed_rom
 
     def add_rom(self, rom: dict) -> None:
@@ -362,7 +386,21 @@ class XMLDatFile(DatFile):
         has_rom: given a parsed rom, return True if it's a duplicate that should be removed.
         on_keep: optional callback invoked with the raw rom dict for every rom that is kept.
         """
-        if self.game_key in container:
+        if 'dir' in container:
+            dirs = container['dir']
+            if not isinstance(dirs, list):
+                dirs = [dirs]
+            new_dirs = []
+            for sub_dir in dirs:
+                self._dedupe_games(sub_dir, has_rom, on_keep)
+                if self.game_key in sub_dir or 'dir' in sub_dir:
+                    new_dirs.append(sub_dir)
+            if new_dirs:
+                container['dir'] = new_dirs
+            else:
+                container.pop('dir', None)
+
+        if self.game_key in container and 'dir' not in container:
             games = container[self.game_key]
             if not isinstance(games, list):
                 games = [games]
@@ -377,19 +415,6 @@ class XMLDatFile(DatFile):
             else:
                 container.pop(self.game_key, None)
 
-        if 'dir' in container:
-            dirs = container['dir']
-            if not isinstance(dirs, list):
-                dirs = [dirs]
-            new_dirs = []
-            for sub_dir in dirs:
-                self._dedupe_games(sub_dir, has_rom, on_keep)
-                if self.game_key in sub_dir or 'dir' in sub_dir:
-                    new_dirs.append(sub_dir)
-            if new_dirs:
-                container['dir'] = new_dirs
-            else:
-                container.pop('dir', None)
 
     def get_rom_shas(self) -> None:
         """Get the shas for the roms and creates an index."""

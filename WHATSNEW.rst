@@ -6,6 +6,7 @@ release 1.1.0
 - Updated mia and systems
 - Several fixes to dedupe and automerge
 - Request helper
+- Removed pydantic for dataclasses
 
 release 1.0.1
 - Updated systems.json

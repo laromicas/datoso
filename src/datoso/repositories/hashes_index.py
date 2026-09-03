@@ -18,7 +18,8 @@ class HashesIndex:
         self.md5 = {}
         self.crc = {}
         self.sizes = {}
-        self.valid_hashes = ['sha256', 'sha1', 'md5', 'crc']
+        # self.valid_hashes = ['sha256', 'sha1', 'md5', 'crc']  # noqa: ERA001
+        self.valid_hashes = ['sha1', '@sha1']
 
     def add_rom(self, rom: dict) -> None:
         """Add a rom to the index."""
