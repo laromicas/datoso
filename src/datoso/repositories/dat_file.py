@@ -194,6 +194,11 @@ class XMLDatFile(DatFile):
             # Load the entire file or just header based on load_games flag
             xml_content = fild.read() if load_games else self._read_header_only(fild)
 
+            # Patches some non standard XML dats found in the wild
+            first_line = xml_content.split('\n', 1)[0]
+            if '[http://www.logiqx.com/Dats/datafile.dt]' in first_line:
+                xml_content = xml_content.replace('[http://www.logiqx.com/Dats/datafile.dt]','')
+
             self.data = xmltodict.parse(xml_content)
             self.detect_main_key()
             self.header = self.data[self.main_key].get('header', {})
@@ -386,21 +391,7 @@ class XMLDatFile(DatFile):
         has_rom: given a parsed rom, return True if it's a duplicate that should be removed.
         on_keep: optional callback invoked with the raw rom dict for every rom that is kept.
         """
-        if 'dir' in container:
-            dirs = container['dir']
-            if not isinstance(dirs, list):
-                dirs = [dirs]
-            new_dirs = []
-            for sub_dir in dirs:
-                self._dedupe_games(sub_dir, has_rom, on_keep)
-                if self.game_key in sub_dir or 'dir' in sub_dir:
-                    new_dirs.append(sub_dir)
-            if new_dirs:
-                container['dir'] = new_dirs
-            else:
-                container.pop('dir', None)
-
-        if self.game_key in container and 'dir' not in container:
+        if self.game_key in container:
             games = container[self.game_key]
             if not isinstance(games, list):
                 games = [games]
@@ -414,6 +405,20 @@ class XMLDatFile(DatFile):
                 container[self.game_key] = new_games
             else:
                 container.pop(self.game_key, None)
+
+        if 'dir' in container:
+            dirs = container['dir']
+            if not isinstance(dirs, list):
+                dirs = [dirs]
+            new_dirs = []
+            for sub_dir in dirs:
+                self._dedupe_games(sub_dir, has_rom, on_keep)
+                if self.game_key in sub_dir or 'dir' in sub_dir:
+                    new_dirs.append(sub_dir)
+            if new_dirs:
+                container['dir'] = new_dirs
+            else:
+                container.pop('dir', None)
 
 
     def get_rom_shas(self) -> None:

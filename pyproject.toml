@@ -62,9 +62,6 @@ dev = [
     # code quality
     "ruff>=0.6.3",
     "line_profiler==4.1.3",
-    # documentation
-    "sphinx>=8.0.0",
-    "sphinx-rtd-theme>=3.0.0",
     "setuptools"
     ]
 test = [
