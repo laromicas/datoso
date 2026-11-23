@@ -48,9 +48,21 @@ def downloader(url: str, destination: str, reporthook: Callable | None=None,  # 
     name = url_label(url) if filename_from_headers else Path(destination).name
     # Poll the file for wget/curl; aria2c preallocates it, so its size means nothing.
     watch = None if filename_from_headers or not isinstance(download, WgetDownload | CurlDownload) else destination
-    with progress.file(name, watch=watch) as task:
+    with progress.file(name, total=content_length(url) if watch else None, watch=watch) as task:
         hook = progress.reporthook(task) if isinstance(download, UrllibDownload) else None
         return download.download(url, destination, filename_from_headers=filename_from_headers, reporthook=hook)
+
+
+def content_length(url: str) -> int | None:
+    """File size from a HEAD request, or None if unknown."""
+    if not url.startswith(('http:', 'https:')):
+        return None
+    try:
+        request = urllib.request.Request(url, method='HEAD')  # noqa: S310
+        with urllib.request.urlopen(request, timeout=10) as response:  # noqa: S310
+            return int(response.headers['Content-Length'])
+    except (OSError, TypeError, ValueError):
+        return None
 
 
 def url_label(url: str) -> str:

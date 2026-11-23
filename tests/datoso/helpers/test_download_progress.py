@@ -11,7 +11,7 @@ import pytest
 from datoso.configuration import config
 from datoso.configuration.logger import stream_handler
 from datoso.helpers import download as download_module
-from datoso.helpers.download import DownloadProgress, downloader, url_label
+from datoso.helpers.download import DownloadProgress, content_length, downloader, url_label
 
 
 @pytest.fixture
@@ -70,10 +70,20 @@ def test_subprocess_downloads_follow_the_file(tmp_path):
         destination.write_bytes(b'0' * 1234)
         return destination
 
-    with mock.patch.object(download_module.WgetDownload, 'download', fake_wget), DownloadProgress() as progress:
+    with mock.patch.object(download_module.WgetDownload, 'download', fake_wget), \
+            mock.patch.object(download_module, 'content_length', return_value=1234) as head, \
+            DownloadProgress() as progress:
         downloader('http://example.org/x.zip', target, downloader='wget', progress=progress)
         file = progress.progress.tasks[1]
         assert (file.completed, file.total, file.finished) == (1234, 1234, True)
+    head.assert_called_once_with('http://example.org/x.zip')
+
+
+def test_content_length(server):
+    url, _ = server
+    assert content_length(f'{url}/a.dat') == 25000
+    assert content_length(f'{url}/missing.dat') is None
+    assert content_length('ftp://example.org/x') is None
 
 
 def test_hidden_when_quiet(monkeypatch):
