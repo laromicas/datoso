@@ -148,7 +148,7 @@ class DeleteOld(Process):
         if not self.database_data.get('new_file', None):
             return 'New'
 
-        if getattr(self, 'folder', None) and self.database_data.get('date', None):
+        if getattr(self, 'folder', None) and (self.database_data.get('date') or self.database_data.get('version')):
             old_file = Path(self.database_data.get('new_file', '') or '')
             new_file = self.destination()
             if old_file == new_file \

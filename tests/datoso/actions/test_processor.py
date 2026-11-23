@@ -460,6 +460,18 @@ class TestDeleteOldAction(unittest.TestCase):
     @mock.patch('datoso.actions.processor.compare_dates', return_value=False)
     @mock.patch('datoso.configuration.config.getboolean', return_value=False)
     @mock.patch('datoso.actions.processor.remove_path')
+    def test_process_versioned_dat_without_date_exists(self, mock_remove_path, mock_getboolean, mock_compare_dates):
+        action = self._create_action()
+        same = {'date': None, 'version': '0.270', 'new_file': self.db_dat_path_str}
+        with mock.patch.object(DeleteOld, 'file_data', new_callable=mock.PropertyMock, return_value=same), \
+                mock.patch.object(DeleteOld, 'database_data', new_callable=mock.PropertyMock, return_value=same):
+            result = action.process()
+        self.assertEqual(result, "Exists")
+        mock_remove_path.assert_not_called()
+
+    @mock.patch('datoso.actions.processor.compare_dates', return_value=False)
+    @mock.patch('datoso.configuration.config.getboolean', return_value=False)
+    @mock.patch('datoso.actions.processor.remove_path')
     def test_process_same_date_new_version_is_replaced(self, mock_remove_path, mock_getboolean, mock_compare_dates):
         self.file_dat.date = self.db_dat.date
         action = self._create_action()
