@@ -64,7 +64,7 @@ class Dedupe:
                     obj.datdb = Dat(name=name, seed=seed)
                     obj.datdb.load()
                     var = obj.datdb
-                elif var.endswith(('.dat', '.xml')):
+                elif var.endswith(('.dat', '.xml')) or Path(var).is_dir():
                     obj.file = var
                 else:
                     msg = 'Invalid dat file'
@@ -75,11 +75,23 @@ class Dedupe:
             if isinstance(var, DatFile):
                 obj.datfile = var
             else:
+                obj.file = self.single_dat_in(obj.file)
                 obj.datfile = self.get_dat_file(obj.file)
 
         load_metadata(child, self.child)
         if parent:
             load_metadata(parent, self.parent)
+
+    @staticmethod
+    def single_dat_in(file: str | Path) -> str | Path:
+        """For a directory DAT, the only .dat/.xml inside it; other paths are returned as is."""
+        if not Path(file).is_dir():
+            return file
+        dats = sorted(path for path in Path(file).iterdir() if path.suffix.lower() in ('.dat', '.xml'))
+        if len(dats) != 1:
+            msg = f'Directory DAT needs exactly one .dat/.xml to dedupe, found {len(dats)}: {file}'
+            raise ValueError(msg)
+        return dats[0]
 
     def get_dat_file(self, file: str | Path) -> DatFile:
         """Return a DatFile from a file."""
