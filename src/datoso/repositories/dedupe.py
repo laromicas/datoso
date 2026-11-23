@@ -12,6 +12,7 @@ class DatDedupe:
     _datdb: Dat
     _datfile: DatFile
     _file: str | Path
+    datfiles: list[DatFile]
 
     @property
     def datdb(self) -> Dat:
@@ -72,26 +73,21 @@ class Dedupe:
             if isinstance(var, Dat):
                 obj.datdb = var
                 obj.file = getattr(var, 'new_file', None) or var.file
-            if isinstance(var, DatFile):
-                obj.datfile = var
-            else:
-                obj.file = self.single_dat_in(obj.file)
-                obj.datfile = self.get_dat_file(obj.file)
+            obj.datfiles = [var] if isinstance(var, DatFile) else \
+                [self.get_dat_file(file) for file in self.dats_in(obj.file)]
+            obj.datfile = obj.datfiles[0] if obj.datfiles else None
 
         load_metadata(child, self.child)
         if parent:
             load_metadata(parent, self.parent)
 
     @staticmethod
-    def single_dat_in(file: str | Path) -> str | Path:
-        """For a directory DAT, the only .dat/.xml inside it; other paths are returned as is."""
+    def dats_in(file: str | Path) -> list[Path]:
+        """Every .dat/.xml under a directory DAT (recursively), or just the file itself."""
         if not Path(file).is_dir():
-            return file
-        dats = sorted(path for path in Path(file).iterdir() if path.suffix.lower() in ('.dat', '.xml'))
-        if len(dats) != 1:
-            msg = f'Directory DAT needs exactly one .dat/.xml to dedupe, found {len(dats)}: {file}'
-            raise ValueError(msg)
-        return dats[0]
+            return [Path(file)]
+        return sorted(path for path in Path(file).rglob('*')
+                      if path.is_file() and path.suffix.lower() in ('.dat', '.xml'))
 
     def get_dat_file(self, file: str | Path) -> DatFile:
         """Return a DatFile from a file."""
@@ -107,16 +103,28 @@ class Dedupe:
         return dat
 
     def dedupe(self) -> int:
-        """Dedupe the dat files."""
-        if self.parent:
-            self.child.datfile.merge_with(self.parent.datfile)
-        else:
-            self.child.datfile.dedupe()
-        logging.info('Deduped %i roms', len(self.child.datfile.merged_roms))
-        return len(self.child.datfile.merged_roms)
+        """Dedupe each child DAT (against every parent DAT, if any); return the ROMs removed."""
+        for datfile in self.child.datfiles:
+            if self.parent:
+                for parent in self.parent.datfiles:
+                    datfile.merge_with(parent)
+            else:
+                datfile.dedupe()
+        merged = sum(len(datfile.merged_roms) for datfile in self.child.datfiles)
+        logging.info('Deduped %i roms', merged)
+        return merged
 
     def save(self, file: str | Path | None = None) -> None:
-        """Save the dat file."""
-        if file and len(self.child.datfile.merged_roms) > 0:
-            self.child.datfile.file = file
-        self.child.datfile.save()
+        """Save the dat file; for a directory DAT, every DAT that changed (in place)."""
+        if len(self.child.datfiles) == 1:
+            datfile = self.child.datfile
+            if file and len(datfile.merged_roms) > 0:
+                datfile.file = file
+            datfile.save()
+            return
+        if file:
+            msg = 'An output file only works with a single DAT, not a directory of DATs'
+            raise ValueError(msg)
+        for datfile in self.child.datfiles:
+            if datfile.merged_roms:
+                datfile.save()

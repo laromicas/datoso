@@ -1,4 +1,4 @@
-"""Dedupe accepts directory DATs (a folder holding one .dat/.xml), as child or parent."""
+"""Dedupe accepts directory DATs (every .dat/.xml in the folder tree), as child or parent."""
 
 import pytest
 from datoso.repositories.dedupe import Dedupe
@@ -44,12 +44,37 @@ def test_directory_dat_as_parent(collection, tmp_path):
     assert Dedupe(str(child), str(collection)).dedupe() == 1
 
 
-def test_directory_needs_exactly_one_dat(collection):
-    write_dat(collection / 'other.xml', 'Other', {'O': [rom('o.bin', 'e' * 40)]})
-    with pytest.raises(ValueError, match='exactly one'):
-        Dedupe(str(collection))
+def test_automerge_every_dat_recursively(collection):
+    nested = collection / 'Sub' / 'Deeper'
+    nested.mkdir(parents=True)
+    other = write_dat(nested / 'other.xml', 'Other', {
+        'O': [rom('o.bin', 'e' * 40)], 'P': [rom('o.bin', 'e' * 40), rom('p.bin', 'f' * 40)],
+    })
+    untouched = write_dat(collection / 'Sub' / 'clean.dat', 'Clean', {'C': [rom('c.bin', '1' * 40)]})
+    before = untouched.stat().st_mtime_ns
+    merged = Dedupe(str(collection))
+    assert merged.dedupe() == 2  # one in each DAT that has duplicates, each deduped on its own
+    merged.save()
+    assert other.read_text(encoding='utf-8').count('o.bin') == 1
+    assert untouched.stat().st_mtime_ns == before  # unchanged DATs are not rewritten
+
+
+def test_directory_parent_counts_all_its_dats(collection, tmp_path):
+    write_dat(collection / 'more.xml', 'More', {'M': [rom('m.bin', 'd' * 40)]})
+    child = write_dat(tmp_path / 'Sega ALLS.dat', 'Sega ALLS', {
+        'X': [rom('shared.bin', 'c' * 40), rom('m.bin', 'd' * 40), rom('x.bin', '9' * 40)],
+    })
+    assert Dedupe(str(child), str(collection)).dedupe() == 2
+
+
+def test_output_file_needs_a_single_dat(collection):
+    write_dat(collection / 'more.xml', 'More', {'M': [rom('m.bin', 'd' * 40)]})
+    merged = Dedupe(str(collection))
+    merged.dedupe()
+    with pytest.raises(ValueError, match='single DAT'):
+        merged.save('out.dat')
 
 
 def test_files_are_left_alone(collection):
     dat = collection / 'TeknoParrot Collection (2026-11-23_RomVault).dat'
-    assert Dedupe.single_dat_in(dat) == dat
+    assert Dedupe.dats_in(dat) == [dat]
