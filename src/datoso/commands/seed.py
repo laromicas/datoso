@@ -11,6 +11,7 @@ from datoso.configuration import config
 from datoso.helpers import Bcolors
 from datoso.helpers.file_utils import parse_path
 from datoso.helpers.plugins import PluginType, installed_seeds
+from datoso.repositories.dat_file import DirMultiDatFile
 
 STATUS_TO_SHOW = ['Updated', 'Created', 'Error', 'Disabled', 'Deduped', 'Automerged', 'No Action Taken, Newer Found', 'Overwritten']
 
@@ -154,6 +155,20 @@ class Seed:
                 return True
         return (file.suffix not in ('.dat', '.xml') and not file.is_dir()) or (fltr and fltr not in str(file))
 
+    @staticmethod
+    def loads_directories(seed_actions: list[dict]) -> bool:
+        """Whether sub-folders of this action folder are DAT inputs, i.e. may be loaded as a ``DirMultiDatFile``.
+
+        True when ``LoadDatFile`` uses a ``_factory`` (it picks the class per entry, e.g. pleasuredome's
+        ``mame_dat_factory`` returns ``MameDirDat`` for folders), has no ``_class`` (auto-detection), or its ``_class``
+        is a ``DirMultiDatFile``. Only a fixed file-type ``_class`` (e.g. nointro's ``NoIntroDat``) excludes folders.
+        """
+        load = next((action for action in seed_actions if action.get('action') == 'LoadDatFile'), {})
+        loader = load.get('_class')
+        if load.get('_factory') or loader is None:
+            return True
+        return isinstance(loader, type) and issubclass(loader, DirMultiDatFile)
+
     def process_action(self, procesor: Processor) -> list:
         """Process action."""
         output = []
@@ -200,9 +215,12 @@ class Seed:
             # TODO(laromicas): override actions to process from config
             if actions_to_execute:
                 actions = [x for x in actions if x['action'] in actions_to_execute]
+            directories = self.loads_directories(seed_actions)
             for file in new_path.iterdir() if new_path.is_dir() else []:
                 if self.should_ignore_file(fltr, file):
                     continue
+                if file.is_dir() and not directories:
+                    continue  # a sub-folder (e.g. No-Intro/Aftermarket): processed through its own action path
                 if not config.getboolean('COMMAND', 'Quiet', fallback=False):
                     self.delete_line(line)
                     line = f'Processing {Bcolors.OKCYAN}{file.name}{Bcolors.ENDC}'
