@@ -1,4 +1,4 @@
-"""Seed.process_dats: which entries of an action folder are handed to the Processor."""
+"""Tests for which folder entries Seed.process_dats processes."""
 
 from pathlib import Path
 
@@ -9,12 +9,12 @@ from datoso.repositories.dat_file import DirMultiDatFile, XMLDatFile
 
 
 class FolderDat(DirMultiDatFile):
-    """A seed DAT class that loads a whole directory (like eggman's TeknoparrotDat)."""
+    """Directory DAT class."""
 
 
 @pytest.fixture
 def processed(monkeypatch, tmp_path):
-    """Run process_dats over tmp_path/seed/dats with the given actions; return the paths handed to the Processor."""
+    """Run process_dats and return the processed paths."""
     seen: list[Path] = []
 
     class RecordingProcessor:
@@ -36,7 +36,7 @@ def processed(monkeypatch, tmp_path):
 
 @pytest.fixture
 def dats(tmp_path):
-    """No-Intro-like layout: DATs plus a nested folder of DATs with its own action path."""
+    """No-Intro-like layout with a nested Aftermarket folder."""
     root = tmp_path / 'seed' / 'dats'
     (root / 'No-Intro' / 'Aftermarket').mkdir(parents=True)
     (root / 'No-Intro' / 'A.dat').write_text('')
@@ -51,7 +51,7 @@ def actions_for(*folders: str, loader: type | None) -> dict:
 
 def test_sub_folders_are_not_dat_files_for_file_loaders(processed, dats):  # noqa: ARG001
     paths = processed(actions_for('No-Intro', 'No-Intro/Aftermarket', loader=XMLDatFile))
-    assert paths == ['No-Intro/A.dat', 'No-Intro/Aftermarket/B (Aftermarket).dat']  # no 'No-Intro/Aftermarket'
+    assert paths == ['No-Intro/A.dat', 'No-Intro/Aftermarket/B (Aftermarket).dat']
 
 
 def test_directory_loaders_still_get_folders(processed, dats):  # noqa: ARG001
@@ -63,7 +63,6 @@ def test_auto_detection_keeps_passing_folders(processed, dats):  # noqa: ARG001
 
 
 def test_factories_still_get_folders(processed, dats):  # noqa: ARG001
-    """pleasuredome: LoadDatFile has a _factory that returns MameDirDat for folders and MameDat for files."""
     actions = {'{dat_origin}/No-Intro': [{'action': 'LoadDatFile', '_factory': lambda _file: FolderDat}]}
     assert processed(actions) == ['No-Intro/A.dat', 'No-Intro/Aftermarket']
 

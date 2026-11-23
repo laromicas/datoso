@@ -157,12 +157,7 @@ class Seed:
 
     @staticmethod
     def loads_directories(seed_actions: list[dict]) -> bool:
-        """Whether sub-folders of this action folder are DAT inputs, i.e. may be loaded as a ``DirMultiDatFile``.
-
-        True when ``LoadDatFile`` uses a ``_factory`` (it picks the class per entry, e.g. pleasuredome's
-        ``mame_dat_factory`` returns ``MameDirDat`` for folders), has no ``_class`` (auto-detection), or its ``_class``
-        is a ``DirMultiDatFile``. Only a fixed file-type ``_class`` (e.g. nointro's ``NoIntroDat``) excludes folders.
-        """
+        """Whether sub-folders can be DATs here (factory, no class, or a DirMultiDatFile class)."""
         load = next((action for action in seed_actions if action.get('action') == 'LoadDatFile'), {})
         loader = load.get('_class')
         if load.get('_factory') or loader is None:
@@ -220,7 +215,7 @@ class Seed:
                 if self.should_ignore_file(fltr, file):
                     continue
                 if file.is_dir() and not directories:
-                    continue  # a sub-folder (e.g. No-Intro/Aftermarket): processed through its own action path
+                    continue  # sub-folders have their own action path
                 if not config.getboolean('COMMAND', 'Quiet', fallback=False):
                     self.delete_line(line)
                     line = f'Processing {Bcolors.OKCYAN}{file.name}{Bcolors.ENDC}'
