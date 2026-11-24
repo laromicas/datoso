@@ -43,7 +43,7 @@ all = [
     "datoso-seed-redump>=1.3.0",
     "datoso-seed-tdc>=1.3.0",
     "datoso-seed-translatedenglish>=1.3.0",
-    "datoso-seed-vpinmame>=1.0.2",
+    "datoso-seed-vpinmame>=1.3.0",
     ]
 fbneo = [ "datoso-seed-fbneo>=1.3.0" ]
 enhanced = [ "datoso-seed-enhanced>=1.3.0" ]
@@ -52,7 +52,7 @@ pleasuredome = [ "datoso-seed-pleasuredome>=1.3.0" ]
 redump = [ "datoso-seed-redump>=1.3.0" ]
 tdc = [ "datoso-seed-tdc>=1.3.0" ]
 translatedenglish = [ "datoso-seed-translatedenglish>=1.3.0" ]
-vpinmame = [ "datoso-seed-vpinmame>=1.0.2" ]
+vpinmame = [ "datoso-seed-vpinmame>=1.3.0" ]
 dev = [
     # code quality
     "ruff>=0.17.6",
