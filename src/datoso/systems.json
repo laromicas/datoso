@@ -2713,6 +2713,16 @@
         "system_type": "Handheld"
     },
     {
+        "company": null,
+        "system": "Timetop Gameking",
+        "override": {
+            "company": "Timetop",
+            "system": "GameKing",
+            "system_type": "Handheld"
+        },
+        "system_type": "Handheld"
+    },
+    {
         "company": "Tomy",
         "system": "Kiss-Site",
         "system_type": "Video"
