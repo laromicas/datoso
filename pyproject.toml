@@ -38,7 +38,7 @@ dynamic = ["version"]
 all = [
     "datoso-seed-fbneo>=1.0.3",
     "datoso-seed-enhanced>=1.1.0",
-    "datoso-seed-nointro>=1.1.1",
+    "datoso-seed-nointro>=1.3.0",
     "datoso-seed-pleasuredome>=1.1.1",
     "datoso-seed-redump>=1.0.1",
     "datoso-seed-tdc>=1.1.0",
@@ -47,7 +47,7 @@ all = [
     ]
 fbneo = [ "datoso-seed-fbneo>=1.0.3" ]
 enhanced = [ "datoso-seed-enhanced>=1.1.0" ]
-nointro = [ "datoso-seed-nointro>=1.1.1" ]
+nointro = [ "datoso-seed-nointro>=1.3.0" ]
 pleasuredome = [ "datoso-seed-pleasuredome>=1.1.1" ]
 redump = [ "datoso-seed-redump>=1.0.1" ]
 tdc = [ "datoso-seed-tdc>=1.1.0" ]
