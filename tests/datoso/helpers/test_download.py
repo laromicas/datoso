@@ -123,7 +123,7 @@ class TestUrllibDownload(unittest.TestCase):
         result = downloader_instance.download(url, destination_dir_str, filename_from_headers=True)
 
         self.assertEqual(result, mock_final_path_obj)
-        mock_urlretrieve.assert_called_once_with(url)
+        mock_urlretrieve.assert_called_once_with(url, reporthook=None)
         mock_shutil_move.assert_called_once_with("/tmp/tmpfile", mock_final_path_obj)
         mock_Path.assert_called_once_with(destination_dir_str)
         mock_dest_path_obj.__truediv__.assert_called_once_with("header_filename.dat")

@@ -102,6 +102,29 @@ class DatFile:
         """Get the suffix for the path."""
         return getattr(self, 'suffix', None)
 
+    def overrides(self) -> System:
+        """Override data for some systems."""
+        find_system = System(company=self.get_company(), system=self.get_system())
+        find_system.load()
+        if getattr(find_system, 'system_type', None):
+            self.system_type = find_system.system_type
+            if getattr(find_system, 'override', None):
+                self.__dict__.update({k: v for k, v in find_system.override.items() if v})
+        return find_system
+
+    def extra_configs(self, find_system: System) -> None:
+        """Extra configs for some systems."""
+        extra_configs = getattr(find_system, 'extra_configs', None)
+        if extra_configs:
+            if extra_configs.get('empty_suffix', None) and not self.suffix:
+                self.suffix = extra_configs['empty_suffix'].get(self.seed, None)
+            if extra_configs.get('additional_suffix', None):
+                self.suffix = str(Path(self.suffix) / extra_configs['additional_suffix'].get(self.seed, None))
+            if extra_configs.get('if_suffix', None):
+                for key, value in extra_configs['if_suffix'].items():
+                    if value and self.suffixes and key in self.suffixes:
+                        self.__dict__.update(value)
+
     def get_path(self) -> str:
         """Get the path for the dat file."""
         suffixes = self.get_suffix()
@@ -453,29 +476,6 @@ class XMLDatFile(DatFile):
         if not self.name:
             self.load()
         return self.name
-
-    def overrides(self) -> System:
-        """Override data for some systems."""
-        find_system = System(company=self.get_company(), system=self.get_system())
-        find_system.load()
-        if getattr(find_system, 'system_type', None):
-            self.system_type = find_system.system_type
-            if getattr(find_system, 'override', None):
-                self.__dict__.update({k: v for k, v in find_system.override.items() if v})
-        return find_system
-
-    def extra_configs(self, find_system: System) -> None:
-        """Extra configs for some systems."""
-        extra_configs = getattr(find_system, 'extra_configs', None)
-        if extra_configs:
-            if extra_configs.get('empty_suffix', None) and not self.suffix:
-                self.suffix = extra_configs['empty_suffix'].get(self.seed, None)
-            if extra_configs.get('additional_suffix', None):
-                self.suffix = str(Path(self.suffix) / extra_configs['additional_suffix'].get(self.seed, None))
-            if extra_configs.get('if_suffix', None):
-                for key, value in extra_configs['if_suffix'].items():
-                    if value and self.suffixes and key in self.suffixes:
-                        self.__dict__.update(value)
 
     def get_date(self) -> str:
         """Get the date from the dat file."""

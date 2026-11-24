@@ -2677,6 +2677,14 @@
         "system_type": "Arcade"
     },
     {
+        "company": null,
+        "system": "TeknoParrot Supplementary",
+        "override": {
+            "system": "TeknoParrot"
+        },
+        "system_type": "Arcade"
+    },
+    {
         "company": "Tangerine Computer Systems",
         "system": "Oric",
         "system_type": "Computer"
@@ -2700,6 +2708,16 @@
         "company": "Tiger",
         "system": "Gizmondo",
         "override": {
+            "system_type": "Handheld"
+        },
+        "system_type": "Handheld"
+    },
+    {
+        "company": null,
+        "system": "Timetop Gameking",
+        "override": {
+            "company": "Timetop",
+            "system": "GameKing",
             "system_type": "Handheld"
         },
         "system_type": "Handheld"
